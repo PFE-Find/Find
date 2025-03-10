@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+#logo_span {
+    background: linear-gradient(90deg, #085D3E 27%, #52B28A 92%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    font-size: 25px;
+
+}
+.logo{
+    border-radius: 10px; 
+}
+
+.links {
+    width: 80%;
+    justify-content: center;
+    gap: 15px;
+}
+
+#internet {
+    height: 30px;
+    width: 30px;
+}
