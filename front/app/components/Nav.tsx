@@ -20,7 +20,7 @@ export default function Navbar() {
     <nav className="bg-white border-gray-200 ">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 relative">
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <Image src="/assets/logo.jpeg" alt="Flowbite Logo" width={50} height={50} style={{ borderRadius: '15px' }} />
+          <Image src="/assets/logo.png" alt="Flowbite Logo" width={50} height={50} style={{ borderRadius: '15px' }} />
           <span id="logo_span" className=" self-center text-2xl font-semibold whitespace-nowrap dark:text-green">Find</span>
         </Link>
         {isLoggedIn ? (
@@ -31,7 +31,7 @@ export default function Navbar() {
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
               <span className="sr-only">Open user menu</span>
-              <img className="w-8 h-8 rounded-full" src="/assets/logo.jpeg" alt="user photo" width={32} height={32} />
+              <img className="w-16 h-16 rounded-full object-cover" src="/assets/wessim.png" alt="user photo" width={32} height={32} />
             </button>
             {dropdownOpen && (
               <div className="z-50 absolute right-0 mt-2 w-48 bg-white divide-y divide-gray-100 rounded-lg shadow-lg dark:bg-gray-700 dark:divide-gray-600 top-full">

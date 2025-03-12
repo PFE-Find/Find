@@ -119,7 +119,7 @@ export default function Home() {
         <div className="items-center py-6 px-4 mx-auto max-w-screen-xl xl:gap-16 md:grid md:grid-cols-2 ">
 
           <img
-            className="object-cover home_img "
+            className="object-cover home_img rounded-xl shadow-xl dark:bg-gray-800"
             src="/assets/home_1.jpeg"
             alt="dashboard image"
             

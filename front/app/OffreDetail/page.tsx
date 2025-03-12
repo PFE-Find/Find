@@ -4,6 +4,7 @@ import OffreImages  from "../components/OffreDetails/Images"
 import Detail  from "../components/OffreDetails/Detail"
 import Maps  from "../components/OffreDetails/Maps"
 import ChatBot from "../components/Chat/Chatbot";
+import Footer from "@/app/components/Footer";
 
 
 
@@ -17,6 +18,7 @@ export default function OffreDetail() {
         <Detail />
         <Maps />
         <ChatBot/>
+        <Footer/>
         </>
     );
 }
