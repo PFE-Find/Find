@@ -1,4 +1,4 @@
-import Page1 from "../components/FormComponents/Page1";
+import Page1 from "../components/FormComponents/Page12";
 
 
 export default function FormPages() {
