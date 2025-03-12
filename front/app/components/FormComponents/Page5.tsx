@@ -1,9 +1,12 @@
 'use client';
 
+import Link from "next/link";
+
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { useState } from 'react';
 import "../../globals.css";
+
 
 const propertyTypes = [
   { id: 1, name: "Terrain agricole", icon: "/assets/icons/terrain-a-vendre.png" },
@@ -14,7 +17,11 @@ const propertyTypes = [
 
 export default function Example() {
   const [progress, setProgress] = useState(15); 
-  const [selected, setSelected] = useState<number | null>(null); 
+  const [location, setLocation] = useState("Tunisia");
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocation(e.target.value);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -26,26 +33,27 @@ export default function Example() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex-col place-content-center container mx-auto ">
-        <h2 className="text-2xl font-semibold text-center mb-10">
-          Parmi les propositions suivantes, laquelle décrit le mieux votre bien ?
-        </h2>
+      <div className="flex-1 flex justify-center items-center px-10 py-8 container mx-auto ">
 
-        {/* Centering the Cards */}
-        <div className="md:grid-cols-4 gap-6 flex flex-row flex justify-center">
-          {propertyTypes.map((type) => (
-            <button
-              key={type.id}
-              onClick={() => setSelected(type.id)}
-              className={`flex flex-col items-center justify-center p-4 border rounded-lg transition duration-200 w-40 h-32 
-                ${selected === type.id ? "border-green-600 bg-green-100" : "border-gray-400 hover:bg-gray-100"}`}
-            >
-              <img src={type.icon} alt={type.name} className="w-12 h-12 mb-2" />
-              <span className="text-sm">{type.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 h-full ">
+          <div className="col-span-2 md:mt-0">
+          <p className="mb-3 mt-5  font-light text-gray-500 md:text-lg dark:text-gray-400">
+          Étape 2</p>            
+            <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-green-600">
+            Faites ressortir votre annonce            </h2>
+            <p className="mb-3 mt-5  font-light text-gray-500 md:text-lg dark:text-gray-400">
+            À cette étape, vous pourrez ajouter les équipements disponibles sur votre terrain ou dans votre matériel, ainsi qu'au moins 5 photos. Vous pourrez ensuite ajouter un titre et une description détaillée.            </p>
+            
+            
+          </div>
+          <img
+            className=" h-[400px] w-[600px] object-cover rounded-xl shadow-xl dark:bg-gray-800"
+            src="/assets/formulair1.png"
+            alt="dashboard image"
+            
+          />
+          </div>
+          </div>
 
       {/* Range Input for Progress */}
       <div className="w-full mt-6">
@@ -54,7 +62,7 @@ export default function Example() {
           min="0"
           max="100"
           value={progress}
-          className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+          className="w-full h-4 rounded-lg appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, rgb(163, 165, 168) ${progress}%, rgb(219, 222, 228) ${progress}%)`,
           }}

@@ -5,6 +5,7 @@ import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { useState } from 'react';
 import "../../globals.css";
 
+
 const propertyTypes = [
   { id: 1, name: "Terrain agricole", icon: "/assets/icons/terrain-a-vendre.png" },
   { id: 2, name: "Matériel agricole", icon: "/assets/icons/machine-a-grue.png" },
@@ -14,7 +15,11 @@ const propertyTypes = [
 
 export default function Example() {
   const [progress, setProgress] = useState(15); 
-  const [selected, setSelected] = useState<number | null>(null); 
+  const [location, setLocation] = useState("Tunisia");
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocation(e.target.value);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -27,25 +32,21 @@ export default function Example() {
 
       {/* Main Content */}
       <div className="flex-1 flex-col place-content-center container mx-auto ">
-        <h2 className="text-2xl font-semibold text-center mb-10">
-          Parmi les propositions suivantes, laquelle décrit le mieux votre bien ?
+        <h2 className="text-2xl font-semibold text-center mb-2">
+        Donnez les informations principales sur votre bien       </h2>
+        <h2 className="text-md  text-center mb-10 w-70">
+        Vous pourrez ajouter plus de détails plus tard, comme les équipements spécifiques.        
         </h2>
 
-        {/* Centering the Cards */}
-        <div className="md:grid-cols-4 gap-6 flex flex-row flex justify-center">
-          {propertyTypes.map((type) => (
-            <button
-              key={type.id}
-              onClick={() => setSelected(type.id)}
-              className={`flex flex-col items-center justify-center p-4 border rounded-lg transition duration-200 w-40 h-32 
-                ${selected === type.id ? "border-green-600 bg-green-100" : "border-gray-400 hover:bg-gray-100"}`}
-            >
-              <img src={type.icon} alt={type.name} className="w-12 h-12 mb-2" />
-              <span className="text-sm">{type.name}</span>
-            </button>
-          ))}
+         {/* Input Field for Location */}
+         <div className="flex justify-center items-center w-full">
+      
+        <form className="max-w-sm mx-auto">
+            <label className="block mb-5 text-3xl font-bold text-gray-900 dark:text-white">Superficie :</label>
+            <input type="number" id="number-input" aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="90210" required />
+        </form>
         </div>
-      </div>
+        </div>
 
       {/* Range Input for Progress */}
       <div className="w-full mt-6">
@@ -54,7 +55,7 @@ export default function Example() {
           min="0"
           max="100"
           value={progress}
-          className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+          className="w-full h-4 rounded-lg appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, rgb(163, 165, 168) ${progress}%, rgb(219, 222, 228) ${progress}%)`,
           }}

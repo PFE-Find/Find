@@ -5,6 +5,7 @@ import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { useState } from 'react';
 import "../../globals.css";
 
+
 const propertyTypes = [
   { id: 1, name: "Terrain agricole", icon: "/assets/icons/terrain-a-vendre.png" },
   { id: 2, name: "Matériel agricole", icon: "/assets/icons/machine-a-grue.png" },
@@ -14,7 +15,11 @@ const propertyTypes = [
 
 export default function Example() {
   const [progress, setProgress] = useState(15); 
-  const [selected, setSelected] = useState<number | null>(null); 
+  const [location, setLocation] = useState("Tunisia");
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocation(e.target.value);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -27,25 +32,37 @@ export default function Example() {
 
       {/* Main Content */}
       <div className="flex-1 flex-col place-content-center container mx-auto ">
-        <h2 className="text-2xl font-semibold text-center mb-10">
-          Parmi les propositions suivantes, laquelle décrit le mieux votre bien ?
+        <h2 className="text-2xl font-semibold text-center mb-2">
+        Où se situe votre bien ?        </h2>
+        <h2 className="text-md  text-center mb-10 w-70">
+        Votre adresse est uniquement partagée avec l'acheteur une fois la transaction confirmée.
         </h2>
 
-        {/* Centering the Cards */}
-        <div className="md:grid-cols-4 gap-6 flex flex-row flex justify-center">
-          {propertyTypes.map((type) => (
-            <button
-              key={type.id}
-              onClick={() => setSelected(type.id)}
-              className={`flex flex-col items-center justify-center p-4 border rounded-lg transition duration-200 w-40 h-32 
-                ${selected === type.id ? "border-green-600 bg-green-100" : "border-gray-400 hover:bg-gray-100"}`}
-            >
-              <img src={type.icon} alt={type.name} className="w-12 h-12 mb-2" />
-              <span className="text-sm">{type.name}</span>
-            </button>
-          ))}
-        </div>
+         {/* Input Field for Location */}
+         <div className="flex justify-center items-center w-full">
+      <input
+        type="text"
+        placeholder="Saisissez votre adresse ...."
+        value={location}
+        onChange={handleInputChange}
+        className="w-[500px] px-4 py-2 mb-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 outline-none"
+      /></div>
+        <div className="flex justify-center items-center w-full">
+        <iframe
+          className="rounded-lg shadow-lg"
+          width="500"
+          height="500"
+          frameBorder="0"
+          scrolling="no"
+          marginHeight={0}
+          marginWidth={0}
+          src={`https://maps.google.com/maps?width=100%25&height=600&hl=en&q=${encodeURIComponent(
+            location
+          )}&t=p&z=9&ie=UTF8&iwloc=B&output=embed`}
+        ></iframe>
       </div>
+            
+        </div>
 
       {/* Range Input for Progress */}
       <div className="w-full mt-6">

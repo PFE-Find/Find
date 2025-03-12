@@ -28,7 +28,7 @@ export default function Example() {
       {/* Main Content */}
       <div className="flex-1 flex-col place-content-center container mx-auto ">
         <h2 className="text-2xl font-semibold text-center mb-10">
-          Parmi les propositions suivantes, laquelle décrit le mieux votre bien ?
+        Passons maintenant à la description de votre bien
         </h2>
 
         {/* Centering the Cards */}

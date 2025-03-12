@@ -2,8 +2,12 @@
 
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
+import { useState } from 'react';
+import "../../globals.css";
 
 export default function Example() {
+  const [progress, setProgress] = useState(10); // Initial progress at 33% (Step 1)
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Top Section */}
@@ -56,9 +60,24 @@ export default function Example() {
           </div>
         </div>
       </div>
+       {/* Range Input for Progress */}
+       <div className="w-full mt-6">
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={progress}
+        className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+        style={{
+          background: `linear-gradient(to right, rgb(163, 165, 168) ${progress}%, rgb(219, 222, 228) ${progress}%)`,
+        }}
+        readOnly
+      />
+    </div>
+      
 
       {/* Footer */}
-      <div className="px-10 py-4 border-t flex justify-between items-center">
+      <div className="px-10 py-4 flex justify-between items-center">
         <a href="#" className="text-gray-600 underline hover:text-green-600">
           Retour
         </a>
