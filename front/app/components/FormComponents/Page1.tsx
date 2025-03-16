@@ -1,25 +1,17 @@
 'use client';
 
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid';
-import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { useState } from 'react';
-import "../../globals.css";
 
-export default function Example() {
-  const [progress, setProgress] = useState(10); // Initial progress at 33% (Step 1)
+export default function Page1() {
+  const [progress, setProgress] = useState(10); // Initial progress at 10%
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Top Section */}
-      <div className="p-4 m-5">
-        <button className="px-4 py-2 border rounded-lg text-green-600 border-green-600 hover:bg-green-100 float-right">
-          Quitter
-        </button>
-      </div>
+    <div className="flex flex-col bg-white">
+      
 
       {/* Main Content */}
-      <div className="flex-1 flex justify-center items-center px-10 py-8 container mx-auto ">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 h-full ">
+      <div className="flex-1 flex justify-center items-center px-10 py-8 container mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 h-full">
           {/* Left Column - Title */}
           <div className="flex flex-col justify-center">
             <h1 className="text-4xl md:text-5xl font-bold text-center md:text-left leading-tight">
@@ -28,9 +20,9 @@ export default function Example() {
           </div>
 
           {/* Right Column - Steps */}
-          <div className="space-y-8 ">
+          <div className="space-y-8 overflow-y-auto h-[600px]">
             {[1, 2, 3].map((step) => (
-              <div key={step} className="flex items-center  border-b-2 border-gray-500 p-5">
+              <div key={step} className="flex items-center border-b-2 border-gray-500 p-5">
                 <div className="flex-shrink-0 mr-6">
                   <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                     <span className="text-2xl font-bold text-green-600">{step}</span>
@@ -60,31 +52,8 @@ export default function Example() {
           </div>
         </div>
       </div>
-       {/* Range Input for Progress */}
-       <div className="w-full mt-6">
-      <input
-        type="range"
-        min="0"
-        max="100"
-        value={progress}
-        className="w-full h-2 rounded-lg appearance-none cursor-pointer"
-        style={{
-          background: `linear-gradient(to right, rgb(163, 165, 168) ${progress}%, rgb(219, 222, 228) ${progress}%)`,
-        }}
-        readOnly
-      />
-    </div>
-      
 
-      {/* Footer */}
-      <div className="px-10 py-4 flex justify-between items-center">
-        <a href="#" className="text-gray-600 underline hover:text-green-600">
-          Retour
-        </a>
-        <button className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200">
-          Commencer
-        </button>
-      </div>
+      
     </div>
   );
 }
