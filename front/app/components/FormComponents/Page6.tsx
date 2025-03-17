@@ -20,16 +20,11 @@ export default function Example() {
   const [selected, setSelected] = useState<number | null>(null);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white p-4 md:p-8">
-      {/* Top Section */}
-      <div className="flex justify-end">
-        <button className="px-4 py-2 border rounded-lg text-green-600 border-green-600 hover:bg-green-100">
-          Quitter
-        </button>
-      </div>
+    <div className="flex flex-col bg-white p-4 md:p-8 overflow-y-auto h-[590px]">
+      
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col space-y-10">
+      <div className="flex-1 flex flex-col ">
         {['Indiquez les équipements disponibles sur votre bien', 'Équipements de sécurité disponibles ?'].map((title, index) => (
           <div key={index} className="container mx-auto text-center">
             <h2 className="text-2xl font-semibold mb-3">{title}</h2>
@@ -52,31 +47,9 @@ export default function Example() {
           </div>
         ))}
       </div>
+      
 
-      {/* Range Input for Progress */}
-      <div className="w-full mt-6">
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={progress}
-          className="w-full h-2 rounded-lg appearance-none cursor-pointer"
-          style={{
-            background: `linear-gradient(to right, rgb(163, 165, 168) ${progress}%, rgb(219, 222, 228) ${progress}%)`,
-          }}
-          readOnly
-        />
-      </div>
-
-      {/* Footer */}
-      <div className="px-4 md:px-10 py-4 flex justify-between items-center">
-        <a href="#" className="text-gray-600 underline hover:text-green-600">
-          Retour
-        </a>
-        <button className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200">
-          Commencer
-        </button>
-      </div>
+      
     </div>
   );
 }
