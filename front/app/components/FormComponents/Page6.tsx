@@ -20,7 +20,7 @@ export default function Example() {
   const [selected, setSelected] = useState<number | null>(null);
 
   return (
-    <div className="flex flex-col bg-white p-4 md:p-8">
+    <div className="flex flex-col bg-white p-4 md:p-8 overflow-y-auto h-[590px]">
       
 
       {/* Main Content */}
@@ -47,6 +47,7 @@ export default function Example() {
           </div>
         ))}
       </div>
+      
 
       
     </div>

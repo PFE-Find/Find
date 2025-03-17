@@ -22,7 +22,7 @@ export default function Example() {
     };
 
     return (
-        <div className="flex flex-col  bg-white">
+        <div className="flex flex-col bg-white overflow-y-auto h-[590px]">
             
             {/* Main Content */}
             <div className="flex-1 flex justify-center items-center px-10 py-8 ">

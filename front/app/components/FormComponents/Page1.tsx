@@ -20,7 +20,7 @@ export default function Page1() {
           </div>
 
           {/* Right Column - Steps */}
-          <div className="space-y-8 overflow-y-auto h-[600px]">
+          <div className="space-y-8 overflow-y-auto h-[590px]">
             {[1, 2, 3].map((step) => (
               <div key={step} className="flex items-center border-b-2 border-gray-500 p-5">
                 <div className="flex-shrink-0 mr-6">
@@ -52,6 +52,7 @@ export default function Page1() {
           </div>
         </div>
       </div>
+      
 
       
     </div>

@@ -46,7 +46,7 @@ export default function Example() {
         <iframe
           className="rounded-lg shadow-lg"
           width="500"
-          height="500"
+          height="480"
           frameBorder="0"
           scrolling="no"
           marginHeight={0}
@@ -58,7 +58,7 @@ export default function Example() {
       </div>
             
         </div>
-
+        
       
     </div>
   );
