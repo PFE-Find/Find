@@ -30,11 +30,14 @@ type FormData = {
     localisation: string;
     équipements: string;
     defects: string;
-    ID_photo: string;
+    photos: string[];
+    propertyTypes: string;
+    position:[number,number];
 };
 
 const INITIAL_DATA: FormData = {
     titre: "",
+    propertyTypes: "",
     description: "",
     prix: "",
     idVendeur: "",
@@ -44,7 +47,8 @@ const INITIAL_DATA: FormData = {
     localisation: "",
     équipements: "",
     defects: "",
-    ID_photo: "",
+    photos: [],
+    position:[0,0]
 };
 
 export default function FormPages() {
@@ -53,23 +57,31 @@ export default function FormPages() {
 
     function updateFields(fields: Partial<FormData>) {
         setData(prev => ({ ...prev, ...fields }));
+        console.log(data);
+        
     }
-
+   
     const { steps, currentStepIndex, step, isFirstStep, isLastStep, back, next } =
         useMultistepForm([
-            <Page1 />,
-            <Page2 />,
-            <Page3 />,
-            <Page4 />,
-            <Page5 />,
-            <Page6 />,
-            <Page7 />,
-            <Page8 />,
-            <Page9 />,
-            <Page10 />,
-            <Page11 />,
-            <Page12 />,
+            <Page1 key="page1"  />,
+            <Page2 key="page2" data={data} updateFields={updateFields} />, //category
+            <Page3 key="page3" data={data} updateFields={updateFields} />, // map 
+            <Page4 key="page4" data={data} updateFields={updateFields} />, // prix
+            <Page5 key="page5" data={data} updateFields={updateFields} />, //pass
+            <Page6 key="page6" data={data} updateFields={updateFields} />,
+            <Page7 key="page7" data={data} updateFields={updateFields} />,//photos
+            <Page8 key="page8" data={data} updateFields={updateFields} />,//title
+            <Page9 key="page9" data={data} updateFields={updateFields} />,
+            <Page10 key="page10" data={data} updateFields={updateFields} />, // description
+            <Page11 key="page11" data={data} updateFields={updateFields} />,
+            <Page12 key="page12" data={data} updateFields={updateFields} />,
         ]);
+        function debug()
+        {
+            next() ; 
+            console.log(data);
+            
+        }
 
     // Calculate progress percentage based on step index
     const progress = (currentStepIndex / (steps.length - 1)) * 100;
@@ -78,8 +90,8 @@ export default function FormPages() {
         <div className="flex flex-col min-h-screen overflow-hidden">
             {/* Top Section */}
             <div className="p-4 m-5">
-                <button 
-                    className="px-4 py-2 border rounded-lg text-green-600 border-green-600 hover:bg-green-100 float-right" 
+                <button
+                    className="px-4 py-2 border rounded-lg text-green-600 border-green-600 hover:bg-green-100 float-right"
                     onClick={() => router.push("/")} // Updated navigation
                 >
                     Quitter
@@ -112,7 +124,7 @@ export default function FormPages() {
                     {!isFirstStep && "Retour"}
                 </button>
                 <button
-                    onClick={next}
+                    onClick={debug}
                     type="button"
                     className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200"
                 >
@@ -122,7 +134,7 @@ export default function FormPages() {
 
             {/* Progress Indicator */}
             <div className="absolute top-0 left-0 flex justify-center items-center m-10">
-                {currentStepIndex + 1} 
+                {currentStepIndex + 1}
             </div>
         </div>
     );

@@ -37,8 +37,7 @@ export default function Example() {
             Faites ressortir votre annonce            </h2>
             <p className="mb-3 mt-5  font-light text-gray-500 md:text-lg dark:text-gray-400">
             À cette étape, vous pourrez ajouter les équipements disponibles sur votre terrain ou dans votre matériel, ainsi qu'au moins 5 photos. Vous pourrez ensuite ajouter un titre et une description détaillée.            </p>
-            
-            
+          
           </div>
           <img
             className=" h-[400px] w-[600px] object-cover rounded-xl shadow-xl dark:bg-gray-800"

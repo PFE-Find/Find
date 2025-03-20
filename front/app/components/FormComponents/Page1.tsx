@@ -11,7 +11,7 @@ export default function Page1() {
 
       {/* Main Content */}
       <div className="flex-1 flex justify-center items-center px-10 py-8 container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 h-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-black h-full">
           {/* Left Column - Title */}
           <div className="flex flex-col justify-center">
             <h1 className="text-4xl md:text-5xl font-bold text-center md:text-left leading-tight">

@@ -5,13 +5,14 @@ import "../../globals.css";
 
 
 
-export default function Example() {
+export default function Example({data, updateFields}) {
     const [progress, setProgress] = useState(15);
     const [text, setText] = useState("");
 
     const handleChange =  (event: ChangeEvent<HTMLTextAreaElement>) => {
         if (event.target.value.length <= 32) {
             setText(event.target.value);
+            updateFields({...data , titre:event.target.value}); 
         }
     };
 

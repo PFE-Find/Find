@@ -43,6 +43,8 @@ export default function Navbar() {
                   <li><Link href="/" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Dashboard</Link></li>
                   <li><Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Settings</Link></li>
                   <li><Link href="/" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Earnings</Link></li>
+                  <li><Link href="/FormPages" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Add Offre</Link></li>
+
                   <li><Link href="/" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Sign out</Link></li>
                 </ul>
               </div>
@@ -78,7 +80,7 @@ export default function Navbar() {
             <li><Link href="/" className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-green-700">Home</Link></li>
             <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">About</Link></li>
             <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Pricing</Link></li>
-            <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Services</Link></li>
+            <li><Link href="/OffrePage" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Services</Link></li>
             <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Contact</Link></li>
           </ul>
         </div>
