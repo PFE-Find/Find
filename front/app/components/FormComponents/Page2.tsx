@@ -1,5 +1,6 @@
 'use client';
 
+import { log } from 'console';
 import { useState } from 'react';
 
 const propertyTypes = [
@@ -9,16 +10,26 @@ const propertyTypes = [
   { id: 4, name: "Terrain résidentiel", icon: "/assets/icons/broche-de-localisation.png" },
 ];
 
-export default function Example() {
+export default function Example({data, updateFields}) {
   const [progress, setProgress] = useState(15); // Initial progress at 15%
-  const [selected, setSelected] = useState<number | null>(null); // Selected property type
+  const [selected, setSelected] = useState<number | null>(null);
+  const [selected_name, setSelected_name] = useState<string | null>(null); // Selected property type
+   // Selected property type
+  function choose (name : string  ,  id: number)
+  {
+      setProgress(id); 
+      setSelected(id); 
+      setSelected_name(name);
+      updateFields({...data ,  propertyTypes : name }) ; 
+      
+  }
 
   return (
     <div className="flex flex-col bg-white overflow-hidden">
       
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col justify-center items-center px-4 mt-32">
+      <div className="flex-1 flex flex-col justify-center items-center px-4 mt-32 text-black">
         <h2 className="text-2xl font-semibold text-center mb-10">
           Parmi les propositions suivantes, laquelle décrit le mieux votre bien ?
         </h2>
@@ -28,7 +39,7 @@ export default function Example() {
           {propertyTypes.map((type) => (
             <button
               key={type.id}
-              onClick={() => setSelected(type.id)}
+              onClick={() => choose(type.name, type.id)}
               className={`flex flex-col items-center justify-center p-4 border rounded-lg transition duration-200 
                 ${selected === type.id ? "border-green-600 bg-green-100" : "border-gray-400 hover:bg-gray-100"}`}
             >

@@ -1,6 +1,6 @@
-"use client"; // Ensures this runs only in the browser
+'use client'; // Ensures this runs only in the browser
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import axios from "axios";
@@ -12,18 +12,28 @@ L.Icon.Default.mergeOptions({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
+
 export default function MapComponent({ position, setPosition }) {
+  // Check if position is valid, fallback to a default position if not
+  const [currentPosition, setCurrentPosition] = useState<[number, number]>(position || [51.505, -0.09]);
+
+  useEffect(() => {
+    // Update currentPosition if position is changed from parent
+    if (position) {
+      setCurrentPosition(position);
+    }
+  }, [position]);
+
   const ClickHandler = ({ setPosition }: { setPosition: (pos: [number, number]) => void }) => {
     useMapEvents({
       click(e) {
-        setPosition([e.latlng.lat, e.latlng.lng]);
-        console.log(position);
-         // Update state with clicked coordinates
+        const newPos: [number, number] = [e.latlng.lat, e.latlng.lng];
+        setPosition(newPos); // Update parent state with clicked coordinates
+        setCurrentPosition(newPos); // Update local state to reflect immediately on map
       },
     });
     return null;
   };
-
 
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,8 +52,9 @@ export default function MapComponent({ position, setPosition }) {
 
       if (response.data.length > 0) {
         const { lat, lon } = response.data[0]; // Get first result
-        setPosition([parseFloat(lat), parseFloat(lon)]);
-
+        const newPos: [number, number] = [parseFloat(lat), parseFloat(lon)];
+        setPosition(newPos);
+        setCurrentPosition(newPos); // Update local state for immediate map update
       } else {
         setError("Country not found. Try again!");
       }
@@ -78,14 +89,12 @@ export default function MapComponent({ position, setPosition }) {
 
       {/* Map */}
       <div className="w-full max-w-xl h-[400px] rounded-lg shadow-lg overflow-hidden">
-        <MapContainer center={position} zoom={6} style={{ height: "100%", width: "100%" }}>
+        <MapContainer center={currentPosition} zoom={6} style={{ height: "100%", width: "100%" }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
           <ClickHandler setPosition={setPosition} />
-          <Marker position={position} />
+          <Marker position={currentPosition} />
         </MapContainer>
       </div>
     </div>
   );
-
-
 }

@@ -2,14 +2,16 @@
 
 import { useState, ChangeEvent } from 'react';
 import "../../globals.css";
+import { Description } from '@headlessui/react';
 
-export default function Example() {
+export default function Example({data ,updateFields}) {
     const [progress, setProgress] = useState(15);
     const [text, setText] = useState("");
 
     const handleChange =  (event: ChangeEvent<HTMLTextAreaElement>) => {
         if (event.target.value.length <= 500) {
             setText(event.target.value);
+            updateFields({...data, description : event.target.value}); 
         }
     };
 
