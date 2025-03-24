@@ -10,7 +10,7 @@ const imageSchema = new mongoose.Schema({
     date: { 
         type: Date, 
         default: Date.now 
-    }});
+    }});    
 
 const Image = mongoose.model('Image', imageSchema);
 

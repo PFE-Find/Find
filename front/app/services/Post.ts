@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8880/events/";
+const API_URL = "http://127.0.0.1:3001/api/Posts";
 
 const eventService = {
   // Fetch all events
@@ -28,7 +28,7 @@ const eventService = {
   // Add a new event
   async addEvent(eventData: any) {
     try {
-      const response = await axios.post(`${API_URL}EventCreation/`, eventData);
+      const response = await axios.post(`${API_URL}/`, eventData);
       return response.data;
     } catch (error) {
       console.error("Error adding event:", error);

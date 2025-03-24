@@ -15,7 +15,7 @@ import Page9 from "../components/FormComponents/Page9";
 import Page10 from "../components/FormComponents/Page10";
 import Page11 from "../components/FormComponents/Page11";
 import Page12 from "../components/FormComponents/Page12";
-
+import eventService from "../services/Post";
 import { useState } from 'react';
 import { useMultistepForm } from "./useMultistepForm";
 
@@ -60,6 +60,14 @@ export default function FormPages() {
         console.log(data);
         
     }
+    async function submitFields() {
+        try {
+          await eventService.addEvent(data);
+          alert("Event added successfully!");
+        } catch (error) {
+          console.error("Error adding event:", error);
+        }
+      }
    
     const { steps, currentStepIndex, step, isFirstStep, isLastStep, back, next } =
         useMultistepForm([
@@ -123,13 +131,23 @@ export default function FormPages() {
                 <button onClick={back} className="text-gray-600 underline hover:text-green-600" type="button">
                     {!isFirstStep && "Retour"}
                 </button>
-                <button
+
+                
+
+              { !isLastStep ? <button
                     onClick={debug}
                     type="button"
                     className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200"
                 >
                     {isFirstStep ? "Commencer" : "Continuer"}
-                </button>
+                </button>  : 
+                <button
+                onClick={submitFields}
+                type="button"
+                className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200"
+            >
+              Submit  
+            </button>}
             </div>
 
             {/* Progress Indicator */}
