@@ -3,16 +3,18 @@ import mongoose from 'mongoose';
 const category =
 {
   Ferme : "Ferme" ,
-  Terrain_Agricole:"Terrain_Agricole",
-  Materiel_Agricole: "Materiel_Agricole",
-  Terrain_Residentiel:"Terrain_Residentiel"
+  Terrain_Agricole:"Terrain agricole",
+  Materiel_Agricole: "Matériel agricole",
+  Terrain_Residentiel:"Terrain résidentiel"
 }
 const post = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    titre: { type: String, required: true },
     description: { type: String, required: true },
-    price: { type: Number, required: true },
-    Category: { type: [String] ,  enum : category, required: true },
+    prix: { type: Number, required: true },
+    propertyTypes: { type: [String] ,  enum : category, required: true },
+    FavorieStatut:{type : String , default: "false" },
+    id_user:  {type : String , default : 1}
   },
   { timestamps: true }
 );

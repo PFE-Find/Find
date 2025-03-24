@@ -1,10 +1,24 @@
 import Item from '../models/Post.js';
-
+import Image from '../models/Image.js';
 export const createItem = async (req, res, next) => {
   try {
-    const newItem = new Item(req.body);
+    // Destructure photos from the request body
+    const { photos, ...postData } = req.body;
+    
+    // Create and save the post
+    const newItem = new Item(postData);
     await newItem.save();
-    res.status(201).json(newItem);
+
+    // If photos exist, create image documents for each one
+    if (photos && photos.length > 0) {
+      const imagesToInsert = photos.map((path) => ({
+        postId: newItem._id,
+        path,
+      }));
+      await Image.insertMany(imagesToInsert);
+    }
+    
+    res.status(201).json({ post: newItem, photos });
   } catch (error) {
     next(error);
   }
