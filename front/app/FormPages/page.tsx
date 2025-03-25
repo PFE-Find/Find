@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { useMultistepForm } from "./useMultistepForm";
 
 type FormData = {
+    type: [];
     titre: string;
     description: string;
     prix: string;
@@ -28,12 +29,13 @@ type FormData = {
     dateCreation: string;
     FavorieStatut: string;
     localisation: string;
-    équipements: string;
+    equipements: string;
     defects: string;
     ID_photo: string;
 };
 
 const INITIAL_DATA: FormData = {
+    type: [],
     titre: "",
     description: "",
     prix: "",
@@ -42,7 +44,7 @@ const INITIAL_DATA: FormData = {
     dateCreation: "",
     FavorieStatut: "",
     localisation: "",
-    équipements: "",
+    equipements: "",
     defects: "",
     ID_photo: "",
 };
@@ -58,7 +60,7 @@ export default function FormPages() {
     const { steps, currentStepIndex, step, isFirstStep, isLastStep, back, next } =
         useMultistepForm([
             <Page1 />,
-            <Page2 />,
+            <Page2 {...data} updateFields={updateFields}/>,
             <Page3 />,
             <Page4 />,
             <Page5 />,
@@ -71,7 +73,6 @@ export default function FormPages() {
             <Page12 />,
         ]);
 
-    // Calculate progress percentage based on step index
     const progress = (currentStepIndex / (steps.length - 1)) * 100;
 
     return (
@@ -80,7 +81,7 @@ export default function FormPages() {
             <div className="p-4 m-5">
                 <button 
                     className="px-4 py-2 border rounded-lg text-green-600 border-green-600 hover:bg-green-100 float-right" 
-                    onClick={() => router.push("/")} // Updated navigation
+                    onClick={() => router.push("/")} 
                 >
                     Quitter
                 </button>
