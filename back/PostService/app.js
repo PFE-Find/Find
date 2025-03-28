@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import itemRoutes from './routes/items.js';
 import cors from 'cors';
+import ReportRouter from './routes/Report.js';
+import CommentRouter from './routes/comment.js';
 const app = express();
 
 app.use(cors());
@@ -12,7 +14,8 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 // Use item routes for all paths starting with "/api/items"
 app.use('/api/Posts', itemRoutes);
-
+app.use('/api/Comments',CommentRouter); 
+app.use('/api/Reports',ReportRouter); 
 
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/PostsDB')

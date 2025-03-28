@@ -1,4 +1,4 @@
-import Comment from "../models/Commantaire"
+import Comment from "../models/Commantaire.js"
 
 
 

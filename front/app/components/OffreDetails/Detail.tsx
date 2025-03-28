@@ -1,20 +1,84 @@
 'use client';
 
+import { stat } from "fs";
 import { useState } from "react";
-
+import { Report } from "@/app/models/Report";
+import reportService from "@/app/services/Report";
+import { Comment } from "@/app/models/Comment";
+import CommentService from "@/app/services/Comment";
 export default function Detail() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [description, setDescription] = useState('');
+  const [comments, setComments] = useState('');
+  const UserId = "akram";
+  const PostId = "67db85c756ef98d8d00c6b43";
+
+
+
+
+
+  enum Status {
+    Pending = "pending",
+    Approved = "approved",
+    Rejected = "rejected",
+  }
+  async function submitReport(data: Report) {
+    try {
+      await reportService.addReport(data);
+      alert("Report added successfully!");
+    } catch (error) {
+      console.error("Error adding report:", error);
+    }
+  }
+  async function submitComment(params:Comment) {
+    try{
+      await CommentService.addComment(params); 
+      alert("comment submited succesfully"); 
+    }
+    catch(error)
+    {
+      console.log("Error Adding your comment! " + error);
+      
+    }
+    
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Report submitted:", { reportReason, description });
-    // Here you can integrate an API call or further processing.
+
+    const report: Report = {
+      text: description,
+      userId: UserId,
+      postId: PostId,
+      reason: reportReason,
+      status: Status.Pending,
+    };
+    console.log(report);
+    submitReport(report);
+
+
     setReportReason('');
     setDescription('');
     setIsModalOpen(false);
   };
+  const handleSubmitComment = (e) => {
+    e.preventDefault();
+    console.log("comment Added Successfully");
+    const comment: Comment = 
+    {
+      userId: UserId,
+      postId: PostId,
+      text:comments
+    }
+    console.log(comment);
+    
+    submitComment(comment); 
+
+    setComments(''); 
+  }
+
 
   return (
     <>
@@ -42,7 +106,7 @@ export default function Detail() {
                     Très bien noté par les voyageurs du pays suivant : <span className="text-black">Tunis</span>
                   </p>
                   <p className="text-sm text-gray-600">
-                    100 % des voyageurs de ce pays (Tunis) ont donné une évaluation globale de 
+                    100 % des voyageurs de ce pays (Tunis) ont donné une évaluation globale de
                     5 étoiles à ce logement au cours de l'année passée.
                   </p>
                 </div>
@@ -91,9 +155,9 @@ export default function Detail() {
           <hr className="border-gray-300" />
           <p className="mt-4 text-gray-700">
             Menzel Abderrahmane, située sur la rive nord du lac de Bizerte, est une ville qui allie traditions agricoles et développement industriel.
-            Historiquement, la région est connue pour ses activités agricoles, notamment l’exploitation de fermes familiales dédiées à la culture de diverses céréales, 
-            de légumes et à l’élevage. Ces dernières années, la ville a connu une transformation notable avec l’établissement du Technopôle Agroalimentaire de Bizerte 
-            (AGRO’TECH) sur une superficie de 45 hectares à Menzel Abderrahmane. Ce pôle se concentre sur la recherche, l’innovation, le développement technologique, 
+            Historiquement, la région est connue pour ses activités agricoles, notamment l’exploitation de fermes familiales dédiées à la culture de diverses céréales,
+            de légumes et à l’élevage. Ces dernières années, la ville a connu une transformation notable avec l’établissement du Technopôle Agroalimentaire de Bizerte
+            (AGRO’TECH) sur une superficie de 45 hectares à Menzel Abderrahmane. Ce pôle se concentre sur la recherche, l’innovation, le développement technologique,
             la formation...
           </p>
 
@@ -111,7 +175,80 @@ export default function Detail() {
             </div>
           </div>
         </div>
+
       </div>
+      {/* comments section   */}
+      <section className="bg-white dark:bg-gray-900 py-8 lg:py-16 antialiased">
+        <div className="max-w-2xl mx-auto px-4">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
+              Discussion (20)
+            </h2>
+          </div>
+          <form className="mb-6"  onSubmit={handleSubmitComment}>
+            <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+              <label htmlFor="comment" className="sr-only">
+                Your comment
+              </label>
+              <textarea
+                id="comment"
+                rows="6"
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
+                className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
+                placeholder="Write a comment..."
+                required
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+             
+              className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800"
+            >
+              Post comment
+            </button>
+          </form>
+          {[{
+            name: "Michael Gough",
+            avatar: "https://flowbite.com/docs/images/people/profile-picture-2.jpg",
+            date: "Feb. 8, 2022",
+            text: "Very straight-to-point article. Really worth time reading. Thank you! But tools are just the instruments for the UX designers. The knowledge of the design tools are as important as the creation of the design strategy."
+          }, {
+            name: "Jese Leos",
+            avatar: "https://flowbite.com/docs/images/people/profile-picture-5.jpg",
+            date: "Feb. 12, 2022",
+            text: "Much appreciated! Glad you liked it ☺️"
+          }, {
+            name: "Bonnie Green",
+            avatar: "https://flowbite.com/docs/images/people/profile-picture-3.jpg",
+            date: "Mar. 12, 2022",
+            text: "The article covers the essentials, challenges, myths and stages the UX designer should consider while creating the design strategy."
+          }].map((comment, index) => (
+            <article key={index} className="p-6 text-base bg-white rounded-lg dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+              <footer className="flex justify-between items-center mb-2">
+                <div className="flex items-center">
+                  <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
+                    <img className="mr-2 w-6 h-6 rounded-full" src={comment.avatar} alt={comment.name} />
+                    {comment.name}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <time>{comment.date}</time>
+                  </p>
+                </div>
+              </footer>
+              <p className="text-gray-500 dark:text-gray-400">{comment.text}</p>
+              <div className="flex items-center mt-4 space-x-4">
+                <button type="button" className="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400 font-medium">
+                  <svg className="mr-1.5 w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z" />
+                  </svg>
+                  Reply
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
 
       {/* Report Modal */}
       {isModalOpen && (
@@ -190,6 +327,7 @@ export default function Detail() {
               </form>
             </div>
           </div>
+
         </div>
       )}
     </>

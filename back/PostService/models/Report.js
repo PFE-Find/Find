@@ -1,13 +1,27 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+
+
+const Reasons = {
+    "spam": "spam",
+    "offensive content": "offensive content",
+    "misinformation": "misinformation",
+    "harassment": "harassment",
+    "inappropriate language": "inappropriate language",
+    "other": "other"
+}
+const Status = {
+    "pending" :  "pending" , 
+    "reviewed": "reviewed",
+    "approved" :  "approved"
+}
 
 const ReportSchema = new mongoose.Schema({
     postId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Post',
+        type: String,
+       
         required: true
     },
-    path: { type: String, required: true },
-    reportId: {
+    userId: {
         type: String,
         required: true
     },
@@ -16,19 +30,18 @@ const ReportSchema = new mongoose.Schema({
         required: true,
     },
     reason: {
-        type: DataTypes.ENUM(
-            'spam',
-            'offensive content',
-            'misinformation',
-            'harassment',
-            'inappropriate language', 
-            'other'
-        ),
-        required : true 
+        type: [String], 
+        enum: Reasons,
+        required: true
     },
     status: {
-        type: DataTypes.ENUM('pending', 'reviewed', 'resolved'),
-        default: 'pending '
+        type:[String],
+        enum:Status,
+        default: "pending"
+    },
+    userId: {
+        type: String,
+        required: true
     },
     date: {
         type: Date,
@@ -36,6 +49,6 @@ const ReportSchema = new mongoose.Schema({
     }
 });
 
-const Report = mongoose.model('Report', ReportSchema);
+const Report = mongoose.model("Report", ReportSchema);
 
 export default Report;
