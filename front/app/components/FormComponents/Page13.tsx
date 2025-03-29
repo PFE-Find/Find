@@ -21,6 +21,7 @@ export default function Page13({ data, updateFields }) {
             <div className="flex space-x-2">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
                     <button
+                    
                         key={value}
                         onClick={() => handleClick(value)}
                         className={`px-6 py-4 rounded-md ${rating === value ? "bg-green-500 text-white" : "bg-gray-200"}`}
