@@ -9,7 +9,10 @@ const filteredOffers = [
 
 ];
 
-export default function Example() {
+export default function Example({ data, updateFields })  {
+    const savedImages = JSON.parse(localStorage.getItem('uploadedPhotos') || '[]'); // Parse saved images
+    const firstImage = savedImages.length > 0 ? savedImages[0] : filteredOffers[0].image; // Use first uploaded image or default
+
     const [progress, setProgress] = useState(15);
     const [favorites, setFavorites] = useState<{ [key: number]: boolean }>({});
     const index = 0; // Static index for now, you can make it dynamic
@@ -22,7 +25,7 @@ export default function Example() {
     };
 
     return (
-        <div className="flex flex-col bg-white overflow-y-auto h-[590px]">
+        <div className="flex flex-col bg-white overflow-y-auto h-[660px]">
             
             {/* Main Content */}
             <div className="flex-1 flex justify-center items-center px-10 py-8 ">
@@ -35,34 +38,33 @@ export default function Example() {
                             Enfin, choisissez les conditions de vente, définissez votre prix et mettez votre annonce en ligne.
                         </p>
                     </div>
-                    <div className='flex flex-row'>
+                    <div className='flex flex-row w-[1200px]'>
 
                         <div className="basis-1/3">
-                            {filteredOffers.length > 0 ? (
+                            
                                 <div className="shadow-xl relative bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700 p-4">
                                     <a href="#">
-                                        <img className="shadow-xl rounded-xl w-full h-80 object-cover" src={filteredOffers[0].image} alt={filteredOffers[0].title} />
+                                        <img className="shadow-xl rounded-xl w-full h-80 object-cover" src={firstImage}
+                                            alt="Uploaded photo" />
                                     </a>
 
                                     {/* Title Badge */}
                                     <div className="shadow-xl w-36 absolute top-5 left-5 bg-white text-gray-900 dark:bg-gray-700 dark:text-white px-3 py-1 rounded-lg text-xs font-bold shadow overflow-hidden text-ellipsis whitespace-nowrap max-h-9">
-                                        {filteredOffers[0].title}
+                                        {data.titre}
                                     </div>
 
 
 
                                     {/* Offer Details */}
                                     <div className="mt-4">
-                                        <p className="text-sm text-gray-700 dark:text-gray-400">{filteredOffers[0].size}</p>
-                                        <p className="text-sm text-gray-700 dark:text-gray-400">{filteredOffers[0].type}</p>
+                                        <p className="text-sm text-gray-700 dark:text-gray-400">{data.Superficie}{data.unit}</p>
+                                        <p className="text-sm text-gray-700 dark:text-gray-400">{data.propertyType}</p>
                                         <a href="#">
-                                            <h5 className="mt-2 text-sm font-bold text-gray-900 dark:text-white">{filteredOffers[0].price}</h5>
+                                            <h5 className="mt-2 text-sm font-bold text-gray-900 dark:text-white">{data.price} DT</h5>
                                         </a>
                                     </div>
                                 </div>
-                            ) : (
-                                <p className="text-gray-500">Aucune offre disponible.</p>
-                            )}
+                            
 
 
                         </div>
@@ -102,13 +104,10 @@ export default function Example() {
                                     {/* Step 3 */}
                                     <div className="">
                                         <h3 className="text-md font-semibold text-gray-900 mb-2">
-                                            Ajustez vos paramètres
+                                            votre description
                                         </h3>
                                         <p className="text-gray-600">
-                                            Personnalisez les conditions de vente en fonction de vos besoins. Fixez les modalités de paiement,
-                                            ajoutez des options de négociation et précisez les garanties offertes. Pensez également à indiquer
-                                            les restrictions légales, les frais supplémentaires éventuels et toute information importante pour
-                                            les futurs acquéreurs.
+                                        {data.description}
                                         </p>
                                     </div>
                                 </div>

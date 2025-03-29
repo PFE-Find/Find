@@ -7,7 +7,7 @@ import "../../globals.css";
 
 import dynamic from 'next/dynamic';
 
-const MapComponent = dynamic(() => import('../MapComponent'), {
+const MapComponent = dynamic(() => import('../MapComponent1'), {
   ssr: false, // Disable SSR for this component
 });
 
@@ -23,9 +23,8 @@ export default function Example({data , updateFields}) {
   };
 
   return (
-    <div className="flex flex-col bg-white">
-
-
+    <div>
+    <div className="flex flex-col bg-white overflow-y-auto h-[660px]">
       {/* Main Content */}
       <div className="flex-1 flex-col place-content-center container mx-auto text-black ">
         <h2 className="text-2xl font-semibold text-center mb-2">
@@ -38,12 +37,14 @@ export default function Example({data , updateFields}) {
 
         <div className="flex justify-center items-center w-full">
 
-          <MapComponent position={position} setPosition = {handlePositionChange} />
+        <MapComponent position={position} setPosition={handlePositionChange} />
+
         </div>
 
       </div>
 
 
+    </div>
     </div>
   );
 }

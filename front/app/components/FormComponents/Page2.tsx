@@ -1,33 +1,49 @@
 'use client';
 
-import { log } from 'console';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const propertyTypes = [
-  { id: 1, name: "Terrain agricole", icon: "/assets/icons/terrain-a-vendre.png" },
-  { id: 2, name: "Matériel agricole", icon: "/assets/icons/machine-a-grue.png" },
-  { id: 3, name: "Ferme", icon: "/assets/icons/field.png" },
-  { id: 4, name: "Terrain résidentiel", icon: "/assets/icons/broche-de-localisation.png" },
-];
 
-export default function Example({data, updateFields}) {
-  const [progress, setProgress] = useState(15); // Initial progress at 15%
+
+type FormData = {
+  propertyType: string;
+};
+
+type UserFormProps = FormData & {
+  updateFields: (fields: Partial<FormData>) => void;
+};
+
+// Inside the Example component
+export default function Example({
+  propertyType,
+  updateFields,
+}: UserFormProps) {
   const [selected, setSelected] = useState<number | null>(null);
-  const [selected_name, setSelected_name] = useState<string | null>(null); // Selected property type
-   // Selected property type
-  function choose (name : string  ,  id: number)
-  {
-      setProgress(id); 
-      setSelected(id); 
-      setSelected_name(name);
-      updateFields({...data ,  propertyTypes : name }) ; 
-      
+
+  // Use the propertyType passed from the parent to highlight the selected button
+  const propertyTypes = [
+    { id: 1, name: "Terrain agricole", icon: "/assets/icons/terrain-a-vendre.png" },
+    { id: 2, name: "Matériel agricole", icon: "/assets/icons/machine-a-grue.png" },
+    { id: 3, name: "Ferme", icon: "/assets/icons/field.png" },
+    { id: 4, name: "Terrain résidentiel", icon: "/assets/icons/broche-de-localisation.png" },
+  ];
+
+  // Set the initial selected state based on the propertyType
+  useEffect(() => {
+    if (propertyType) {
+      const selectedProperty = propertyTypes.find((type) => type.name === propertyType);
+      if (selectedProperty) {
+        setSelected(selectedProperty.id);
+      }
+    }
+  }, [propertyType]);
+
+  function choose(name: string, id: number) {
+    setSelected(id);
+    updateFields({ propertyType: name }); // Update the parent component state
   }
 
   return (
     <div className="flex flex-col bg-white overflow-hidden">
-      
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col justify-center items-center px-4 mt-32 text-black">
         <h2 className="text-2xl font-semibold text-center mb-10">
@@ -49,9 +65,6 @@ export default function Example({data, updateFields}) {
           ))}
         </div>
       </div>
-      
-
-      
     </div>
   );
 }

@@ -12,37 +12,59 @@ const propertyTypes = [
   { id: 4, name: "Terrain résidentiel", icon: "/assets/icons/broche-de-localisation.png" },
 ];
 
-export default function Example() {
-  const [progress, setProgress] = useState(15); 
-  const [selected, setSelected] = useState<number | null>(null); 
+export default function Example({ data, updateFields }) {
+  const [price, setprice] = useState(data.price);
+  const [unit, setUnit] = useState(data.unit);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setprice(value);
+    updateFields({ ...data, price: value === "" ? null : parseFloat(value) });
+  };
+
+  const handleUnitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedUnit = e.target.value;
+    setUnit(selectedUnit);
+    updateFields({ ...data, unit: selectedUnit });
+  };
 
   return (
+
     <div className="flex flex-col bg-white">
-     
-
-      {/* Main Content */}
-      <div className="flex-1 flex-col place-content-center container mx-auto mt-32">
-        <h2 className="text-2xl font-semibold text-center mb-10">
-        Passons maintenant à la description de votre bien
-        </h2>
-
-        {/* Centering the Cards */}
-        <div className="md:grid-cols-4 gap-6 flex flex-row flex justify-center">
-          {propertyTypes.map((type) => (
-            <button
-              key={type.id}
-              onClick={() => setSelected(type.id)}
-              className={`flex flex-col items-center justify-center p-4 border rounded-lg transition duration-200 w-40 h-32 
-                ${selected === type.id ? "border-green-600 bg-green-100" : "border-gray-400 hover:bg-gray-100"}`}
-            >
-              <img src={type.icon} alt={type.name} className="w-12 h-12 mb-2" />
-              <span className="text-sm">{type.name}</span>
-            </button>
-          ))}
+      <div className="flex-1 flex justify-center items-center mt-32 text-black">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold mb-2">Le prix final du votre bien</h2>
+          <h2 className="text-md mb-10 text-black">
+            Vous y êtes presque ! Veuillez entrer le prix final de votre bien et revoir toutes les informations avant la soumission. Assurez-vous que tout est correct, car ces détails seront visibles par les acheteurs potentiels.
+          </h2>
+          {/* Centering the Cards */}
+          <div className="flex justify-center items-center w-full">
+            <form className="max-w-sm mx-auto">
+              <label className="block mb-2 text-xl font-bold text-gray-900 dark:text-white">Prix :</label>
+              <div className="flex space-x-2">
+                <input
+                  required
+                  type="number"
+                  id="number-input"
+                  value={price}
+                  onChange={handleInputChange}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  placeholder="000 000 000"
+                />
+                <select
+                  value={unit}
+                  onChange={handleUnitChange}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                >
+                  <option value="DT">DT</option>
+                  {/* <option value="ha">ha</option> */}
+                </select>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
 
-      
+      </div>
     </div>
   );
 }
