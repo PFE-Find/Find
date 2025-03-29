@@ -2,23 +2,19 @@
 
 import { useState, ChangeEvent } from 'react';
 import "../../globals.css";
-import { Description } from '@headlessui/react';
 
-export default function Example({data ,updateFields}) {
-    const [progress, setProgress] = useState(15);
-    const [text, setText] = useState("");
+export default function Example({ data, updateFields }) {
+    const [text, setText] = useState<string>(data.description || ""); // Initialize with description if available
 
-    const handleChange =  (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         if (event.target.value.length <= 500) {
             setText(event.target.value);
-            updateFields({...data, description : event.target.value}); 
+            updateFields({ ...data, description: event.target.value });
         }
     };
 
     return (
-        <div className="flex flex-col  bg-white">
-            
-
+        <div className="flex flex-col bg-white">
             {/* Main Content */}
             <div className="flex-1 flex-col place-content-center container mx-auto mt-32">
                 <h2 className="text-2xl font-semibold text-center mb-2">
@@ -40,8 +36,6 @@ export default function Example({data ,updateFields}) {
                     <p className="text-gray-500 text-sm mt-2">{text.length}/500 caractères</p>
                 </div>
             </div>
-
-            
         </div>
     );
 }
