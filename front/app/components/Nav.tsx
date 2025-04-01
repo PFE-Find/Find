@@ -18,9 +18,9 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white border-gray-200 ">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 relative">
+      <div className="max-w-screen-2xl flex flex-wrap items-center justify-between mx-auto p-4 relative">
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <Image src="/assets/logo.png" alt="Flowbite Logo" width={50} height={50} style={{ borderRadius: '15px' }} />
+          <Image src="/assets/logo.png" alt="Flowbite Logo" width={40} height={40} style={{ borderRadius: '15px' }} />
           <span id="logo_span" className=" self-center text-2xl font-semibold whitespace-nowrap dark:text-green">Find</span>
         </Link>
         {isLoggedIn ? (
@@ -31,7 +31,7 @@ export default function Navbar() {
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
               <span className="sr-only">Open user menu</span>
-              <img className="w-16 h-16 rounded-full object-cover" src="/assets/wessim.png" alt="user photo" width={32} height={32} />
+              <img className="w-14 h-14 rounded-full object-cover" src="/assets/wessim.png" alt="user photo" width={8} height={8} />
             </button>
             {dropdownOpen && (
               <div className="z-50 absolute right-0 mt-2 w-48 bg-white divide-y divide-gray-100 rounded-lg shadow-lg dark:bg-gray-700 dark:divide-gray-600 top-full">
@@ -40,10 +40,10 @@ export default function Navbar() {
                   <span className="block text-sm text-gray-500 truncate dark:text-gray-400">name@flowbite.com</span>
                 </div>
                 <ul className="py-2">
-                  <li><Link href="/" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Dashboard</Link></li>
-                  <li><Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Settings</Link></li>
-                  <li><Link href="/" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Earnings</Link></li>
-                  <li><Link href="/FormPages" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Add Offre</Link></li>
+                  <li><Link href="/" className="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Dashboard</Link></li>
+                  <li><Link href="/profile" className="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Settings</Link></li>
+                  <li><Link href="/" className="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Earnings</Link></li>
+                  <li><Link href="/FormPages" className="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Add Offre</Link></li>
 
                   <li><Link href="/" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Sign out</Link></li>
                 </ul>
@@ -76,7 +76,7 @@ export default function Navbar() {
           </div>
         )}
         <div className={`${menuOpen ? 'block' : 'hidden'} w-full md:flex md:w-auto md:order-1`}>
-          <ul className="flex flex-col md:flex-row font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 md:mt-0 md:border-0 md:bg-white ">
+          <ul className="flex flex-col  text-xl md:flex-row font-bold p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 md:mt-0 md:border-0 md:bg-white ">
             <li><Link href="/" className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-green-700">Home</Link></li>
             <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">About</Link></li>
             <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Pricing</Link></li>

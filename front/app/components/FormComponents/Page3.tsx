@@ -38,11 +38,8 @@ export default function Example({data , updateFields}) {
         <div className="flex justify-center items-center w-full">
 
         <MapComponent position={position} setPosition={handlePositionChange} />
-
         </div>
-
       </div>
-
 
     </div>
     </div>
