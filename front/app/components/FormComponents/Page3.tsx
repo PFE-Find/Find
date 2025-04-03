@@ -13,13 +13,12 @@ const MapComponent = dynamic(() => import('../MapComponent1'), {
 
 
 export default function Example({data , updateFields}) {
-  const [progress, setProgress] = useState(15);
-  const [location, setLocation] = useState("Tunisia");
-  const [position, setPosition] = useState<[number, number]>([36.8065, 10.1815]); // Default: Tunis
+  
+  const [localisation, setlocalisation] = useState<[number, number]>([36.8065, 10.1815]); // Default: Tunis
 
-  const handlePositionChange = (newPosition: [number, number]) => {
-    setPosition(newPosition);
-    updateFields({ ...data, position: newPosition }); // Update parent data
+  const handlelocalisationChange = (newlocalisation: [number, number]) => {
+    setlocalisation(newlocalisation);
+    updateFields({ ...data, localisation: newlocalisation }); // Update parent data
   };
 
   return (
@@ -37,7 +36,7 @@ export default function Example({data , updateFields}) {
 
         <div className="flex justify-center items-center w-full">
 
-        <MapComponent position={position} setPosition={handlePositionChange} />
+        <MapComponent position={localisation} setPosition={handlelocalisationChange} />
         </div>
       </div>
 

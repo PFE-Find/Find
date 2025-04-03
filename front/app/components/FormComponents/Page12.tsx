@@ -57,10 +57,10 @@ export default function Example({ data, updateFields })  {
 
                                     {/* Offer Details */}
                                     <div className="mt-4">
-                                        <p className="text-sm text-gray-700 dark:text-gray-400">{data.Superficie}{data.unit}</p>
+                                        <p className="text-sm text-gray-700 dark:text-gray-400">{data.Superficie} {data.unit}</p>
                                         <p className="text-sm text-gray-700 dark:text-gray-400">{data.propertyType}</p>
                                         <a href="#">
-                                            <h5 className="mt-2 text-sm font-bold text-gray-900 dark:text-white">{data.price} DT</h5>
+                                            <h5 className="mt-2 text-sm font-bold text-gray-900 dark:text-white">{data.prix} DT</h5>
                                         </a>
                                     </div>
                                 </div>

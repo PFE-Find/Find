@@ -8,20 +8,11 @@ import { useState } from 'react';
 import "../../globals.css";
 
 
-const propertyTypes = [
-  { id: 1, name: "Terrain agricole", icon: "/assets/icons/terrain-a-vendre.png" },
-  { id: 2, name: "Matériel agricole", icon: "/assets/icons/machine-a-grue.png" },
-  { id: 3, name: "Ferme", icon: "/assets/icons/field.png" },
-  { id: 4, name: "Terrain résidentiel", icon: "/assets/icons/broche-de-localisation.png" },
-];
+
 
 export default function Example() {
-  const [progress, setProgress] = useState(15); 
-  const [location, setLocation] = useState("Tunisia");
+  
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocation(e.target.value);
-  };
 
   return (
     <div className="flex flex-col bg-white">

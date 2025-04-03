@@ -1,24 +1,18 @@
 import mongoose from 'mongoose';
 
-const category =
-{
-  Ferme : "Ferme" ,
-  Terrain_Agricole:"Terrain agricole",
-  Materiel_Agricole: "Matériel agricole",
-  Terrain_Residentiel:"Terrain résidentiel"
-}
-const post = new mongoose.Schema(
+const postSchema = new mongoose.Schema(
   {
     titre: { type: String, required: true },
     description: { type: String, required: true },
     prix: { type: Number, required: true },
-    propertyTypes: { type: [String] ,  enum : category, required: true },
-    FavorieStatut:{type : String , default: "false" },
-    id_user:  {type : String , default : 1}
+    localisation: { type: [Number], required: true },
+    propertyType: { type: String, enum: ['Land', 'Material'], required: true },
+    id_user: { type: Number, default: 1 },
+    statut: { type: Boolean, default: false },
+    images: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Image' }] 
   },
-  { timestamps: true }
+  { timestamps: true, discriminatorKey: 'propertyType' }
 );
 
-
-const Item = mongoose.model('Post', post);
-export default Item;
+const Post = mongoose.model('Post', postSchema);
+export default Post;

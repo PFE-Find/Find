@@ -16,7 +16,7 @@ import Page10 from "../components/FormComponents/Page10";
 import Page11 from "../components/FormComponents/Page11";
 import Page12 from "../components/FormComponents/Page12";
 import Page13 from "../components/FormComponents/Page13";
-import eventService from "../services/Post";
+import eventService from "../services/Offres";
 
 const stepsLabels = [
     "Décrivez votre bien",
@@ -26,37 +26,32 @@ const stepsLabels = [
 type FormData = {
     titre: string;
     description: string;
-    price: string;
+    prix: string;
     Superficie: string;
     unit: string;
     idVendeur: string;
-    statut: string;
-    dateCreation: string;
-    FavorieStatut: string;
-    localisation: string;
+    localisation: [number, number];
     equipements: string[];
     etat: string;
     photos: string[];
     propertyType: string;
-    position: [number, number];
+    propertyId: number | null;
+
 };
 
 const INITIAL_DATA: FormData = {
     titre: "",
     Superficie: "",
-    unit:"",
+    unit: "",
     propertyType: "",
+    propertyId: 0,
     description: "",
-    price: "",
+    prix: "",
     idVendeur: "",
-    statut: "",
-    dateCreation: "",
-    FavorieStatut: "",
-    localisation: "",
+    localisation: [0, 0],
     equipements: [],
     etat: "",
     photos: [],
-    position: [0, 0]
 };
 
 
@@ -76,7 +71,7 @@ export default function FormPages() {
 
     async function submitFields() {
         try {
-            await eventService.addEvent(data);
+            await eventService.addOffre(data);
             alert("Event added successfully!");
         } catch (error) {
             console.error("Error adding event:", error);
@@ -92,9 +87,14 @@ export default function FormPages() {
 
     const { steps, currentStepIndex, step, isFirstStep, isLastStep, back, next } = useMultistepForm([
         <Page1 key="page1" />,
-        <Page2 key="page2" propertyType={data.propertyType} updateFields={updateFields} />,
+        <Page2
+            key="page2"
+            propertyType={data.propertyType}
+            propertyId={data.propertyId}
+            updateFields={updateFields}
+        />,
         <Page3 key="page3" data={data} updateFields={updateFields} />,
-        ...(data.propertyType !== "Matériel agricole" ? [
+        ...(data.propertyType !== "Material" ? [
             <Page4 key="page4" data={data} updateFields={updateFields} />
         ] : [
             <Page13 key="page13" data={data} updateFields={updateFields} />
@@ -118,10 +118,10 @@ export default function FormPages() {
         },
         3: (data) => {
             const errors = [];
-            if (data.propertyType !== "Matériel agricole" && !data.Superficie) {
+            if (data.propertyType !== "Material" && !data.Superficie) {
                 errors.push("Veuillez indiquer la superficie du votre bien.");
             }
-            else if(data.propertyType == "Matériel agricole" && !data.etat){
+            else if (data.propertyType == "Material" && !data.etat) {
                 errors.push("Veuillez indiquer l'etat du votre bien.");
             }
             return errors;
@@ -143,7 +143,7 @@ export default function FormPages() {
         },
         10: (data) => {
             const errors = [];
-            if (!data.price) errors.push("Veuillez indiquer le prix de vente ou de location.");
+            if (!data.prix) errors.push("Veuillez indiquer le prix de vente ou de location.");
             return errors;
         },
         // Add more validation rules for other steps as needed
