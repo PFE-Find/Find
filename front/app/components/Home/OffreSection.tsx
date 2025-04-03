@@ -5,6 +5,7 @@ import { Heart } from "lucide-react";
 import Link from "next/link";
 import eventService from "../../services/Offres"
 
+
 // Assuming you're fetching data from your backend endpoint
 const fetchOffresData = async () => {
   const response = await fetch("/api/items"); // Replace with your actual API endpoint
@@ -13,6 +14,7 @@ const fetchOffresData = async () => {
   }
   return response.json();
 };
+
 
 export default function Offres() {
   const [favorites, setFavorites] = useState<{ [key: number]: boolean }>({});
