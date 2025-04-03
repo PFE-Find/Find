@@ -11,6 +11,7 @@ import Offres from "@/app/components/Home/OffreSection";
 export default function Home() {
     const googleMapsApiKey = 'AIzaSyBwuWweetgIP1ZiyM-ttW0a6ARGdrkvij8';
     const [mapUrl, setMapUrl] = useState('https://www.google.com/maps/embed/v1/place?q=Bizerte,+Tunisie&key=' + googleMapsApiKey); // Default map URL
+    
 
     return (
         <div>
@@ -189,7 +190,7 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="p-4 container mx-auto rounded-2xl">
+                <div className="p-4 container mx-auto rounded-2xl mb-20">
                     <div style={{ width: "100%" }}>
                         <iframe
                             width="100%"

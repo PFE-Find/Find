@@ -2,44 +2,44 @@
 
 import { useEffect, useState } from 'react';
 
-
-
 type FormData = {
   propertyType: string;
+  propertyId: number | null;
 };
 
 type UserFormProps = FormData & {
   updateFields: (fields: Partial<FormData>) => void;
 };
 
-// Inside the Example component
 export default function Example({
   propertyType,
+  propertyId,
   updateFields,
 }: UserFormProps) {
-  const [selected, setSelected] = useState<number | null>(null);
+  const [selected, setSelected] = useState<number | null>(propertyId);
 
-  // Use the propertyType passed from the parent to highlight the selected button
   const propertyTypes = [
-    { id: 1, name: "Terrain agricole", icon: "/assets/icons/terrain-a-vendre.png" },
-    { id: 2, name: "Matériel agricole", icon: "/assets/icons/machine-a-grue.png" },
-    { id: 3, name: "Ferme", icon: "/assets/icons/field.png" },
-    { id: 4, name: "Terrain résidentiel", icon: "/assets/icons/broche-de-localisation.png" },
+    { id: 1, type: "Land", name: "Terrain agricole", icon: "/assets/icons/terrain-a-vendre.png" },
+    { id: 2, type: "Material", name: "Matériel agricole", icon: "/assets/icons/machine-a-grue.png" },
+    { id: 3, type: "Land", name: "Ferme", icon: "/assets/icons/field.png" },
+    { id: 4, type: "Land", name: "Terrain résidentiel", icon: "/assets/icons/broche-de-localisation.png" },
   ];
 
-  // Set the initial selected state based on the propertyType
+  // Set the initial selected state based on the propertyType and propertyId
   useEffect(() => {
-    if (propertyType) {
+    if (propertyId) {
+      setSelected(propertyId);
+    } else if (propertyType) {
       const selectedProperty = propertyTypes.find((type) => type.name === propertyType);
       if (selectedProperty) {
         setSelected(selectedProperty.id);
       }
     }
-  }, [propertyType]);
+  }, [propertyType, propertyId]);
 
-  function choose(name: string, id: number) {
+  function choose(type: string, id: number) {
     setSelected(id);
-    updateFields({ propertyType: name }); // Update the parent component state
+    updateFields({ propertyType: type, propertyId: id }); // Update parent component state
   }
 
   return (
@@ -55,7 +55,7 @@ export default function Example({
           {propertyTypes.map((type) => (
             <button
               key={type.id}
-              onClick={() => choose(type.name, type.id)}
+              onClick={() => choose(type.type, type.id)}
               className={`flex flex-col items-center justify-center p-4 border rounded-lg transition duration-200 
                 ${selected === type.id ? "border-green-600 bg-green-100" : "border-gray-400 hover:bg-gray-100"}`}
             >

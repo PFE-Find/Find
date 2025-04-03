@@ -1,19 +1,32 @@
 'use client';
 
 import { stat } from "fs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Report } from "@/app/models/Report";
 import reportService from "@/app/services/Report";
 import { Comment } from "@/app/models/Comment";
 import CommentService from "@/app/services/Comment";
-export default function Detail() {
+import { format } from 'date-fns';
+interface Offre {
+  offre: {
+    location: number[]; // The location is stored as an array [lat, lon]
+    createdAt: string;
+    prix: number;
+  };
+}
+
+export default function Detail({ offre }: Offre) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [description, setDescription] = useState('');
   const [comments, setComments] = useState('');
-  const UserId = "akram";
-  const PostId = "67db85c756ef98d8d00c6b43";
+  const [locationName, setLocationName] = useState('Fetching location...');
+  const UserId = 'akram';
+  const PostId = '67db85c756ef98d8d00c6b43';
 
+  // const [offre, setOffre] = useState(null);
+
+  console.log("Offre received:", offre);
 
 
 
@@ -23,6 +36,55 @@ export default function Detail() {
     Approved = "approved",
     Rejected = "rejected",
   }
+  // Reverse Geocoding to get location name or fallback to village name
+  const fetchLocationName = async () => {
+    try {
+      console.log('Offre location:', offre.location);
+
+      // Ensure the location array is valid
+      if (!Array.isArray(offre.location) || offre.location.length !== 2) {
+        console.error('Invalid location format:', offre.location);
+        setLocationName('Invalid location data');
+        return;
+      }
+
+      const [lat, lon] = offre.location; // Extract latitude and longitude
+      console.log('Latitude:', lat, 'Longitude:', lon);
+
+      // Fetch reverse geocoding data
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Reverse geocoding failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Reverse geocoding response:', data);
+
+      // Extract city, village, or fallback to "Unknown location"
+      setLocationName(
+        data.address?.city || data.address?.village || 'Unknown location'
+      );
+    } catch (error) {
+      console.error('Error fetching location name:', error);
+      setLocationName('Unknown location');
+    }
+  };
+
+  useEffect(() => {
+    fetchLocationName();
+  }, [offre]);
+
+  async function submitReport(data: Report) {
+    try {
+      await reportService.addReport(data);
+      alert('Report added successfully!');
+    } catch (error) {
+      console.error('Error adding report:', error);
+    }
+  }
   async function submitReport(data: Report) {
     try {
       await reportService.addReport(data);
@@ -31,18 +93,18 @@ export default function Detail() {
       console.error("Error adding report:", error);
     }
   }
-  async function submitComment(params:Comment) {
-    try{
-      await CommentService.addComment(params); 
-      alert("comment submited succesfully"); 
+  async function submitComment(params: Comment) {
+    try {
+      await CommentService.addComment(params);
+      alert("comment submited succesfully");
     }
-    catch(error)
-    {
+    catch (error) {
       console.log("Error Adding your comment! " + error);
-      
+
     }
-    
+
   }
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -66,18 +128,21 @@ export default function Detail() {
   const handleSubmitComment = (e) => {
     e.preventDefault();
     console.log("comment Added Successfully");
-    const comment: Comment = 
+    const comment: Comment =
     {
       userId: UserId,
       postId: PostId,
-      text:comments
+      text: comments
     }
     console.log(comment);
-    
-    submitComment(comment); 
 
-    setComments(''); 
+    submitComment(comment);
+
+    setComments('');
   }
+  
+  
+  
 
 
   return (
@@ -119,15 +184,17 @@ export default function Detail() {
             <div className="grid grid-cols-2 text-gray-700">
               <div className="border-b p-2">
                 <p className="text-sm font-semibold text-green-600">Date d'ajout</p>
-                <p className="text-sm">11/02/2025</p>
+                <p className="text-sm">
+                  {format(new Date(offre.createdAt), 'yyyy-MM-dd')}
+                </p>
               </div>
               <div className="border-b p-2">
                 <p className="text-sm font-semibold text-green-600">Lieu</p>
-                <p className="text-sm">Bizerte Menzel Abderrahmane</p>
+                <p className="text-sm">{locationName}</p>
               </div>
               <div className="p-2 col-span-2">
                 <p className="text-sm font-semibold text-green-600">Prix</p>
-                <p className="text-lg font-semibold">250000 DNT</p>
+                <p className="text-lg font-semibold">{offre.prix} DNT</p>
               </div>
             </div>
 
@@ -185,7 +252,7 @@ export default function Detail() {
               Discussion (20)
             </h2>
           </div>
-          <form className="mb-6"  onSubmit={handleSubmitComment}>
+          <form className="mb-6" onSubmit={handleSubmitComment}>
             <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
               <label htmlFor="comment" className="sr-only">
                 Your comment
@@ -202,7 +269,7 @@ export default function Detail() {
             </div>
             <button
               type="submit"
-             
+
               className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800"
             >
               Post comment

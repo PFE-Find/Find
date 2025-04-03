@@ -78,10 +78,17 @@ export default function Navbar() {
         <div className={`${menuOpen ? 'block' : 'hidden'} w-full md:flex md:w-auto md:order-1`}>
           <ul className="flex flex-col  text-xl md:flex-row font-bold p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 md:mt-0 md:border-0 md:bg-white ">
             <li><Link href="/" className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-green-700">Home</Link></li>
-            <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">About</Link></li>
+            <li><Link href="/OffrePage" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Tout Les Offres</Link></li>
             <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Pricing</Link></li>
             <li><Link href="/OffrePage" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Services</Link></li>
             <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Contact</Link></li>
+            <button
+            type="button"
+            onClick={() => router.push("/FormPages")}
+            className="text-white font-playfair font-dmserif font-bold transition ease-in-out delay-150 bg-green-300 hover:bg-green-500 focus:ring-4 focus:outline-none focus:ring-green-400 rounded-lg text-sm px-4 py-2 text-center hover:-translate-y-1 hover:scale-110 duration-300"
+        >
+            Create new
+        </button>
           </ul>
         </div>
       </div>

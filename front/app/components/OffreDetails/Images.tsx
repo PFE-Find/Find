@@ -1,17 +1,26 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
-export default function Images() {
-    const images = [
-        "/assets/photo.jpg",
-        "/assets/photo2.jpg",
-        "/assets/photo3.jpg",
-        "/assets/photo4.jpg",
-    ];
-    const [mainImage, setMainImage] = useState(images[0]);
+interface ImageObject {
+    path: string;
+}
+
+interface ImagesProps {
+    images: ImageObject[];
+    titre: string; // Added titre as a prop
+}
+
+export default function Images({ images, titre }: ImagesProps) {
+    console.log("Images:", images);
+
+    if (!images || images.length === 0) {
+        return <p>No images available</p>;
+    }
+
+    const [mainImage, setMainImage] = useState(images[0].path);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -25,10 +34,11 @@ export default function Images() {
 
     return (
         <div className="p-4">
-            <p className="container mx-auto text-3 xl text-gray-700 font-bold dark:text-gray-400 mt-5 mb-5">Magnifique farm  à bizerte Menzel  abd rahmen</p>
+            <p className="container mx-auto text-3xl text-gray-700 font-bold dark:text-gray-400 mt-5 mb-5">
+                {titre} {/* Dynamically using titre prop */}
+            </p>
             <div className="container mx-auto flex flex-wrap md:flex-nowrap gap-4">
                 {/* Main Image */}
-                
                 <div className="w-full md:w-2/3">
                     <img src={mainImage} alt="Main" className="w-full h-[592px] rounded-lg shadow-md object-cover" />
                 </div>
@@ -37,10 +47,10 @@ export default function Images() {
                     {images.slice(1, 4).map((img, index) => (
                         <div key={index} className="relative">
                             <img
-                                src={img}
+                                src={img.path}
                                 alt={`Thumbnail ${index}`}
                                 className="w-full h-48 object-cover rounded-md cursor-pointer opacity-75 hover:opacity-100 transition"
-                                onClick={() => setMainImage(img)}
+                                onClick={() => setMainImage(img.path)}
                             />
                             {/* Button over the last image */}
                             {index === images.slice(1, 4).length - 1 && (
@@ -55,8 +65,7 @@ export default function Images() {
                     ))}
                 </div>
             </div>
-            <p className="container mx-auto text-3 xl text-gray-700 font-bold dark:text-gray-400 mt-5 mb-5">Magnifique farm  à bizerte Menzel  abd rahmen</p>
-
+            
 
             {/* Modal */}
             <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -68,7 +77,7 @@ export default function Images() {
                         <button className="p-2" onClick={prevImage}>
                             <ChevronLeft className="w-8 h-8" />
                         </button>
-                        <img src={images[currentIndex]} alt="Modal" className="w-full h-[500px] object-cover rounded-md" />
+                        <img src={images[currentIndex].path} alt="Modal" className="w-full h-[500px] object-cover rounded-md" />
                         <button className="p-2" onClick={nextImage}>
                             <ChevronRight className="w-8 h-8" />
                         </button>

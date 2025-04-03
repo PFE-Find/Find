@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 // Use item routes for all paths starting with "/api/items"
 app.use('/api/Posts', itemRoutes);
+
 app.use('/api/Comments',CommentRouter); 
 app.use('/api/Reports',ReportRouter); 
 

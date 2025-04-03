@@ -13,13 +13,13 @@ const propertyTypes = [
 ];
 
 export default function Example({ data, updateFields }) {
-  const [price, setprice] = useState(data.price);
+  const [prix, setprix] = useState(data.prix);
   const [unit, setUnit] = useState(data.unit);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setprice(value);
-    updateFields({ ...data, price: value === "" ? null : parseFloat(value) });
+    setprix(value);
+    updateFields({ ...data, prix: value === "" ? null : parseFloat(value) });
   };
 
   const handleUnitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -46,7 +46,7 @@ export default function Example({ data, updateFields }) {
                   required
                   type="number"
                   id="number-input"
-                  value={price}
+                  value={prix}
                   onChange={handleInputChange}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                   placeholder="000 000 000"
