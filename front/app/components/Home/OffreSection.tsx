@@ -79,13 +79,13 @@ export default function Offres() {
               <div key={offre._id} className="relative w-[250px] flex-shrink-0">
                 <Link key={offre._id} href={`/OffreDetail/${offre._id}`} prefetch={false}>
                 <div className="shadow-xl bg-white border border-gray-200 rounded-xl dark:bg-gray-800 dark:border-gray-700 p-4">
-                  <a href="#">
+                  <Link href="/">
                     <img
                       className="rounded-xl w-full h-40 object-cover"
                       src={offre.images?.[0]?.path || "/default-image.jpg"} // Default image if none exists
                       alt={offre.titre}
                     />
-                  </a>
+                  </Link>
 
                   {/* Title Badge */}
                   <div className="absolute w-50 top-5 left-5 bg-white text-gray-900 dark:bg-gray-700 dark:text-white px-3 py-1 rounded-lg text-xs font-bold shadow">
@@ -101,11 +101,11 @@ export default function Offres() {
                     <p className="text-sm text-gray-700 dark:text-gray-400">
                       {offre.propertyType}
                     </p>
-                    <a href="#">
+                    <Link href="/">
                       <h5 className="mt-2 text-sm font-bold text-gray-900 dark:text-white">
                         {offre.prix} TND
                       </h5>
-                    </a>
+                    </Link>
                   </div>
 
                   {/* Favorite Button */}

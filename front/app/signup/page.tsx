@@ -1,11 +1,14 @@
 
 import Nav from "@/app/components/Nav"
-import SignIn from "@/app/components/SignIn"; 
 
+import SignUp from "../components/SignUp"
 
-export default function SignUp()
+export default function SignUpPage()
 {
     return (
-        <><Nav></Nav><SignIn></SignIn></>
+        <><Nav></Nav>
+          <SignUp></SignUp>
+        
+        </>
     )
 }

@@ -85,14 +85,7 @@ export default function Detail({ offre }: Offre) {
       console.error('Error adding report:', error);
     }
   }
-  async function submitReport(data: Report) {
-    try {
-      await reportService.addReport(data);
-      alert("Report added successfully!");
-    } catch (error) {
-      console.error("Error adding report:", error);
-    }
-  }
+
   async function submitComment(params: Comment) {
     try {
       await CommentService.addComment(params);
