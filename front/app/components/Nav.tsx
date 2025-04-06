@@ -6,6 +6,8 @@ import Image from 'next/image';
 import SignIn from "@/app/components/SignIn";
 import { Dialog } from '@material-tailwind/react';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
+
 
 
 export default function Navbar() {
@@ -45,7 +47,9 @@ export default function Navbar() {
                   <li><Link href="/" className="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Earnings</Link></li>
                   <li><Link href="/FormPages" className="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Add Offre</Link></li>
 
-                  <li><Link href="/" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Sign out</Link></li>
+                  <li><button onClick={() => {
+                    signOut();
+                  }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Sign out</button></li>
                 </ul>
               </div>
             )}
@@ -83,6 +87,7 @@ export default function Navbar() {
             <li><Link href="/OffrePage" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-teal-700 dark:text-black">Services</Link></li>
             <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-teal-700 dark:text-black">Contact</Link></li>
             <button
+
             type="button"
             onClick={() => router.push("/FormPages")}
             className="text-white font-playfair font-dmserif font-bold transition ease-in-out delay-150 bg-teal-500 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-400 rounded-lg text-sm px-4 py-2 text-center hover:-translate-y-1 hover:scale-110 duration-300"

@@ -97,12 +97,15 @@ export default function Offres() {
             {filteredOffers.map((offre) => (
               <div key={offre._id} className="relative w-[350px]  flex-shrink-0 ">
                 <Link key={offre._id} href={`/OffreDetail/${offre._id}`} prefetch={false}>
+
                   <div className="shadow-lg h-[350px] bg-white border border-gray-200  dark:bg-gray-800 dark:border-gray-700 p-4 hover:bg-gray-100 transition">
+
                     <img
                       className="rounded-xl w-full h-52 object-cover"
                       src={offre.images?.[0]?.path || "/default-image.jpg"} // Default image if none exists
                       alt={offre.titre}
                     />
+
 
                     {/* Title Badge */}
                     <div className="absolute w-50 top-5 left-5 bg-white text-gray-900 dark:bg-gray-700 dark:text-white px-3 py-1 rounded-lg text-xs font-bold shadow">
