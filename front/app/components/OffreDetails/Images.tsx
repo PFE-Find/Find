@@ -33,7 +33,7 @@ export default function Images({ images, titre }: ImagesProps) {
     };
 
     return (
-        <div className="p-4">
+        <div className="p-4 ">
             <p className="container mx-auto text-3xl text-gray-700 font-bold dark:text-gray-400 mt-5 mb-5">
                 {titre} {/* Dynamically using titre prop */}
             </p>

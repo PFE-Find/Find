@@ -37,7 +37,9 @@ export default function OffreDetail() {
     return (
         <>
             <Navbar />
+            
             <Search />
+            {/* <div className="overflow-y-auto h-[1200px]"> */}
             {offre ? (
                 <>
                     <OffreImages images={offre.images} titre={offre.titre} />
@@ -50,6 +52,7 @@ export default function OffreDetail() {
             
             <ChatBot />
             <Footer />
+            {/* </div> */}
         </>
     );
 }

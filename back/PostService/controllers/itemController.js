@@ -62,6 +62,66 @@ export const getItems = async (req, res, next) => {
     next(err);
   }
 };
+export const getItems1 = async (req, res, next) => {
+  try {
+    const items = await Post.find({ statut: true })// Only fetch posts with statut = 0
+      .populate({
+        path: 'images', // This will populate the 'images' field with Image documents
+        select: 'path date', // Only select the 'path' and 'date' fields from the Image model
+      })
+      .exec();
+
+    const allItems = items.map((post) => ({
+      ...post.toObject(),
+      images: post.images || [], // Ensure images are included even if none are found
+    }));
+
+    res.json(allItems);
+  } catch (err) {
+    next(err);
+  }
+};
+export const getItems2 = async (req, res, next) => {
+  try {
+    const items = await Post.find({ statut: false })// Only fetch posts with statut = 0
+      .populate({
+        path: 'images', // This will populate the 'images' field with Image documents
+        select: 'path date', // Only select the 'path' and 'date' fields from the Image model
+      })
+      .exec();
+
+    const allItems = items.map((post) => ({
+      ...post.toObject(),
+      images: post.images || [], // Ensure images are included even if none are found
+    }));
+
+    res.json(allItems);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateOffreStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // You can add validation for status if needed
+    const updatedPost = await Post.findByIdAndUpdate(
+      id,
+      { statut: true }, // set statut to 1
+      { new: true } // return the updated document
+    );
+
+    if (!updatedPost) {
+      return res.status(404).json({ message: "Offre not found." });
+    }
+
+    res.status(200).json(updatedPost);
+  } catch (err) {
+    next(err);
+  }
+};
+
 
 
 

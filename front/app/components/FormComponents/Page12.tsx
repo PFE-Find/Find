@@ -9,7 +9,7 @@ const filteredOffers = [
 
 ];
 
-export default function Example({ data, updateFields })  {
+export default function Example({ data, updateFields }) {
     const savedImages = JSON.parse(localStorage.getItem('uploadedPhotos') || '[]'); // Parse saved images
     const firstImage = savedImages.length > 0 ? savedImages[0] : filteredOffers[0].image; // Use first uploaded image or default
 
@@ -26,7 +26,7 @@ export default function Example({ data, updateFields })  {
 
     return (
         <div className="flex flex-col bg-white overflow-y-auto h-[660px]">
-            
+
             {/* Main Content */}
             <div className="flex-1 flex justify-center items-center px-10 py-8 ">
                 <div className="grid grid-flow-row grid-cols-1 gap-4 h-full">
@@ -41,30 +41,35 @@ export default function Example({ data, updateFields })  {
                     <div className='flex flex-row w-[1200px]'>
 
                         <div className="basis-1/3">
-                            
-                                <div className="shadow-xl relative bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700 p-4">
-                                    <a href="#">
-                                        <img className="shadow-xl rounded-xl w-full h-80 object-cover" src={firstImage}
-                                            alt="Uploaded photo" />
-                                    </a>
 
-                                    {/* Title Badge */}
-                                    <div className="shadow-xl w-36 absolute top-5 left-5 bg-white text-gray-900 dark:bg-gray-700 dark:text-white px-3 py-1 rounded-lg text-xs font-bold shadow overflow-hidden text-ellipsis whitespace-nowrap max-h-9">
-                                        {data.titre}
-                                    </div>
+                            <div className="shadow-xl relative bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700 p-4">
+                                <a href="#">
+                                    <img className="shadow-xl rounded-xl w-full h-80 object-cover" src={firstImage}
+                                        alt="Uploaded photo" />
+                                </a>
 
-
-
-                                    {/* Offer Details */}
-                                    <div className="mt-4">
-                                        <p className="text-sm text-gray-700 dark:text-gray-400">{data.Superficie} {data.unit}</p>
-                                        <p className="text-sm text-gray-700 dark:text-gray-400">{data.propertyType}</p>
-                                        <a href="#">
-                                            <h5 className="mt-2 text-sm font-bold text-gray-900 dark:text-white">{data.prix} DT</h5>
-                                        </a>
-                                    </div>
+                                {/* Title Badge */}
+                                <div className="shadow-xl w-36 absolute top-5 left-5 bg-white text-gray-900 dark:bg-gray-700 dark:text-white px-3 py-1 rounded-lg text-xs font-bold shadow overflow-hidden text-ellipsis whitespace-nowrap max-h-9">
+                                    {data.titre}
                                 </div>
-                            
+
+
+
+                                {/* Offer Details */}
+                                <div className="mt-4">
+                                    <p className="text-sm text-gray-700 dark:text-gray-400">{data.Superficie} {data.unit}</p>
+                                    {data.etat && data.etat !== 0 && (
+                                        <p className="text-sm text-gray-700 dark:text-gray-400">
+                                            {data.etat}/10 Etat
+                                        </p>
+                                    )}
+                                    <p className="text-sm text-gray-700 dark:text-gray-400">{data.propertyType}</p>
+                                    <a href="#">
+                                        <h5 className="mt-2 text-sm font-bold text-gray-900 dark:text-white">{data.prix} DT</h5>
+                                    </a>
+                                </div>
+                            </div>
+
 
 
                         </div>
@@ -107,7 +112,7 @@ export default function Example({ data, updateFields })  {
                                             votre description
                                         </h3>
                                         <p className="text-gray-600">
-                                        {data.description}
+                                            {data.description}
                                         </p>
                                     </div>
                                 </div>
@@ -117,8 +122,8 @@ export default function Example({ data, updateFields })  {
                 </div>
             </div>
 
-            
-            
+
+
         </div >
     );
 }

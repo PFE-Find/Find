@@ -10,9 +10,12 @@ export default function OffrePage() {
     return (
         <>
         <Navbar/>
+        <div className="">
         {/* <Search /> */}
         <Offre />
+        
         <ChatBot/>
+        </div>
         </>
     );
 }
