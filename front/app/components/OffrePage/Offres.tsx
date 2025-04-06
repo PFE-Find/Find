@@ -20,7 +20,7 @@ export default function Offres() {
     useEffect(() => {
         async function fetchOffres() {
             try {
-                const data = await eventService.getOffres();
+                const data = await eventService.getOffres1();
                 setOffres(data);
                 console.log("Fetched offres:", data);
             } catch (error) {
@@ -48,10 +48,10 @@ export default function Offres() {
 
     return (
         <div>
-            <div className="flex flex-col divide-y-4 divide-y-reverse divide-gray-200">
+            <div className="flex flex-col divide-y-4 divide-y-reverse divide-gray-200  ">
                 <div>
                     <form
-                        className="max-w-md mx-auto shadow-xl rounded-3xl mt-20"
+                        className="max-w-md mx-auto shadow-xl rounded-3xl mt-20 "
                         onSubmit={(e) => e.preventDefault()}
                     >
                         <label className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">
@@ -94,7 +94,7 @@ export default function Offres() {
                 <div className="mt-20 "></div>
             </div>
             {/* Category Selection */}
-            <div className="flex justify-center items-center mt-5 mb-5 space-x-4">
+            <div className="flex justify-center items-center mt-5 mb-5 space-x-4 ">
                 <a
                     href="#"
                     onClick={() => setSelectedCategory("Land")}
@@ -147,7 +147,7 @@ export default function Offres() {
             {rows.slice(0, visibleCount).map((row, rowIndex) => (
                 <div
                     key={rowIndex}
-                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-4"
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-4 "
                 >
                     {row.map((offre) => (
                         <Link

@@ -13,6 +13,26 @@ const Offres = {
       throw error;
     }
   },
+  // Fetch all offres with statue true
+  async getOffres1() {
+    try {
+      const response = await axios.get(`${API_URL}GetAll1`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching offres:", error);
+      throw error;
+    }
+  },
+  // Fetch all offres with statue false
+  async getOffres2() {
+    try {
+      const response = await axios.get(`${API_URL}GetAll2`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching offres:", error);
+      throw error;
+    }
+  },
 
   // Fetch a single offre by ID
   async getOffre(id: string) {
@@ -56,6 +76,10 @@ const Offres = {
       console.error("Error updating offre:", error);
       throw error;
     }
+  },
+  updateStatut: async (id: string) => {
+    const response = await axios.patch(`${API_URL}${id}`);
+    return response.data;
   },
 
   // Get total number of offres

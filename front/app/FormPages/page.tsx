@@ -17,6 +17,7 @@ import Page11 from "../components/FormComponents/Page11";
 import Page12 from "../components/FormComponents/Page12";
 import Page13 from "../components/FormComponents/Page13";
 import eventService from "../services/Offres";
+import Swal from "sweetalert2";
 
 const stepsLabels = [
     "Décrivez votre bien",
@@ -59,8 +60,21 @@ export default function FormPages() {
     const router = useRouter();
     const [data, setData] = useState(INITIAL_DATA);
     const [errors, setErrors] = useState<string[]>([]); // To store validation errors
-
     useEffect(() => {
+        // Check if the page has already been reloaded
+        if (!sessionStorage.getItem("pageReloaded")) {
+            // Set the flag that the page has been reloaded
+            sessionStorage.setItem("pageReloaded", "true");
+            window.location.reload(); // Reload the page
+        }
+
+        // If the page has been reloaded already, remove the flag
+        return () => {
+            sessionStorage.removeItem("pageReloaded");
+        };
+    }, []);
+    useEffect(() => {
+        
         localStorage.removeItem('uploadedPhotos');
         localStorage.removeItem('selectedEquipment');
     }, []);
@@ -69,14 +83,62 @@ export default function FormPages() {
         setData((prev) => ({ ...prev, ...fields }));
     }
 
-    async function submitFields() {
+    const submitFields = async () => {
         try {
             await eventService.addOffre(data);
-            alert("Event added successfully!");
+            
+            Swal.fire({
+                title: "Succès !",
+                text: "Offre ajoutée avec succès !",
+                icon: "success",
+                confirmButtonText: "Aller au profil",
+                timer: 3000,
+                timerProgressBar: true,
+                customClass: {
+                    popup: "bg-white shadow-lg rounded-lg",
+                    title: "text-lg font-bold text-gray-800",
+                    confirmButton: "bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded"
+                },
+                willClose: () => {
+                    // Reset styles and clean up any changes
+                    const swalElement = document.querySelector('.swal2-container');
+                    if (swalElement) {
+                        const swalElementHTMLElement = swalElement as HTMLElement;
+                        swalElementHTMLElement.classList.remove('swal2-shown');
+                        swalElementHTMLElement.style = ''; // Reset any inline styles applied
+                    }
+                }
+            }).then(() => {
+                window.location.href = "/profile"; // Redirect to profile page
+            });
+    
         } catch (error) {
             console.error("Error adding event:", error);
+    
+            Swal.fire({
+                title: "Erreur",
+                text: "Une erreur est survenue lors de l'ajout de l'offre.",
+                icon: "error",
+                confirmButtonText: "Réessayer",
+                customClass: {
+                    popup: "bg-white shadow-lg rounded-lg",
+                    title: "text-lg font-bold text-red-600",
+                    confirmButton: "bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded"
+                },
+                willClose: () => {
+                    // Reset styles and clean up any changes
+                    const swalElement = document.querySelector('.swal2-container');
+                    if (swalElement) {
+                        const swalElementHTMLElement = swalElement as HTMLElement;
+                        swalElementHTMLElement.classList.remove('swal2-shown');
+                        swalElementHTMLElement.style = ''; // Reset any inline styles applied
+                    }
+                }
+            });
         }
-    }
+    };
+    
+    
     const getStepClass = (stepGroupIndex: number) => {
         if (stepGroupIndex === 0 && currentStepIndex <= 3) return "text-green-600 border-green-600";
         if (stepGroupIndex === 1 && currentStepIndex >= 4 && currentStepIndex <= 9) return "text-green-600 border-green-600";
@@ -85,69 +147,102 @@ export default function FormPages() {
     };
 
 
-    const { steps, currentStepIndex, step, isFirstStep, isLastStep, back, next } = useMultistepForm([
+    const pages = [
         <Page1 key="page1" />,
-        <Page2
-            key="page2"
-            propertyType={data.propertyType}
-            propertyId={data.propertyId}
-            updateFields={updateFields}
-        />,
+        <Page2 key="page2" propertyType={data.propertyType} propertyId={data.propertyId} updateFields={updateFields} />,
         <Page3 key="page3" data={data} updateFields={updateFields} />,
-        ...(data.propertyType !== "Material" ? [
-            <Page4 key="page4" data={data} updateFields={updateFields} />
-        ] : [
-            <Page13 key="page13" data={data} updateFields={updateFields} />
-        ]),
+        ...(data.propertyType !== "Material" 
+            ? [<Page4 key="page4" data={data} updateFields={updateFields} />] 
+            : [<Page13 key="page13" data={data} updateFields={updateFields} />]
+        ),
         <Page5 key="page5" />,
         <Page8 key="page8" titre={data.titre} updateFields={updateFields} />,
         <Page7 key="page7" data={data} updateFields={updateFields} />,
-        <Page6 key="page6" equipements={data.equipements} updateFields={updateFields} />,// selectedequipment page
+    ];
+    
+    // Dynamically include Page6 only when propertyType is NOT "Material"
+    if (data.propertyType !== "Material") {
+        pages.push(<Page6 key="page6" equipements={data.equipements} updateFields={updateFields} />);
+    }
+    
+    pages.push(
         <Page10 key="page10" data={data} updateFields={updateFields} />,
         <Page11 key="page11" />,
         <Page9 key="page9" data={data} updateFields={updateFields} />,
-        <Page12 key="page12" data={data} updateFields={updateFields} />,
-    ]);
-
-    // Validation rules for each step
-    const validationRules: Record<number, (data: FormData) => string[]> = {
-        1: (data) => {
-            const errors = [];
-            if (!data.propertyType) errors.push("Veuillez spécifier le type de propriété.");
-            return errors;
-        },
-        3: (data) => {
-            const errors = [];
-            if (data.propertyType !== "Material" && !data.Superficie) {
-                errors.push("Veuillez indiquer la superficie du votre bien.");
-            }
-            else if (data.propertyType == "Material" && !data.etat) {
-                errors.push("Veuillez indiquer l'etat du votre bien.");
-            }
-            return errors;
-        },
-        5: (data) => {
-            const errors = [];
-            if (!data.titre) errors.push("Le titre de l'annonce est obligatoire.");
-            return errors;
-        },
-        6: (data) => {
-            const errors = [];
-            if (data.photos.length < 5) errors.push("Veuillez ajouter au moins 5 photos pour compléter votre annonce.");
-            return errors;
-        },
-        8: (data) => {
-            const errors = [];
-            if (!data.description) errors.push("Merci d'ajouter une description détaillée de votre bien.");
-            return errors;
-        },
-        10: (data) => {
-            const errors = [];
-            if (!data.prix) errors.push("Veuillez indiquer le prix de vente ou de location.");
-            return errors;
-        },
-        // Add more validation rules for other steps as needed
+        <Page12 key="page12" data={data} updateFields={updateFields} />
+    );
+    
+    const { steps, currentStepIndex, step, isFirstStep, isLastStep, back, next } = useMultistepForm(pages);
+    
+    // Adjust validation rules dynamically to match the correct step index
+    const validationRules: Record<number, (data: FormData) => string[]> = {};
+    let stepIndex = 1;
+    
+    validationRules[stepIndex++] = (data) => {
+        const errors = [];
+        if (!data.propertyType) errors.push("Veuillez spécifier le type de propriété.");
+        return errors;
     };
+    
+    stepIndex++; // Skipping Page2 (no validation required)
+    
+    validationRules[stepIndex++] = (data) => {
+        const errors = [];
+        if (data.propertyType !== "Material" && !data.Superficie) {
+            errors.push("Veuillez indiquer la superficie de votre bien.");
+        } else if (data.propertyType === "Material" && !data.etat) {
+            errors.push("Veuillez indiquer l'état de votre bien.");
+        }
+        return errors;
+    };
+    
+    stepIndex++; // Skipping Page4/Page13 (no validation required)
+    
+    validationRules[stepIndex++] = (data) => {
+        const errors = [];
+        if (!data.titre) errors.push("Le titre de l'annonce est obligatoire.");
+        return errors;
+    };
+    
+    validationRules[stepIndex++] = (data) => {
+        const errors = [];
+        if (data.photos.length < 5) {
+            errors.push("Veuillez ajouter au moins 5 photos pour compléter votre annonce.");
+        }
+        return errors;
+    };
+    
+    // If Page6 exists, insert validation rule at the correct position
+    if (data.propertyType !== "Material") {
+        validationRules[stepIndex++] = (data) => {
+            const errors = [];
+            if (!data.equipements || data.equipements.length === 0) {
+                errors.push("Veuillez sélectionner au moins un équipement.");
+            }
+            return errors;
+        };
+    }
+    
+    validationRules[stepIndex++] = (data) => {
+        const errors = [];
+        if (!data.description) {
+            errors.push("Merci d'ajouter une description détaillée de votre bien.");
+        }
+        return errors;
+    };
+    
+        stepIndex++;
+    
+    
+    validationRules[stepIndex++] = (data) => {
+        const errors = [];
+        if (!data.prix) {
+            errors.push("Veuillez indiquer le prix de vente ou de location.");
+        }
+        return errors;
+    };
+    
+    
 
     // Validate the current step
     function validateCurrentStep(): boolean {
