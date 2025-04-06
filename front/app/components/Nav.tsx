@@ -19,7 +19,7 @@ export default function Navbar() {
 
 
   return (
-    <nav className="bg-white border-gray-200 ">
+    <nav className="bg-opacity-80 bg-white shadow-md  w-full rounded-lg">
       <div className="max-w-screen-2xl flex flex-wrap items-center justify-between mx-auto p-4 relative">
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
           <Image src="/assets/logo.png" alt="Flowbite Logo" width={40} height={40} style={{ borderRadius: '15px' }} />
@@ -42,7 +42,7 @@ export default function Navbar() {
                   <span className="block text-sm text-gray-500 truncate dark:text-gray-400">name@flowbite.com</span>
                 </div>
                 <ul className="py-2">
-                  <li><Link href="/" className="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Dashboard</Link></li>
+                  <li><Link href="/Admin/DashBoard" className="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Dashboard</Link></li>
                   <li><Link href="/profile" className="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Settings</Link></li>
                   <li><Link href="/" className="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Earnings</Link></li>
                   <li><Link href="/FormPages" className="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Add Offre</Link></li>
@@ -80,19 +80,20 @@ export default function Navbar() {
           </div>
         )}
         <div className={`${menuOpen ? 'block' : 'hidden'} w-full md:flex md:w-auto md:order-1`}>
-          <ul className="flex flex-col  text-xl md:flex-row font-bold p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 md:mt-0 md:border-0 md:bg-white ">
-            <li><Link href="/" className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-green-700">Home</Link></li>
-            <li><Link href="/OffrePage" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Tout Les Offres</Link></li>
-            <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Pricing</Link></li>
-            <li><Link href="/OffrePage" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Services</Link></li>
-            <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 dark:text-black">Contact</Link></li>
+          <ul className="flex flex-col  text-xl md:flex-row font-bold p-4 md:p-0 mt-4 border border-gray-100 rounded-lg  md:space-x-8 md:mt-0 md:border-0 md:bg-white md:bg-opacity-80  ">
+            <li><Link href="/" className="block py-2 px-3 text-white  rounded md:bg-transparent md:text-teal-700">Home</Link></li>
+            <li><Link href="/OffrePage" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-teal-700 dark:text-black">Tout Les Offres</Link></li>
+            <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-teal-700 dark:text-black">Pricing</Link></li>
+            <li><Link href="/OffrePage" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-teal-700 dark:text-black">Services</Link></li>
+            <li><Link href="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-teal-700 dark:text-black">Contact</Link></li>
             <button
-              type="button"
-              onClick={() => router.push("/FormPages")}
-              className="text-white font-playfair font-dmserif font-bold transition ease-in-out delay-150 bg-green-300 hover:bg-green-500 focus:ring-4 focus:outline-none focus:ring-green-400 rounded-lg text-sm px-4 py-2 text-center hover:-translate-y-1 hover:scale-110 duration-300"
-            >
-              Create new
-            </button>
+
+            type="button"
+            onClick={() => router.push("/FormPages")}
+            className="text-white font-playfair font-dmserif font-bold transition ease-in-out delay-150 bg-teal-500 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-400 rounded-lg text-sm px-4 py-2 text-center hover:-translate-y-1 hover:scale-110 duration-300"
+        >
+            Create new
+        </button>
           </ul>
         </div>
       </div>
