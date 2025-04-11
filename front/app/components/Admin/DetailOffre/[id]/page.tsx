@@ -115,7 +115,7 @@ const Details: React.FC = () => {
                   <div>
                     <h3 className="text-sm text-gray-500 font-medium">Superficie</h3>
                     <p className="text-2xl font-bold text-gray-900">
-                      {offre.superficie || "N/A"} m²
+                      {offre.Superficie } m²
                     </p>
                   </div>
                 </div>
