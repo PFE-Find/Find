@@ -51,12 +51,12 @@ const Sidebar = () => {
             {/* Profile Section */}
             <div id="profile" className="text-center">
               <img
-                src="https://images.unsplash.com/photo-1628157588553-5eeea00af15c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
+                src="/assets/wessim.png"
                 alt="Avatar user"
-                className="w-20 h-20 rounded-full mx-auto border-4 border-teal-400"
+                className="w-20 h-20 rounded-full mx-auto border-4 border-teal-400 object-cover"
               />
-              <h2 className="mt-2 text-lg font-semibold">Eduard Pantazi</h2>
-              <p className="text-sm text-teal-200">Administrator</p>
+              <h2 className="mt-2 text-lg font-semibold">Wessim Saidani</h2>
+              <p className="text-sm text-teal-200">Administrateur</p>
             </div>
 
             {/* Search Box */}

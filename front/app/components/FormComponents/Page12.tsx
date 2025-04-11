@@ -58,7 +58,7 @@ export default function Example({ data, updateFields }) {
                                 {/* Offer Details */}
                                 <div className="mt-4">
                                     <p className="text-sm text-gray-700 dark:text-gray-400">{data.Superficie} {data.unit}</p>
-                                    {data.etat && data.etat !== 0 && (
+                                    {data.propertyType && data.etat !== 0 && (
                                         <p className="text-sm text-gray-700 dark:text-gray-400">
                                             {data.etat}/10 Etat
                                         </p>
