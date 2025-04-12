@@ -1,10 +1,11 @@
 import axios from "axios";
 import { Report } from "../models/Report";
 import { User } from "../models/User";
+import { log } from "console";
 
 const API_URL = "http://127.0.0.1:3001/api/auth";
 
-const reportService = {
+const userService = {
   // Fetch all reports
   async getReports() {
     try {
@@ -16,7 +17,17 @@ const reportService = {
     }
   },
 
-
+  async findUserByEmail( email :  string)
+  {
+    try{
+      const response =  await axios.post(`${API_URL}/findUserByEmail/`, email);
+      return response; 
+    }
+    catch(error)
+    {
+      console.log(error);
+    }
+  },
   async SignUp(eventData: User) {
     try {
       const response = await axios.post(`${API_URL}/`, eventData);
@@ -41,4 +52,4 @@ const reportService = {
 
 }
 
-export default reportService;
+export default userService;
