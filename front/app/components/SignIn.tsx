@@ -124,6 +124,7 @@ export default function SignIn() {
                             type="button"
                             className="flex items-center justify-center w-full 
                                        bg-red-600 text-white rounded-lg py-2 hover:bg-red-700"
+                                       onClick={()=>signIn('google',{redirect:true ,callbackUrl:'/'})}
                           >
                             <Image
                               src="/assets/google.png"
