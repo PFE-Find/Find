@@ -39,7 +39,7 @@ const ReportSchema = new mongoose.Schema({
         enum:Status,
         default: "pending"
     },
-    userId: {
+    OffreId: {
         type: String,
         required: true
     },
