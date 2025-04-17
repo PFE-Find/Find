@@ -5,7 +5,7 @@ import HomePage from "@/app/Home/page"
 import { options } from "./api/auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import userService from "./services/User";
+
 
 export default async function Home() {
 
@@ -18,7 +18,9 @@ export default async function Home() {
     }
     return (
       <div>
-        <HomePage ></HomePage>
+        
+      <HomePage session={session}/> 
+   
 
       </div>
     );

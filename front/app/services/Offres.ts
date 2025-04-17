@@ -33,6 +33,28 @@ const Offres = {
       throw error;
     }
   },
+  async getAllOffresByUserId(id: string) {
+    try {
+      console.log(id);
+      
+      const response = await axios.get(`${API_URL}GetAll3/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching offres:", error);
+      throw error;
+    }
+  },
+  async getAllOffresByUserId2(id: string) {
+    try {
+      console.log(id);
+      
+      const response = await axios.get(`${API_URL}GetAll4/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching offres:", error);
+      throw error;
+    }
+  },
 
   // Fetch a single offre by ID
   async getOffre(id: string) {
