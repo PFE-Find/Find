@@ -2,15 +2,33 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { FiHeart, FiArrowLeft, FiArrowRight, FiStar, FiMapPin } from "react-icons/fi";
+import { motion, AnimatePresence } from "framer-motion";
 import eventService from "../../services/Offres";
 
-export default function Offres() {
-  const [favorites, setFavorites] = useState<{ [key: number]: boolean }>({});
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [offres, setOffres] = useState<any[]>([]); // Define your data structure if known
+interface Offre {
+  _id: string;
+  titre: string;
+  description: string;
+  prix: string;
+  Superficie: string;
+  unit: string;
+  id_user: string;
+  localisation: [number, number];
+  placeName: string[];
+  equipements: string[];
+  etat: string;
+  images?: { path: string }[];
+  propertyType: string;
+  propertyId: number | null;
+}
 
-  const scrollItemsPerRow = 3; // Number of cards to scroll
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+export default function Offres() {
+  const [favorites, setFavorites] = useState<{ [key: string]: boolean }>({});
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [offres, setOffres] = useState<Offre[]>([]);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchOffres() {
@@ -25,123 +43,218 @@ export default function Offres() {
     fetchOffres();
   }, []);
 
-  const filteredOffers =
-    selectedCategory === "all"
-      ? offres
-      : offres.filter((offer) => offer.propertyType === selectedCategory);
+  const toggleFavorite = (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setFavorites(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
-  const scrollLeft = () => {
+  const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
-      const scrollDistance = 350;
-      const scrollDuration = 1000; // adjust this value to change the scrolling speed
-      const startTime = performance.now();
-      const startScrollLeft = scrollContainerRef.current.scrollLeft;
-
-      function animateScroll() {
-        const currentTime = performance.now();
-        const elapsed = currentTime - startTime;
-        const progress = elapsed / scrollDuration;
-        const newScrollLeft = startScrollLeft - scrollDistance * progress;
-
-        if (progress < 1) {
-          scrollContainerRef.current.scrollLeft = newScrollLeft;
-          requestAnimationFrame(animateScroll);
-        } else {
-          scrollContainerRef.current.scrollLeft = startScrollLeft - scrollDistance;
-        }
-      }
-
-      animateScroll();
+      const { scrollLeft, clientWidth } = scrollContainerRef.current;
+      const scrollTo = direction === "left" 
+        ? scrollLeft - clientWidth * 0.8 
+        : scrollLeft + clientWidth * 0.8;
+      
+      scrollContainerRef.current.scrollTo({
+        left: scrollTo,
+        behavior: 'smooth'
+      });
     }
   };
 
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      const scrollDistance = 350;
-      const scrollDuration = 1000; // adjust this value to change the scrolling speed
-      const startTime = performance.now();
-      const startScrollLeft = scrollContainerRef.current.scrollLeft;
+  const filteredOffers = selectedCategory === "all"
+    ? offres
+    : offres.filter((offer) => offer.propertyType === selectedCategory);
 
-      function animateScroll() {
-        const currentTime = performance.now();
-        const elapsed = currentTime - startTime;
-        const progress = elapsed / scrollDuration;
-        const newScrollLeft = startScrollLeft + scrollDistance * progress;
-
-        if (progress < 1) {
-          scrollContainerRef.current.scrollLeft = newScrollLeft;
-          requestAnimationFrame(animateScroll);
-        } else {
-          scrollContainerRef.current.scrollLeft = startScrollLeft + scrollDistance;
-        }
+  // Animation variants
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.05,
+        duration: 0.5,
+        ease: "easeOut"
       }
+    }),
+    hover: {
+      y: -5,
+      transition: { duration: 0.2 }
+    }
+  };
 
-      animateScroll();
+  const imageHoverVariants = {
+    hover: {
+      scale: 1.05,
+      transition: { duration: 0.3 }
     }
   };
 
   return (
-    <div>
-      <div className="relative flex items-center   shadow-xl mx-auto max-w-screen-2xl">
-        {/* Left Button */}
-        <button
-          onClick={scrollLeft}
-          className="absolute bg-gray-400 left-0 top-1/2 transform -translate-y-1/2 bg-white text-gray-700 p-2 rounded-full shadow-lg z-10"
-        >
-          <span className="text-lg">←</span>
-        </button>
-
-        {/* Scrollable Content */}
-        <div ref={scrollContainerRef} className="overflow-x-hidden  w-full py-4">
-          <div className="flex space-x-4">
-            {filteredOffers.map((offre) => (
-              <div key={offre._id} className="relative w-[350px]  flex-shrink-0 ">
-                <Link key={offre._id} href={`/OffreDetail/${offre._id}`} prefetch={false}>
-
-                  <div className="shadow-lg h-[350px] bg-white border border-gray-200  dark:bg-gray-800 dark:border-gray-700 p-4 hover:bg-gray-100 transition">
-
-                    <img
-                      className="rounded-xl w-full h-52 object-cover"
-                      src={offre.images?.[0]?.path || "/default-image.jpg"} // Default image if none exists
-                      alt={offre.titre}
-                    />
-
-
-                    {/* Title Badge */}
-                    <div className="absolute w-50 top-5 left-5 bg-white text-gray-900 dark:bg-gray-700 dark:text-white px-3 py-1 rounded-lg text-xs font-bold shadow">
-                      {offre.titre}
-                    </div>
-
-                    {/* Offer Details */}
-                    <div className="mt-4">
-                      <p className="text-sm text-gray-700 dark:text-gray-400">
-                        {offre.Superficie} {offre.unit}
-                      </p>
-                      {offre.etat && offre.etat !== 0 && (
-                        <p className="text-sm text-gray-700 dark:text-gray-400">{offre.etat}/10</p>
-                      )}
-                      <p className="text-sm text-gray-700 dark:text-gray-400">{offre.propertyType}</p>
-
-                      <h5 className="mt-2 text-sm font-bold text-gray-900 dark:text-white">
-                        {offre.prix} TND
-                      </h5>
-
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            ))}
-          </div>
+    <section className="py-4 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="max-w-full mx-auto">
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Découvrez nos offres</h2>
+          <p className="text-gray-600 dark:text-gray-400">Trouvez la propriété parfaite pour vos besoins</p>
         </div>
 
-        {/* Right Button */}
-        <button
-          onClick={scrollRight}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white text-gray-700 p-2 rounded-full shadow-lg z-10"
-        >
-          <span className="text-lg">→</span>
-        </button>
+        <div className="relative group">
+          <button
+            onClick={() => scroll("left")}
+            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-full shadow-lg z-10 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all opacity-0 group-hover:opacity-100 border border-gray-200 dark:border-gray-700"
+            aria-label="Scroll left"
+          >
+            <FiArrowLeft className="w-5 h-5" />
+          </button>
+
+          {/* Updated scroll container with hidden scrollbar */}
+          <div 
+            ref={scrollContainerRef}
+            className="overflow-x-auto pb-8 scrollbar-hide"
+            style={{
+              scrollbarWidth: 'none',  // For Firefox
+              msOverflowStyle: 'none'   // For IE/Edge
+            }}
+          >
+            {/* Hide scrollbar for WebKit browsers */}
+            <style jsx>{`
+              .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            
+            <div className="flex space-x-6 w-max px-1">
+              <AnimatePresence>
+                {filteredOffers.map((offre, index) => (
+                  <motion.div
+                    key={offre._id}
+                    custom={index}
+                    initial="hidden"
+                    animate="visible"
+                    whileHover="hover"
+                    variants={cardVariants}
+                    viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+                    className="relative w-[360px] flex-shrink-0"
+                    onMouseEnter={() => setHoveredCard(offre._id)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                  >
+                    <Link href={`/OffreDetail/${offre._id}`} prefetch={false} className="block h-full">
+                      <div className="h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
+                        {/* Image Container */}
+                        <div className="relative h-64 overflow-hidden">
+                          <motion.img
+                            className="w-full h-full object-cover"
+                            src={offre.images?.[0]?.path || "/default-property.jpg"}
+                            alt={offre.titre}
+                            loading="lazy"
+                            variants={imageHoverVariants}
+                          />
+                          
+                          {/* Favorite Button */}
+                          <button
+                            onClick={(e) => toggleFavorite(offre._id, e)}
+                            className={`absolute top-4 right-4 p-2 rounded-full transition-all ${
+                              favorites[offre._id] 
+                                ? 'text-red-500 bg-white/90 shadow-sm' 
+                                : 'text-gray-400 bg-white/80 hover:text-red-500'
+                            }`}
+                          >
+                            <FiHeart className={`w-5 h-5 ${favorites[offre._id] ? 'fill-current' : ''}`} />
+                          </button>
+                          
+                          {/* Rating */}
+                          {offre.etat && offre.etat !== "0" && (
+                            <div className="absolute bottom-4 left-4 flex items-center bg-black/80 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm">
+                              <FiStar className="text-yellow-400 mr-1" />
+                              {offre.etat}/10
+                            </div>
+                          )}
+                          
+                          {/* Hover Overlay */}
+                          <AnimatePresence>
+                            {hoveredCard === offre._id && (
+                              <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="absolute inset-0 bg-black/20 flex items-center justify-center"
+                              >
+                                <motion.span
+                                  initial={{ scale: 0.8 }}
+                                  animate={{ scale: 1 }}
+                                  className="bg-white text-gray-900 font-medium px-4 py-2 rounded-full shadow-lg"
+                                >
+                                  Voir les détails
+                                </motion.span>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6 flex-grow flex flex-col">
+                          <div className="flex justify-between items-start mb-3">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white truncate">
+                              {offre.titre}
+                            </h3>
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-100 capitalize">
+                              {offre.propertyType}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center text-gray-600 dark:text-gray-400 text-sm mb-3">
+                            <FiMapPin className="mr-1.5 flex-shrink-0" />
+                            <span className="truncate">
+                              {offre.placeName || "Localisation non spécifiée"}
+                            </span>
+                          </div>
+
+                          <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                            <div className="flex items-center space-x-3">
+                              {offre.Superficie && offre.Superficie !== "0" && (
+                                <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">Superficie</p>
+                                  <p className="font-semibold text-gray-900 dark:text-white">
+                                    {offre.Superficie} {offre.unit}
+                                  </p>
+                                </div>
+                              )}
+                              {offre.equipements?.length > 0 && (
+                                <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">Équipements</p>
+                                  <p className="font-semibold text-gray-900 dark:text-white">
+                                    {offre.equipements.length}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-gray-500 dark:text-gray-400">Prix</p>
+                              <h4 className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                                {offre.prix} TND
+                              </h4>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          <button
+            onClick={() => scroll("right")}
+            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-full shadow-lg z-10 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all opacity-0 group-hover:opacity-100 border border-gray-200 dark:border-gray-700"
+            aria-label="Scroll right"
+          >
+            <FiArrowRight className="w-5 h-5" />
+          </button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
