@@ -19,6 +19,8 @@ app.use('/api/auth',UserRouter);
 app.use('/api/Comments',CommentRouter); 
 app.use('/api/Reports',ReportRouter); 
 
+
+
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/PostsDB')
  .then(() => console.log('Connected to MongoDB'))
