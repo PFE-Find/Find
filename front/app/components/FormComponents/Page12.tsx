@@ -1,129 +1,229 @@
 'use client';
 
 import { useState } from 'react';
-import { HeartIcon } from '@heroicons/react/24/solid';
-import "../../globals.css";
+import { HeartIcon, CheckCircleIcon, CalendarIcon, DocumentTextIcon, StarIcon, MapPinIcon } from '@heroicons/react/24/solid';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
-const filteredOffers = [
-    { id: 1, title: "Offre 1", image: "/assets/photo.jpg", size: "100m²", type: "Terrain agricole", price: "10,000 TND" },
 
-];
 
-export default function Example({ data, updateFields }) {
-    const savedImages = JSON.parse(localStorage.getItem('uploadedPhotos') || '[]'); // Parse saved images
-    const firstImage = savedImages.length > 0 ? savedImages[0] : filteredOffers[0].image; // Use first uploaded image or default
-
-    const [progress, setProgress] = useState(15);
+export default function ListingPreview({ data, updateFields }) {
+    const savedImages = JSON.parse(localStorage.getItem('uploadedPhotos') || '[]');
+    const firstImage = savedImages.length > 0 ? savedImages[0] : filteredOffers[0].image;
     const [favorites, setFavorites] = useState<{ [key: number]: boolean }>({});
-    const index = 0; // Static index for now, you can make it dynamic
+    const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
-    const toggleFavorite = (id: number) => {
-        setFavorites((prevFavorites) => ({
-            ...prevFavorites,
-            [id]: !prevFavorites[id],
-        }));
+    const toggleFavorite = (id: number, e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
+    };
+
+    // Animation variants
+    const cardVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { duration: 0.5 }
+        },
+        hover: { 
+            y: -5,
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+        }
+    };
+
+    const imageHoverVariants = {
+        hover: { scale: 1.05 }
     };
 
     return (
-        <div className="flex flex-col bg-white overflow-y-auto h-[660px]">
-
+        <div className="flex flex-col bg-gray-50  overflow-y-auto h-[700px]">
             {/* Main Content */}
-            <div className="flex-1 flex justify-center items-center px-10 py-8 ">
-                <div className="grid grid-flow-row grid-cols-1 gap-4 h-full">
-                    <div className="row-span-2 col-span-2">
-                        <h2 className="mb-4 text-4xl font-extrabold text-gray-900 dark:text-green-600">
+            <div className="flex-1 flex justify-center items-start px-4 py-12">
+                <div className="max-w-7xl w-full">
+                    {/* Header Section */}
+                    <div className="mb-12 text-center">
+                        <motion.h2 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="text-4xl font-bold text-gray-900 mb-4"
+                        >
                             Vérifiez votre annonce
-                        </h2>
-                        <p className="mt-5 font-light text-gray-500 md:text-lg dark:text-gray-400">
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2, duration: 0.5 }}
+                            className="text-lg text-gray-600 max-w-2xl mx-auto"
+                        >
                             Enfin, choisissez les conditions de vente, définissez votre prix et mettez votre annonce en ligne.
-                        </p>
+                        </motion.p>
                     </div>
-                    <div className='flex flex-row w-[1200px]'>
 
-                        <div className="basis-1/3">
-
-                            <div className="shadow-xl relative bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700 p-4">
-                                <a href="#">
-                                    <img className="shadow-xl rounded-xl w-full h-80 object-cover" src={firstImage}
-                                        alt="Uploaded photo" />
-                                </a>
-
-                                {/* Title Badge */}
-                                <div className="shadow-xl w-36 absolute top-5 left-5 bg-white text-gray-900 dark:bg-gray-700 dark:text-white px-3 py-1 rounded-lg text-xs font-bold shadow overflow-hidden text-ellipsis whitespace-nowrap max-h-9">
-                                    {data.titre}
-                                </div>
-
-
-
-                                {/* Offer Details */}
-                                <div className="mt-4">
-                                    <p className="text-sm text-gray-700 dark:text-gray-400">{data.Superficie} {data.unit}</p>
-                                    {data.propertyType && data.etat !== 0 && (
-                                        <p className="text-sm text-gray-700 dark:text-gray-400">
-                                            {data.etat}/10 Etat
-                                        </p>
+                    {/* Content Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Property Card - Redesigned */}
+                        <motion.div 
+                            key={1}
+                            initial="hidden"
+                            animate="visible"
+                           
+                            variants={cardVariants}
+                            className="relative lg:col-span-1"
+                            
+                        >
+                            <div className=" flex flex-col bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100">
+                                {/* Image Container */}
+                                <div className="relative h-64 overflow-hidden">
+                                    <motion.img
+                                        className="w-full h-full object-cover"
+                                        src={firstImage}
+                                        alt="Property"
+                                        loading="lazy"
+                                        variants={imageHoverVariants}
+                                    />
+                                    
+                                    
+                                    
+                                    {/* Rating */}
+                                    {data.propertyType === "Material" && (
+                                        <div className="absolute bottom-4 left-4 flex items-center bg-black/80 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm">
+                                            <StarIcon className="w-4 h-4 text-yellow-400 mr-1" />
+                                            {data.etat}/10
+                                        </div>
                                     )}
-                                    <p className="text-sm text-gray-700 dark:text-gray-400">{data.propertyType}</p>
-                                    <a href="#">
-                                        <h5 className="mt-2 text-sm font-bold text-gray-900 dark:text-white">{data.prix} DT</h5>
-                                    </a>
+                                    
+                                   
+                                </div>
+
+                                {/* Content */}
+                                <div className="p-6 flex-grow flex flex-col">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h3 className="text-xl font-bold text-gray-900 truncate">
+                                            {data.titre || "Titre non spécifié"}
+                                        </h3>
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800 capitalize">
+                                            {data.propertyType || "Type non spécifié"}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center text-gray-600 text-sm mb-3">
+                                        <MapPinIcon className="w-4 h-4 mr-1.5 flex-shrink-0" />
+                                        <span className="truncate">
+                                            {data.placeName || "Localisation non spécifiée"}
+                                        </span>
+                                    </div>
+
+                                    
+
+                                    <div className="mt-auto pt-4 border-t border-gray-200 flex justify-between items-center">
+                                        <div className="flex items-center space-x-3">
+                                        {data.propertyType === "Land"  && (
+                                                <div className="bg-gray-50 p-2 rounded-lg">
+                                                    <p className="text-xs text-gray-500">Superficie</p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {data.Superficie} {data.unit}
+                                                    </p>
+                                                </div>
+                                            )}
+                                            {data.propertyType === "Land"  && (
+                                                <div className="bg-gray-50 p-2 rounded-lg">
+                                                    <p className="text-xs text-gray-500">Équipements</p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {data.equipements.length}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-xs text-gray-500">Prix</p>
+                                            <h4 className="text-xl font-bold text-blue-600">
+                                                {data.prix || "N/A"} TND
+                                            </h4>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                        </motion.div>
 
-
-
-                        </div>
-
-                        <div className="basis-2/3 ml-4">
-                            <div className="flex flex-col bg-white ">
-                                <div className="max-w-2xl mx-auto">
-                                    {/* Section Title */}
-                                    <h2 className="text-xl font-extrabold text-gray-900 ">Et ensuite ?</h2>
-
-                                    {/* Step 1 */}
-                                    <div className="">
-                                        <h3 className="text-md font-semibold text-gray-900 mb-2">
-                                            Confirmez les informations avant de publier votre annonce
-                                        </h3>
-                                        <p className="text-gray-600">
-                                            Avant la mise en ligne de votre annonce, nous devons nous assurer que toutes les informations
-                                            fournies sont correctes et conformes aux exigences en vigueur. Nous vous informerons si votre
-                                            identité doit être vérifiée ou si des documents supplémentaires sont requis. Selon votre localisation,
-                                            un enregistrement auprès des autorités locales pourrait être nécessaire.
-                                        </p>
+                        {/* Details Section */}
+                        <div className="lg:col-span-2 space-y-8">
+                            {/* ... (keep your existing details sections) ... */}
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4, duration: 0.5 }}
+                                className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
+                            >
+                                <div className="flex items-center mb-4">
+                                    <div className="p-2 rounded-full bg-purple-100 text-purple-600 mr-3">
+                                        <DocumentTextIcon className="w-5 h-5" />
                                     </div>
-
-                                    {/* Step 2 */}
-                                    <div className="">
-                                        <h3 className="text-md font-semibold text-gray-900 mb-2">
-                                            Configurez vos disponibilités
-                                        </h3>
-                                        <p className="text-gray-600">
-                                            Définissez les créneaux durant lesquels votre bien sera disponible pour consultation ou réservation.
-                                            Vous pouvez choisir des périodes spécifiques ou une disponibilité permanente. Une fois configurées,
-                                            ces informations permettront aux acheteurs potentiels de mieux organiser leurs démarches.
-                                            <strong> Note :</strong> Votre annonce sera visible 24 heures après sa publication pour une diffusion optimale.
-                                        </p>
-                                    </div>
-
-                                    {/* Step 3 */}
-                                    <div className="">
-                                        <h3 className="text-md font-semibold text-gray-900 mb-2">
-                                            votre description
-                                        </h3>
-                                        <p className="text-gray-600">
-                                            {data.description}
-                                        </p>
-                                    </div>
+                                    <h3 className="text-xl font-semibold text-gray-900">
+                                        Description complète
+                                    </h3>
                                 </div>
-                            </div>
+                                <div className="prose prose-sm max-w-none text-gray-600 pl-11">
+                                    {data.description ? (
+                                        <p>{data.description}</p>
+                                    ) : (
+                                        <p className="text-gray-400 italic">Aucune description fournie</p>
+                                    )}
+                                </div>
+                            </motion.div>
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2, duration: 0.5 }}
+                                className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
+                            >
+                                <div className="flex items-center mb-4">
+                                    <div className="p-2 rounded-full bg-teal-100 text-teal-600 mr-3">
+                                        <CheckCircleIcon className="w-5 h-5" />
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-gray-900">
+                                        Confirmez les informations
+                                    </h3>
+                                </div>
+                                <p className="text-gray-600 pl-11">
+                                    Avant la publication, vérifiez que toutes les informations sont exactes et conformes. 
+                                    Nous pourrons vous demander une vérification d'identité ou des documents supplémentaires 
+                                    selon les exigences locales. Certaines régions nécessitent un enregistrement auprès des 
+                                    autorités compétentes.
+                                </p>
+                            </motion.div>
+
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3, duration: 0.5 }}
+                                className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
+                            >
+                                <div className="flex items-center mb-4">
+                                    <div className="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
+                                        <CalendarIcon className="w-5 h-5" />
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-gray-900">
+                                        Configurez vos disponibilités
+                                    </h3>
+                                </div>
+                                <p className="text-gray-600 pl-11">
+                                    Définissez les créneaux pour les visites ou réservations. Vous pouvez choisir des 
+                                    périodes spécifiques ou une disponibilité permanente. Ces informations aideront les 
+                                    acheteurs à organiser leur planning.
+                                    <span className="block mt-2 text-sm bg-yellow-50 text-yellow-700 p-2 rounded">
+                                        Votre annonce sera visible 24 heures après publication pour une diffusion optimale.
+                                    </span>
+                                </p>
+                            </motion.div>
+
+                            
                         </div>
                     </div>
                 </div>
             </div>
-
-
-
-        </div >
+        </div>
     );
 }

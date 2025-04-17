@@ -1,6 +1,8 @@
 'use client';
 
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Info, AlertCircle } from 'lucide-react';
 import "../../globals.css";
 
 type FormData = {
@@ -11,42 +13,141 @@ type UserFormProps = FormData & {
     updateFields: (fields: Partial<FormData>) => void;
 };
 
-export default function Example({
-    titre,
+export default function TitleForm({
+    titre = "",
     updateFields,
 }: UserFormProps) {
-    
-    // Ensure titre is always a string
-    const safeTitre = titre ?? ""; 
+    const [isFocused, setIsFocused] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(false);
+    const [characterCount, setCharacterCount] = useState(titre.length);
+
+    useEffect(() => {
+        setCharacterCount(titre.length);
+    }, [titre]);
 
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        const newValue = event.target.value.slice(0, 32);
+        const newValue = event.target.value.slice(0, 50);
         updateFields({ titre: newValue });
     };
 
-    return (
-        <div className="flex flex-col bg-white">
-            {/* Main Content */}
-            <div className="flex flex-col items-center justify-center container mx-auto mt-32">
-                <h2 className="text-2xl font-semibold text-center mb-2">
-                    À présent, donnez un titre à votre annonce (ex. : terrain agricole, matériel agricole, ferme)
-                </h2>
-                <h2 className="text-md text-center mb-10 max-w-lg">
-                    Les titres courts et précis sont généralement les plus efficaces. N'hésitez pas, vous pourrez toujours le modifier plus tard.
-                </h2>
+    const variants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+                duration: 0.3,
+                ease: "easeOut"
+            }
+        }
+    };
 
-                <div className="flex flex-col items-center w-full max-w-[700px]">
-                    <textarea
-                        id="message"
-                        className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Écrivez votre titre ici..."
-                        value={safeTitre} // Always a string
-                        onChange={handleChange}
-                        maxLength={32}
-                    ></textarea>
-                    <p className="text-gray-500 text-sm mt-2">{safeTitre.length}/32 caractères</p>
-                </div>
+    return (
+        <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={variants}
+            className="flex flex-col  bg-gradient-to-b from-gray-50 to-white"
+        >
+            {/* Main Content */}
+            <div className="flex flex-col items-center justify-center container mx-auto px-4 py-20 md:py-32">
+                <motion.div 
+                    className="w-full max-w-2xl text-center mb-10"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                >
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        Donnez un titre accrocheur à votre annonce
+                    </h1>
+                    <p className="text-lg text-gray-600">
+                        Un bon titre augmente la visibilité de votre annonce. Soyez concis et descriptif.
+                    </p>
+                </motion.div>
+
+                <motion.div 
+                    className="w-full max-w-2xl"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                >
+                    <div className="relative mb-2">
+                        <div className="flex items-center justify-between">
+                            <label htmlFor="annonce-title" className="block text-sm font-medium text-gray-700 mb-1">
+                                Titre de l'annonce
+                                <button 
+                                    type="button" 
+                                    className="ml-2 text-gray-400 hover:text-gray-600"
+                                    onMouseEnter={() => setShowTooltip(true)}
+                                    onMouseLeave={() => setShowTooltip(false)}
+                                    onClick={() => setShowTooltip(!showTooltip)}
+                                >
+                                    <Info className="w-4 h-4 inline" />
+                                </button>
+                            </label>
+                            <span className={`text-xs ${characterCount === 50 ? 'text-red-500' : 'text-gray-500'}`}>
+                                {characterCount}/50
+                            </span>
+                        </div>
+
+                        <AnimatePresence>
+                            {showTooltip && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute z-10 w-full p-3 mt-1 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg shadow-lg"
+                                >
+                                    <p>Exemples de bons titres :</p>
+                                    <ul className="list-disc pl-5 mt-1 space-y-1">
+                                        <li>"Terrain agricole 5ha - Nord Tunis"</li>
+                                        <li>"Tracteur John Deere 2020 - 200h"</li>
+                                        <li>"Ferme laitière avec équipement complet"</li>
+                                    </ul>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    <motion.div 
+                        className={`relative transition-all duration-200 ${isFocused ? 'ring-2 ring-green-500' : ''}`}
+                        whileHover={{ scale: 1.005 }}
+                    >
+                        <textarea
+                            id="annonce-title"
+                            rows={3}
+                            className={`block p-4 w-full text-lg text-gray-900 bg-white rounded-xl border ${isFocused ? 'border-green-500' : 'border-gray-300'} shadow-sm focus:outline-none transition-all duration-200 resize-none`}
+                            placeholder="Ex: Terrain agricole 5ha avec source d'eau..."
+                            value={titre}
+                            onChange={handleChange}
+                            maxLength={50}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
+                        />
+                    </motion.div>
+
+                    {characterCount === 50 && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex items-center mt-2 text-sm text-red-500"
+                        >
+                            <AlertCircle className="w-4 h-4 mr-1" />
+                            <span>Vous avez atteint la limite de caractères</span>
+                        </motion.div>
+                    )}
+
+                    <motion.div 
+                        className="mt-8 text-center"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                    >
+                        
+                    </motion.div>
+                </motion.div>
             </div>
-        </div>
+        </motion.div>
     );
 }

@@ -2,45 +2,55 @@
 
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import "../../globals.css";
 
 import dynamic from 'next/dynamic';
 
-const MapComponent = dynamic(() => import('../MapComponent1'), {
-  ssr: false, // Disable SSR for this component
+const MapComponent = dynamic(() => import('../MapComponent'), {
+  ssr: false,
 });
 
-
-export default function Example({data , updateFields}) {
-  
-  const [localisation, setlocalisation] = useState<[number, number]>([36.8065, 10.1815]); // Default: Tunis
-
-  const handlelocalisationChange = (newlocalisation: [number, number]) => {
-    setlocalisation(newlocalisation);
-    updateFields({ ...data, localisation: newlocalisation }); // Update parent data
+export default function Example({ data, updateFields }) {
+  const defaultLocation = {
+    coordinates: [36.8065, 10.1815], // Default: Tunis
+    placeName: "Tunis, Tunisia"
   };
+
+  const [position, setPosition] = useState(defaultLocation);
+
+useEffect(() => {
+  if (data?.localisation) {
+    setPosition({ coordinates: data.localisation, placeName: data.placeName });
+  }
+}, [data]);
+
+  const handlePositionChange = useCallback((newPosition) => {
+    setPosition(newPosition);
+    console.log("Position updated:", newPosition);
+    updateFields({ ...data, localisation: newPosition.coordinates, placeName: newPosition.placeName });
+  }, [data, updateFields]);
 
   return (
     <div>
-    <div className="flex flex-col bg-white overflow-y-auto h-[660px]">
-      {/* Main Content */}
-      <div className="flex-1 flex-col place-content-center container mx-auto text-black ">
-        <h2 className="text-2xl font-semibold text-center mb-2">
-          Où se situe votre bien ?        </h2>
-        <h2 className="text-md  text-center mb-10 w-70">
-          Votre adresse est uniquement partagée avec l'acheteur une fois la transaction confirmée.
-        </h2>
+      <div className="flex flex-col bg-white overflow-y-auto h-[700px]">
+        <div className="flex-1 flex-col place-content-center container mx-auto text-black ">
+          <h2 className="text-2xl font-semibold text-center mb-2">
+            Où se situe votre bien ?
+          </h2>
+          <h2 className="text-md text-center w-70">
+          Sélectionnez Votre adresse.
+          </h2>
 
-        {/* Input Field for Location */}
-
-        <div className="flex justify-center items-center w-full">
-
-        <MapComponent position={localisation} setPosition={handlelocalisationChange} />
+          <div className="flex justify-center items-center w-full">
+            <MapComponent
+              position={position}
+              setPosition={handlePositionChange}
+              zoom={12} // Add a default zoom level
+            />
+          </div>
         </div>
       </div>
-
-    </div>
     </div>
   );
 }
