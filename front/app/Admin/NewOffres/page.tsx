@@ -2,8 +2,7 @@
 import { useEffect, useState } from 'react'
 import Offres from '../../components/Admin/Offres'
 import eventService from '../../services/Offres'
-import { Offer } from '../../components/Admin/Offres' // Define this type (see below)
-import SidBar from '../../components/Admin/SideBar'
+
 
 export default function OffrePage() {
   const [offres, setOffres] = useState<Offer[]>([])
@@ -14,7 +13,7 @@ export default function OffrePage() {
     try {
       setIsLoading(true)
       setError(null)
-      const data = await eventService.getOffres()
+      const data = await eventService.getOffres2()
       setOffres(data)
     } catch (err) {
       setError('Failed to load offers')
@@ -33,13 +32,11 @@ export default function OffrePage() {
   }
 
   return (
-    <>
     <Offres 
       offres={offres} 
       isLoading={isLoading} 
       error={error}
       onRefresh={handleRefresh}
     />
-    </>
   )
 }

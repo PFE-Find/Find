@@ -6,8 +6,9 @@ const postSchema = new mongoose.Schema(
     description: { type: String, required: true },
     prix: { type: Number, required: true },
     localisation: { type: [Number], required: true },
+    placeName: { type: String, required: true },
     propertyType: { type: String, enum: ['Land', 'Material'], required: true },
-    id_user: { type: Number, default: 1 },
+    id_user: { type: String, required: true },
     statut: { type: Boolean, default: false },
     images: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Image' }] 
   },

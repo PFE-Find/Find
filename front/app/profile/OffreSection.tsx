@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { FiHeart, FiArrowLeft, FiArrowRight, FiStar, FiMapPin } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import eventService from "../../services/Offres";
 
 interface Offre {
   _id: string;
@@ -15,33 +14,30 @@ interface Offre {
   unit: string;
   id_user: string;
   localisation: [number, number];
-  placeName: string[];
+  placeName:string[];
   equipements: string[];
   etat: string;
   images?: { path: string }[];
   propertyType: string;
   propertyId: number | null;
+  isNew?: boolean;
+  isPromoted?: boolean;
 }
 
-export default function Offres() {
+interface OffresSectionProps {
+  offres: Offre[];
+  title?: string;
+  subtitle?: string;
+}
+
+export default function Offres({
+  offres,
+  title = "Découvrez nos offres",
+  subtitle = "Trouvez la propriété parfaite pour vos besoins"
+}: OffresSectionProps) {
   const [favorites, setFavorites] = useState<{ [key: string]: boolean }>({});
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [offres, setOffres] = useState<Offre[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    async function fetchOffres() {
-      try {
-        const data = await eventService.getOffres1();
-        setOffres(data);
-        console.log("Fetched offres:", data);
-      } catch (error) {
-        console.error("Error fetching offres:", error);
-      }
-    }
-    fetchOffres();
-  }, []);
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -62,10 +58,6 @@ export default function Offres() {
       });
     }
   };
-
-  const filteredOffers = selectedCategory === "all"
-    ? offres
-    : offres.filter((offer) => offer.propertyType === selectedCategory);
 
   // Animation variants
   const cardVariants = {
@@ -93,13 +85,9 @@ export default function Offres() {
   };
 
   return (
-    <section className="py-4 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="max-w-full mx-auto">
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Découvrez nos offres</h2>
-          <p className="text-gray-600 dark:text-gray-400">Trouvez la propriété parfaite pour vos besoins</p>
-        </div>
-
+    <section className="py-4 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="max-w-6xl mx-auto">
+        
         <div className="relative group">
           <button
             onClick={() => scroll("left")}
@@ -109,25 +97,13 @@ export default function Offres() {
             <FiArrowLeft className="w-5 h-5" />
           </button>
 
-          {/* Updated scroll container with hidden scrollbar */}
           <div 
             ref={scrollContainerRef}
             className="overflow-x-auto pb-8 scrollbar-hide"
-            style={{
-              scrollbarWidth: 'none',  // For Firefox
-              msOverflowStyle: 'none'   // For IE/Edge
-            }}
           >
-            {/* Hide scrollbar for WebKit browsers */}
-            <style jsx>{`
-              .scrollbar-hide::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
-            
             <div className="flex space-x-6 w-max px-1">
               <AnimatePresence>
-                {filteredOffers.map((offre, index) => (
+                {offres.map((offre, index) => (
                   <motion.div
                     key={offre._id}
                     custom={index}
@@ -151,6 +127,20 @@ export default function Offres() {
                             loading="lazy"
                             variants={imageHoverVariants}
                           />
+                          
+                          {/* Badges */}
+                          <div className="absolute top-4 left-4 flex flex-col space-y-2">
+                            {offre.isNew && (
+                              <span className="bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                                Nouveau
+                              </span>
+                            )}
+                            {offre.isPromoted && (
+                              <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                                Promu
+                              </span>
+                            )}
+                          </div>
                           
                           {/* Favorite Button */}
                           <button
@@ -211,16 +201,17 @@ export default function Offres() {
                             </span>
                           </div>
 
+                    
+
                           <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
                             <div className="flex items-center space-x-3">
-                              {offre.Superficie && offre.Superficie !== "0" && (
-                                <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
-                                  <p className="text-xs text-gray-500 dark:text-gray-400">Superficie</p>
-                                  <p className="font-semibold text-gray-900 dark:text-white">
-                                    {offre.Superficie} {offre.unit}
-                                  </p>
-                                </div>
-                              )}
+                            {offre.Superficie && offre.Superficie !== "0" && (
+                              <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Superficie</p>
+                                <p className="font-semibold text-gray-900 dark:text-white">
+                                  {offre.Superficie} {offre.unit}
+                                </p>
+                              </div>)}
                               {offre.equipements?.length > 0 && (
                                 <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
                                   <p className="text-xs text-gray-500 dark:text-gray-400">Équipements</p>
@@ -254,6 +245,8 @@ export default function Offres() {
             <FiArrowRight className="w-5 h-5" />
           </button>
         </div>
+
+        
       </div>
     </section>
   );

@@ -1,204 +1,187 @@
-
+'use client';
 import Nav from "@/app/components/Nav"
 import Footer from "../components/Footer"
 import "../styles/Profile.css";
+import { useSession } from 'next-auth/react';
+import OffresSection from "./OffreSection"
+import { useEffect, useState } from "react";
+import eventService from "../services/Offres";
+import { FiUser } from "react-icons/fi";
+
 export default function Profile() {
-    const posts = [
-        {
-            id: 1,
-            title: 'Boost your conversion rate',
-            href: '#',
-            description:
-                'Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel. Iusto corrupti dicta.',
-            date: 'Mar 16, 2020',
-            datetime: '2020-03-16',
-            category: { title: 'Marketing', href: '#' },
-            author: {
-                name: 'Michael Foster',
-                role: 'Co-Founder / CTO',
-                href: '#',
-                imageUrl:
-                    'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-            },
-        },
-        {
-            id: 1,
-            title: 'Boost your conversion rate',
-            href: '#',
-            description:
-                'Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel. Iusto corrupti dicta.',
-            date: 'Mar 16, 2020',
-            datetime: '2020-03-16',
-            category: { title: 'Marketing', href: '#' },
-            author: {
-                name: 'Michael Foster',
-                role: 'Co-Founder / CTO',
-                href: '#',
-                imageUrl:
-                    'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-            },
-        },
-        {
-            id: 1,
-            title: 'Boost your conversion rate',
-            href: '#',
-            description:
-                'Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel. Iusto corrupti dicta.',
-            date: 'Mar 16, 2020',
-            datetime: '2020-03-16',
-            category: { title: 'Marketing', href: '#' },
-            author: {
-                name: 'Michael Foster',
-                role: 'Co-Founder / CTO',
-                href: '#',
-                imageUrl:
-                    'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-            },
-        },
-        // More posts...
-    ]
+    const { data: session, status } = useSession();
+    const [offres, setOffres] = useState<any[]>([]);
+    const [offres2, setOffres2] = useState<any[]>([]);
+
+    useEffect(() => {
+        async function fetchOffres() {
+            if (session?.user?.id) {
+                try {
+                    
+                    const offres2 = await eventService.getAllOffresByUserId(session.user.id);
+                    setOffres2(offres2);
+                    console.log("Fetched offres:", offres);
+                } catch (error) {
+                    console.error("Error fetching offres:", error);
+                }
+            }
+        }
+        async function fetchOffres2() {
+            if (session?.user?.id) {
+                try {
+                    console.log("Fetching offres for user ID:", session.user.id);
+                    const offres = await eventService.getAllOffresByUserId2(session.user.id);
+                    setOffres(offres);
+                    
+                    console.log("Fetched offres2:", offres);
+                } catch (error) {
+                    console.error("Error fetching offres2:", error);
+                }
+            }
+        }
+        fetchOffres2();
+        fetchOffres();
+    }, [session]);
+      
     return (
-        <div>
-            <Nav></Nav>
-            <div className="container ">
+        <div className="bg-gray-50 min-h-screen">
+            <Nav />
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Left Side - Profile Card */}
+                    <div className="w-full lg:w-1/3">
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+                            <div className="p-6 flex flex-col items-center">
+                            {session?.user?.image ? (
+                                <img 
+                                    src={session?.user?.image} 
+                                    width={200} 
+                                    height={200}
+                                    className="rounded-full border-4 border-white shadow-lg mb-4"
+                                    alt="Profile"
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).style.display = 'none';
+                                      }} 
+                                />
+                                
+                            ) : (
+                                <div 
+                                className="w-[200] h-[200] rounded-full border-2 border-green-200 bg-gray-100 flex items-center justify-center">
+                                  <FiUser  className="w-[100] h-[100] text-gray-400" />
+                                </div>
+                              )}
 
-                <div className="left_side mt-5">
-                    <div className="card shadow-md flex border-black profile-card mb-5 mt-5">
-                        <div className="flex-col justify-center content-center infos-profile">
-                            <img src="/assets/profile.png" width={100} id="profile_img"></img>
-                            <span className="text-gray-600 font-bold" >Akram Zaabi</span>
-                            <span className="text-gray-500">Super Hote </span>
+                                <h2 className="text-2xl font-bold text-gray-800">{session?.user?.name}</h2>
+                                <p className="text-gray-600 mb-4">{session?.user?.email}</p>
+                                
+                                <div className="grid grid-cols-3 gap-4 text-center w-full mt-4">
+                                    <div className="bg-blue-50 p-3 rounded-lg">
+                                        <p className="text-2xl font-bold text-blue-600">13</p>
+                                        <p className="text-sm text-gray-500">Évaluations</p>
+                                    </div>
+                                    <div className="bg-green-50 p-3 rounded-lg">
+                                        <p className="text-2xl font-bold text-green-600">4.65</p>
+                                        <p className="text-sm text-gray-500">Note globale</p>
+                                    </div>
+                                    <div className="bg-purple-50 p-3 rounded-lg">
+                                        <p className="text-2xl font-bold text-purple-600">7</p>
+                                        <p className="text-sm text-gray-500">Mois d'expérience</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex-col justify-center content-center tags">
-                            <span className=" score">13</span>
-                            <span className="text-gray-500 text-sm notes">évaluations </span>
-                            <span className=" score">4,65</span>
-                            <span className="text-gray-500 text-sm notes">en note globale </span>
-                            <span className=" score">7</span>
-                            <span className="text-gray-500 text-sm notes">mois d'experience  en tant que hote</span>
+
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                            <div className="p-6">
+                                <h3 className="text-xl font-bold text-gray-800 mb-4">Vérifications</h3>
+                                <div className="space-y-3">
+                                    <div className="flex items-center">
+                                        <div className="bg-green-100 p-2 rounded-full mr-3">
+                                            <img src="/assets/verif.png" width={20} height={20} alt="Verified" />
+                                        </div>
+                                        <span className="text-gray-600">{session?.user?.email}</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <div className="bg-green-100 p-2 rounded-full mr-3">
+                                            <img src="/assets/verif.png" width={20} height={20} alt="Verified" />
+                                        </div>
+                                        <span className="text-gray-600">Numéro de téléphone</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div className="card shadow-md  profile-verif ">
-                        <div className="rapper">
-                            <span className="text-black text-xl font-bold">Vérifications éffectuées par
-                                Akram Zaabi</span>
-                            <div className="verification">
-                                <img src="/assets/verif.png" ></img>
-                                <span className="text-gray-400 font-bold">Addresse mail</span>
-                            </div>
-                            <div className="verification">
-                                <img src="/assets/verif.png" ></img>
-                                <span className="text-gray-400 font-bold">Numéro de télephone
-                                </span>
-                            </div>
-                        </div>
 
-                    </div>
-                </div>
-
-                <div className="details mt-4">
-                    <h1 className="text-black font-bold text-3xl mt-5" id="title" style={{ 'borderBottom': '1px solid lightgray' }}>Informations sur Akram Zaabi</h1>
-                    <h3 className="text-black font-bold text-2xl mt-5">Commentaires sur Akram Zaabi</h3>
-                    <div className="bg-white  ">
-                        <div className="mx-auto max-w-7xl px-6 ">
-                            <div className="mx-auto grid mt-4 max-w-2xl grid-cols-1 gap-x-8 gap-y-8 border-t border-b border-gray-200 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-                                {posts.map((post) => (
-                                    <article key={post.id} className="mt-2 flex max-w-xl flex-col items-start justify-between">
-                                        <div className="flex items-center gap-x-4 text-xs">
-                                            <time dateTime={post.datetime} className="text-gray-500">
-                                                {post.date}
-                                            </time>
-                                            <a
-                                                href={post.category.href}
-                                                className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
-                                            >
-                                                {post.category.title}
-                                            </a>
-                                        </div>
-                                        <div className="group relative">
-                                            <h3 className="mt-3 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600">
-                                                <a href={post.href}>
-                                                    <span className="absolute inset-0" />
-                                                    {post.title}
-                                                </a>
-                                            </h3>
-                                            <p className="mt-5 line-clamp-3 text-sm/6 text-gray-600">{post.description}</p>
-                                        </div>
-                                        <div className="relative mt-8 flex items-center gap-x-4 mb-3">
-                                            <img alt="" src="/assets/profile.png" className="size-10 rounded-full bg-gray-50" />
-                                            <div className="text-sm/6">
-                                                <p className="font-semibold text-gray-900">
-                                                    <a href={post.author.href}>
-                                                        <span className="absolute inset-0" />
-                                                       Akram Zaabi
-                                                    </a>
-                                                </p>
-                                                <p className="text-gray-600">{post.author.role}</p>
+                    {/* Right Side - Content */}
+                    <div className="w-full lg:w-2/3">
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+                            <div className="p-6">
+                                <h1 className="text-2xl font-bold text-gray-800 pb-4 border-b border-gray-200">
+                                    Informations sur {session?.user?.name}
+                                </h1>
+                                
+                                <h3 className="text-xl font-bold text-gray-800 mt-6 mb-4">Commentaires</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {offres.map((post) => (
+                                        <div key={post.id} className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="text-sm text-gray-500">{post.date}</span>
+                                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                                    {post.category}
+                                                </span>
+                                            </div>
+                                            <h4 className="font-semibold text-lg text-gray-800 mb-2">{post.title}</h4>
+                                            <p className="text-gray-600 text-sm line-clamp-3">{post.description}</p>
+                                            <div className="flex items-center mt-4">
+                                                <img 
+                                                    src="/assets/profile.png" 
+                                                    alt="Author" 
+                                                    className="w-8 h-8 rounded-full mr-2" 
+                                                />
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-800">Akram Zaabi</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </article>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                    <h3 className="text-black font-bold text-xl mt-5">Quelques Annonces Publiées par Akram Zaabi </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4 ">
-
-                       <div className="h-auto bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700 m-2 sm:m-5 w-full max-w-xs sm:max-w-sm">
-                            <a href="#">
-                                <img className="rounded-xl w-full h-40 object-cover" src="/assets/terrain.png" alt="Terrain Image" />
-                            </a>
-                            <div className="p-4">
-                                <a href="#">
-                                    <h5 className="text-base font-bold tracking-tight text-gray-900 dark:text-white">Terrain à Bizerte</h5>
-                                </a>
-                                <p className="text-sm text-gray-700 dark:text-gray-400">5 hectares</p>
-                                <p className="text-sm text-gray-700 dark:text-gray-400">Agricole</p>
-                                <a href="#">
-                                    <h5 className="text-sm font-bold text-gray-900 dark:text-white">250 000 TND</h5>
-
-                                </a>
-                            </div>
-                        </div><div className="h-auto bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700 m-2 sm:m-5 w-full max-w-xs sm:max-w-sm">
-                            <a href="#">
-                                <img className="rounded-xl w-full h-40 object-cover" src="/assets/terrain.png" alt="Terrain Image" />
-                            </a>
-                            <div className="p-4">
-                                <a href="#">
-                                    <h5 className="text-base font-bold tracking-tight text-gray-900 dark:text-white">Terrain à Bizerte</h5>
-                                </a>
-                                <p className="text-sm text-gray-700 dark:text-gray-400">5 hectares</p>
-                                <p className="text-sm text-gray-700 dark:text-gray-400">Agricole</p>
-                                <a href="#">
-                                    <h5 className="text-sm font-bold text-gray-900 dark:text-white">250 000 TND</h5>
-
-                                </a>
-                            </div>
-                        </div><div className="h-auto bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700 m-2 sm:m-5 w-full max-w-xs sm:max-w-sm">
-                            <a href="#">
-                                <img className="rounded-xl w-full h-40 object-cover" src="/assets/terrain.png" alt="Terrain Image" />
-                            </a>
-                            <div className="p-4">
-                                <a href="#">
-                                    <h5 className="text-base font-bold tracking-tight text-gray-900 dark:text-white">Terrain à Bizerte</h5>
-                                </a>
-                                <p className="text-sm text-gray-700 dark:text-gray-400">5 hectares</p>
-                                <p className="text-sm text-gray-700 dark:text-gray-400">Agricole</p>
-                                <a href="#">
-                                    <h5 className="text-sm font-bold text-gray-900 dark:text-white">250 000 TND</h5>
-
-                                </a>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
+                        {/* Annonces Sections */}
+                        <div className="space-y-8">
+                            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                                <div className="p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h3 className="text-xl font-bold text-gray-800">
+                                            Annonces en attente d'approbation
+                                        </h3>
+                                        <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                            {offres.length} en attente
+                                        </span>
+                                    </div>
+                                    <OffresSection offres={offres} />
+                                </div>
+                            </div>
 
-
+                            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                                <div className="p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h3 className="text-xl font-bold text-gray-800">
+                                            Annonces publiées
+                                        </h3>
+                                        <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                            {offres2.length} publiées
+                                        </span>
+                                    </div>
+                                    <OffresSection offres={offres2} />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
             </div>
-
-            <Footer></Footer>
+            <Footer />
         </div>
     )
 }

@@ -101,6 +101,71 @@ export const getItems2 = async (req, res, next) => {
   }
 };
 
+
+
+export const getItems3 = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    
+
+    const items = await Post.find({ id_user: userId, statut: true })
+      .populate({
+        path: 'images',
+        select: 'path date',
+      })
+      .exec();
+
+    
+
+    if (!items || items.length === 0) {
+      return res.status(404).json({ message: 'No items found for this user' });
+    }
+
+    const itemsPlain = items.map((item) => ({
+      ...item.toObject(),
+      images: item.images || [],
+    }));
+
+   
+
+    res.json(itemsPlain);
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    next(error);
+  }
+};
+export const getItems4 = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    
+
+    const items = await Post.find({ id_user: userId, statut: false })
+      .populate({
+        path: 'images',
+        select: 'path date',
+      })
+      .exec();
+
+    
+
+    if (!items || items.length === 0) {
+      return res.status(404).json({ message: 'No items found for this user' });
+    }
+
+    const itemsPlain = items.map((item) => ({
+      ...item.toObject(),
+      images: item.images || [],
+    }));
+
+    
+
+    res.json(itemsPlain);
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    next(error);
+  }
+};
+
 export const updateOffreStatus = async (req, res, next) => {
   try {
     const { id } = req.params;

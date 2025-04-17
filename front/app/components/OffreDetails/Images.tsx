@@ -10,14 +10,16 @@ interface ImageObject {
 
 interface ImagesProps {
     images: ImageObject[];
-    titre: string; // Added titre as a prop
+    titre: string;
 }
 
 export default function Images({ images, titre }: ImagesProps) {
-    console.log("Images:", images);
-
     if (!images || images.length === 0) {
-        return <p>No images available</p>;
+        return (
+            <div className="p-8 text-center">
+                <p className="text-gray-500 dark:text-gray-400">Aucune image disponible</p>
+            </div>
+        );
     }
 
     const [mainImage, setMainImage] = useState(images[0].path);
@@ -33,32 +35,48 @@ export default function Images({ images, titre }: ImagesProps) {
     };
 
     return (
-        <div className="p-4 ">
-            <p className="container mx-auto text-3xl text-gray-700 font-bold dark:text-gray-400 mt-5 mb-5">
-                {titre} {/* Dynamically using titre prop */}
-            </p>
-            <div className="container mx-auto flex flex-wrap md:flex-nowrap gap-4">
+        <div className="p-4 max-w-[80%] mx-auto">
+            
+            
+            <div className="flex flex-col lg:flex-row gap-6">
                 {/* Main Image */}
-                <div className="w-full md:w-2/3">
-                    <img src={mainImage} alt="Main" className="w-full h-[592px] rounded-lg shadow-md object-cover" />
+                <div className="w-full lg:w-2/3 relative group">
+                    <img 
+                        src={mainImage} 
+                        alt="Main" 
+                        className="w-full h-[600px] rounded-xl shadow-lg object-cover transition-all duration-300 hover:shadow-xl cursor-pointer"
+                        onClick={() => {
+                            setCurrentIndex(images.findIndex(img => img.path === mainImage));
+                            setIsModalOpen(true);
+                        }}
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 rounded-xl"></div>
                 </div>
+                
                 {/* Thumbnails */}
-                <div className="w-full md:w-1/3 flex flex-col gap-2 relative">
-                    {images.slice(1, 4).map((img, index) => (
-                        <div key={index} className="relative">
+                <div className="w-full lg:w-1/3 h-[600px] grid grid-cols-2 gap-3">
+                    {images.slice(0, 4).map((img, index) => (
+                        <div 
+                            key={index} 
+                            className={`relative rounded-lg overflow-hidden transition-all duration-200 ${mainImage === img.path ? 'ring-4 ring-blue-500' : ''}`}
+                        >
                             <img
                                 src={img.path}
                                 alt={`Thumbnail ${index}`}
-                                className="w-full h-48 object-cover rounded-md cursor-pointer opacity-75 hover:opacity-100 transition"
+                                className={`w-full h-full object-cover cursor-pointer transition-all duration-200 ${mainImage === img.path ? 'opacity-100' : 'opacity-90 hover:opacity-100'}`}
                                 onClick={() => setMainImage(img.path)}
                             />
-                            {/* Button over the last image */}
-                            {index === images.slice(1, 4).length - 1 && (
+                            
+                            {/* Button for last thumbnail */}
+                            {index === 3 && images.length > 4 && (
                                 <button
-                                    className="absolute inset-0 bg-black bg-opacity-50 text-white text-center rounded-md flex items-center justify-center font-medium"
-                                    onClick={() => setIsModalOpen(true)}
+                                    className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center font-medium hover:bg-opacity-50 transition-all"
+                                    onClick={() => {
+                                        setCurrentIndex(0);
+                                        setIsModalOpen(true);
+                                    }}
                                 >
-                                    Afficher toutes les photos
+                                    <span className="text-lg">+{images.length - 4} photos</span>
                                 </button>
                             )}
                         </div>
@@ -66,21 +84,55 @@ export default function Images({ images, titre }: ImagesProps) {
                 </div>
             </div>
             
-
             {/* Modal */}
-            <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                <div className="relative bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full">
-                    <button className="absolute top-2 right-2 p-2" onClick={() => setIsModalOpen(false)}>
-                        <X className="w-6 h-6" />
+            <Dialog 
+                open={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" aria-hidden="true" />
+                
+                <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+                    <button 
+                        className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 transition-all shadow-md"
+                        onClick={() => setIsModalOpen(false)}
+                    >
+                        <X className="w-6 h-6 text-gray-900 dark:text-gray-100" />
                     </button>
-                    <div className="flex items-center justify-center">
-                        <button className="p-2" onClick={prevImage}>
+                    
+                    <div className="flex items-center justify-between h-full">
+                        <button 
+                            className="p-4 z-10 text-gray-900 dark:text-gray-100 hover:bg-white/20 dark:hover:bg-gray-800/50 transition-all"
+                            onClick={prevImage}
+                        >
                             <ChevronLeft className="w-8 h-8" />
                         </button>
-                        <img src={images[currentIndex].path} alt="Modal" className="w-full h-[500px] object-cover rounded-md" />
-                        <button className="p-2" onClick={nextImage}>
+                        
+                        <div className="flex-1 flex items-center justify-center h-full">
+                            <img 
+                                src={images[currentIndex].path} 
+                                alt={`Slide ${currentIndex}`} 
+                                className="max-w-full max-h-[85vh] object-contain p-4"
+                            />
+                        </div>
+                        
+                        <button 
+                            className="p-4 z-10 text-gray-900 dark:text-gray-100 hover:bg-white/20 dark:hover:bg-gray-800/50 transition-all"
+                            onClick={nextImage}
+                        >
                             <ChevronRight className="w-8 h-8" />
                         </button>
+                    </div>
+                    
+                    <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+                        {images.map((_, idx) => (
+                            <button
+                                key={idx}
+                                className={`w-3 h-3 rounded-full transition-all ${currentIndex === idx ? 'bg-blue-600 w-6' : 'bg-gray-300 dark:bg-gray-600'}`}
+                                onClick={() => setCurrentIndex(idx)}
+                                aria-label={`Aller à l'image ${idx + 1}`}
+                            />
+                        ))}
                     </div>
                 </div>
             </Dialog>

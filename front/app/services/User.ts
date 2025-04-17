@@ -45,7 +45,25 @@ const userService = {
       const response = await axios.put(`${API_URL}/${id}`, eventData);
       return response.data;
     } catch (error) {
-      console.error("Error updating event:", error);
+      console.error("Error fetchreport:", error);
+      throw error;
+    }
+  },
+  async getUserById(id: string) {
+    try {
+      const response = await axios.get(`${API_URL}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetch user:", error);
+      throw error;
+    }
+  },
+  async getUsers() {
+    try {
+      const response = await axios.get(`${API_URL}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching users:", error);
       throw error;
     }
   },

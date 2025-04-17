@@ -1,226 +1,361 @@
 'use client';
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import "../styles/globals.css";
-import Nav from "@/app/components/Nav"
+import { motion } from "framer-motion";
+import { FiArrowRight, FiPlay, FiCheck, FiMapPin, FiShield, FiTrendingUp, FiHeadphones, FiBarChart2, FiEye } from "react-icons/fi";
+import Nav from "@/app/components/Nav";
 import Footer from "@/app/components/Footer";
-import Box from '@mui/material/Box';
-import Slider from '@mui/material/Slider';
 import Offres from "@/app/components/Home/OffreSection";
+import Image from 'next/image';
+
+// Animation variants
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+};
+
+const fadeIn = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { duration: 0.8 } }
+};
+
+const slideInFromLeft = {
+  hidden: { opacity: 0, x: -100 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.8 } }
+};
+
+const slideInFromRight = {
+  hidden: { opacity: 0, x: 100 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.8 } }
+};
+
+const scaleUp = {
+  hidden: { opacity: 0, scale: 0.9 },
+  show: { opacity: 1, scale: 1, transition: { duration: 0.6 } }
+};
 
 export default function Home() {
-    const googleMapsApiKey = 'AIzaSyBwuWweetgIP1ZiyM-ttW0a6ARGdrkvij8';
-    const [mapUrl, setMapUrl] = useState('https://www.google.com/maps/embed/v1/place?q=Bizerte,+Tunisie&key=' + googleMapsApiKey); // Default map URL
+  const features = [
+    {
+      icon: <FiMapPin className="w-6 h-6 text-teal-600" />,
+      title: "Trouvez les meilleures opportunités",
+      description: "Explorez notre sélection de terres agricoles et d'équipements de haute qualité, mis à jour régulièrement."
+    },
+    {
+      icon: <FiShield className="w-6 h-6 text-teal-600" />,
+      title: "Transaction sécurisée",
+      description: "Nous garantissons des transactions sécurisées avec des fournisseurs vérifiés et un processus fiable."
+    },
+    {
+      icon: <FiTrendingUp className="w-6 h-6 text-teal-600" />,
+      title: "Gestion simplifiée",
+      description: "Plateforme tout-en-un pour gérer vos investissements agricoles : recherche, évaluation et suivi."
+    },
+    {
+      icon: <FiHeadphones className="w-6 h-6 text-teal-600" />,
+      title: "Accompagnement personnalisé",
+      description: "Bénéficiez d'un accompagnement dédié et d'analyses IA pour maximiser vos investissements."
+    }
+  ];
 
+  const cards = [
+    {
+      image: "/assets/home1.jpg",
+      title: "Publiez votre annonce en quelques clics",
+      description: "Ajoutez facilement une annonce avec une description détaillée, des photos et un prix."
+    },
+    {
+      image: "/assets/home2.jpg",
+      title: "Trouvez rapidement des acheteurs ou vendeurs",
+      description: "Grâce à notre système de recherche avancé, filtrez les annonces selon vos critères."
+    },
+    {
+      image: "/assets/home4.jpg",
+      title: "Discutez directement avec les intéressés",
+      description: "Entrez en contact via notre messagerie intégrée pour négocier et obtenir des informations."
+    }
+  ];
 
-    return (
-        <div>
-            <Nav></Nav>
-            {/* <section className="bg-white  " style={{ borderRadius: '15px', width: '100%', display: 'flex', flexDirection: 'column', justifySelf: 'center' }}>
-                <div className="bg-gradient-to-b from-teal-600 to-teal-200 mx-auto max-w-screen-full text-center lg:py-16 lg:px-11 mb-20 "
-                    style={{
-                        
-                        borderRadius: '15px',
-                        width: '90%'
-                    }}> */}
-            <section className="bg-white  " style={{ borderRadius: '15px', width: '100%', display: 'flex', flexDirection: 'column', justifySelf: 'center' }}>
-                <div className="mx-auto bg-gradient-to-b from-[#f0fdf4] to-teal-600 max-w-screen-full text-center lg:py-16 lg:px-11 mb-20"
-                    style={{
-                        
-                        borderRadius: '15px',
-                        width: '90%'
-                    }}>
-                    <h1 className="mb-4 text-2xl font-bold tracking-tight leading-none text-gray-800 md:text-4xl lg:text-6xl dark:text-gray-900">
-                        Facilitons ensemble <br />
-                        le commerce  <span className="text-teal-600">Agricole</span>
+  return (
+    <div className="bg-gray-50">
+      <Nav />
 
-                    </h1>
+      {/* Hero Section */}
+      <motion.section
+        initial="hidden"
+        animate="show"
+        variants={container}
+        className="relative bg-gradient-to-b from-teal-600 to-white pt-20 md:pt-32 px-4"
+      >
+        <div className="max-w-full mx-auto text-center">
+          <motion.h1
+            variants={item}
+            className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight mb-6"
+          >
+            Facilitons ensemble le commerce <br />
+            <span className="text-teal-600">Agricole</span>
+          </motion.h1>
 
-                    <p className="mb-8 text-lg font-normal text-gray-800 lg:text-2xl sm:px-16 xl:px-80 dark:text-gray-700">
-                        Finder propose une plateforme intelligente pour faciliter l'achat et <br /> la vente de terres agricoles. En combinant transparence du marché
-                    </p>
-                    <div className="flex mt-5 flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4 ">
-                        <Link href="/" className="dark:hover:bg-gray-700 "
-                            style={{ borderRadius: '8px' }}>
-                            <span className="inline-flex justify-center items-center py-3 px-5 text-base hover:text-teal-800 font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-200 focus:ring-4 focus:ring-teal-300 dark:focus:ring-teal-900">
-                                Essayez
-                                <svg className="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
-                            </span>
-                        </Link>
-                        <Link href="/">
-                            <span className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-teal-800 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-gray-100  text-green-700 border-gray-700  focus:ring-gray-800">
-                                <svg className="mr-2 -ml-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                                </svg>
-                                Register
-                            </span>
-                        </Link>
-                    </div>
-                </div>
-                <div className="mx-auto max-w-screen-2xl sm:py-4 lg:px-6 mb-10">
-  <div className="space-y-8 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-12 md:space-y-0 gap-0">
+          <motion.p
+            variants={item}
+            className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-10"
+          >
+            Finder propose une plateforme intelligente pour faciliter l'achat et la vente de terres agricoles.
+          </motion.p>
 
-    {/* Opportunités */}
-    <div>
-      <div className="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-teal-100 lg:h-12 lg:w-12 dark:bg-teal-100">
-        <svg className="w-5 h-5 text-teal-700 lg:w-6 lg:h-6 dark:text-teal-700" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25M8.25 9V5.25M3 11.25v-3a.75.75 0 01.75-.75h16.5a.75.75 0 01.75.75v3M12 14.25a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z" />
-        </svg>
-      </div>
-      <h3 className="mb-2 text-xl font-bold dark:text-white">Trouvez les meilleures opportunités</h3>
-      <p className="text-gray-500 dark:text-gray-400">
-        Explorez notre sélection de terres agricoles et d'équipements de haute qualité, mis à jour régulièrement pour vous offrir les meilleures opportunités d'investissement.
-      </p>
-    </div>
+          <motion.div
+            variants={item}
+            className="flex flex-col sm:flex-row justify-center gap-4"
+          >
+            <Link href="/offres">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center px-8 py-4 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-all"
+              >
+                Explorer les offres
+                <FiArrowRight className="ml-2" />
+              </motion.button>
+            </Link>
 
-    {/* Transaction sécurisée */}
-    <div>
-      <div className="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-teal-100 lg:h-12 lg:w-12 dark:bg-teal-300">
-        <svg className="w-5 h-5 text-teal-700 lg:w-6 lg:h-6 dark:text-teal-700" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3zM12 14.25c-4.97 0-9 2.239-9 5v1.5h18v-1.5c0-2.761-4.03-5-9-5z" />
-        </svg>
-      </div>
-      <h3 className="mb-2 text-xl font-bold dark:text-white">Transaction sécurisée</h3>
-      <p className="text-gray-500 dark:text-gray-400">
-        Nous garantissons des transactions sécurisées et transparentes, avec des fournisseurs vérifiés et un processus de paiement fiable.
-      </p>
-    </div>
-
-    {/* Gestion simplifiée */}
-    <div>
-      <div className="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-teal-100 lg:h-12 lg:w-12 dark:bg-teal-300">
-        <svg className="w-5 h-5 text-teal-600 lg:w-6 lg:h-6 dark:text-teal-600" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h4l3 10h4l3-10h4" />
-        </svg>
-      </div>
-      <h3 className="mb-2 text-xl font-bold dark:text-white">Gestion simplifiée</h3>
-      <p className="text-gray-500 dark:text-gray-400">
-        Nous vous proposons une plateforme tout-en-un pour gérer vos investissements agricoles : recherche, évaluation, négociation, paiement et suivi des transactions.
-      </p>
-    </div>
-
-    {/* Accompagnement personnalisé */}
-    <div>
-      <div className="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-teal-100 lg:h-12 lg:w-12 dark:bg-teal-300">
-        <svg className="w-5 h-5 text-teal-600 lg:w-6 lg:h-6 dark:text-teal-600" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13 7H7v6h6V7zM17 7h2a2 2 0 012 2v6a2 2 0 01-2 2h-2m-4 0H7a2 2 0 01-2-2V7a2 2 0 012-2h6" />
-        </svg>
-      </div>
-      <h3 className="mb-2 text-xl font-bold dark:text-white">Accompagnement personnalisé</h3>
-      <p className="text-gray-500 dark:text-gray-400">
-        Bénéficiez d'un accompagnement dédié et d'analyses IA pour vous aider à prendre des décisions éclairées et maximiser vos investissements agricoles.
-      </p>
-    </div>
-
-  </div>
-</div>
-
-
-
-
-                <div className=" mx-auto max-w-screen-xl md:grid md:grid-cols-2 m-20">
-
-                    <img
-                        className="object-cover h-[450px] w-[550px] mr-0  shadow-xl  dark:bg-gray-800"
-                        src="/assets/home_1.jpeg"
-                        alt="dashboard image"
-
-                    />
-                    <div className="mt-4 ">
-                        <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-green-600">
-                            dans toutes les régions agricoles de la Tunisie.
-                        </h2>
-                        <p className="mb-3 mt-5  font-light text-gray-500 md:text-lg dark:text-gray-400">
-                            Find  propose une plateforme intelligente pour faciliter l'achat et la vente de terres agricoles. En combinant transparence du marché et analyses basées sur l'IA, nous permettons aux agriculteurs, investisseurs et vendeurs de prendre des décisions éclairées et de maximiser leurs opportunités.                        </p>
-                        <Link
-                            href="#"
-                            className="inline-flex mt-5 items-center text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-teal-900"
-                        >
-                            Get started
-                            <svg
-                                className="ml-2  w-5 h-5"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                        </Link>
-                    </div>
-                </div>
-                <Offres></Offres>
-
-
-
-
-
-
-                <h2 className="text-3xl font-bold text-center m-20">
-                    Avec <span className="text-teal-700">Find</span>, achetez et vendez en toute simplicité
-                </h2>
-                <div className="flex flex-wrap justify-center gap-32 mb-20">
-
-
-                    <div className="max-w-sm bg-white rounded-3xl shadow-sm dark:bg-gray-800 dark:border-gray-700 text-center">
-                        <a href="#">
-                            <img className="object-cover w-full h-[450px] rounded-t-3xl" src="/assets/home1.jpg" alt="" />
-                        </a>
-                        <div className="p-5">
-                            <a href="#">
-                                <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">Publiez votre annonce en quelques clics</h5>
-                            </a>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">Ajoutez facilement une annonce avec une description détaillée, des photos et un prix. Que ce soit pour un terrain agricole, un terrain résidentiel ou du matériel agricole, mettez en avant vos offres en quelques minutes.</p>
-                        </div>
-                    </div>
-
-                    <div className="max-w-sm bg-white rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 text-center">
-                        <a href="#">
-                            <img className="object-cover w-full h-[450px] rounded-t-3xl" src="/assets/home2.jpg" alt="" />
-                        </a>
-                        <div className="p-5">
-                            <a href="#">
-                                <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">Trouvez rapidement des acheteurs ou des vendeurs près de chez vous</h5>
-                            </a>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">Grâce à notre système de recherche avancé, filtrez les annonces selon vos critères : emplacement, superficie, type de terrain ou équipement disponible. Trouvez exactement ce dont vous avez besoin sans perdre de temps.</p>
-                        </div>
-                    </div>
-
-                    <div className="max-w-sm bg-white rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 text-center">
-                        <a href="#">
-                            <img className="object-cover w-full h-[450px] rounded-t-3xl" src="/assets/home4.jpg" alt="" />
-                        </a>
-                        <div className="p-5">
-                            <a href="#">
-                                <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">Discutez directement avec les intéressés</h5>
-                            </a>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">Entrez en contact avec les vendeurs ou acheteurs via notre messagerie intégrée. Posez vos questions, négociez les prix et obtenez toutes les informations nécessaires avant de conclure la transaction.</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="p-4 container mx-auto rounded-2xl mb-20">
-                    <div style={{ width: "100%" }}>
-                        <iframe
-                            width="100%"
-                            height="500"
-                            frameBorder="0"
-                            scrolling="no"
-                            marginHeight={0}
-                            marginWidth={0}
-                            src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=tunisia+(My%20Business%20Name)&amp;t=p&amp;z=6&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
-                        ></iframe>
-                    </div>
-                </div>
-
-                <Footer></Footer>
-
-            </section>
-
+            <Link href="/inscription">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center px-8 py-4 border border-teal-600 text-teal-600 rounded-lg font-medium hover:bg-teal-50 transition-all"
+              >
+                <FiPlay className="mr-2" />
+                Voir la démo
+              </motion.button>
+            </Link>
+          </motion.div>
         </div>
-    );
+      </motion.section>
+      {/* Offers Section */}
+      <div className="py-16 bg-white">
+        <Offres />
+      </div>
+      <motion.div variants={item} className="text-center mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Pourquoi choisir <span className="text-teal-600">Find</span> ?
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Une plateforme complète pour tous vos besoins agricoles
+            </p>
+          </motion.div>
+
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center py-12">
+        {/* Image Section */}
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="relative rounded-xl overflow-hidden shadow-xl h-[500px]"
+        >
+          <Image
+            src="/assets/home_1.jpeg"
+            alt="Agriculture en Tunisie"
+            fill
+            className="object-cover"
+            priority
+          />
+        </motion.div>
+
+        {/* Content Section */}
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="space-y-6"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 leading-tight">
+            Connectez-vous aux meilleures terres agricoles de Tunisie
+          </h2>
+
+          <div className="space-y-4">
+            {[
+              {
+                icon: <FiCheck className="text-green-500 mt-1 mr-3 flex-shrink-0" />,
+                text: "Plateforme intelligente pour l'achat/vente de terres"
+              },
+              {
+                icon: <FiBarChart2 className="text-green-500 mt-1 mr-3 flex-shrink-0" />,
+                text: "Analyses basées sur l'IA pour des décisions éclairées"
+              },
+              {
+                icon: <FiEye className="text-green-500 mt-1 mr-3 flex-shrink-0" />,
+                text: "Transparence du marché et évaluations précises"
+              }
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: i * 0.1 + 0.4 }}
+                viewport={{ once: true }}
+                className="flex items-start"
+              >
+                {item.icon}
+                <p className="text-gray-600 text-lg">{item.text}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+            viewport={{ once: true }}
+          >
+            <Link href="/offres" passHref>
+              <motion.button
+                whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
+                whileTap={{ scale: 0.98 }}
+                className="px-8 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-all text-lg"
+              >
+                Commencer maintenant
+                <FiArrowRight className="inline ml-2" />
+              </motion.button>
+            </Link>
+          </motion.div>
+        </motion.div>
+      </div>
+      {/* CTA Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="bg-teal-600 py-16 text-white"
+      >
+        <div className="max-w-4xl mx-auto text-center px-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Prêt à transformer votre expérience agricole ?</h2>
+          <p className="text-lg mb-8">Rejoignez des milliers d'agriculteurs et d'investisseurs qui font confiance à Find</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/inscription">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-3 bg-white text-teal-600 rounded-lg font-medium hover:bg-gray-100 transition-all"
+              >
+                S'inscrire gratuitement
+              </motion.button>
+            </Link>
+            <Link href="/contact">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-3 border border-white text-white rounded-lg font-medium hover:bg-teal-700 transition-all"
+              >
+                Nous contacter
+              </motion.button>
+            </Link>
+          </div>
+        </div>
+      </motion.section>
+
+
+
+      {/* Cards Section */}
+      <motion.section
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        variants={container}
+        className="py-20 bg-gray-50"
+      >
+        <div className="max-w-[80%] mx-auto px-4">
+          <motion.div variants={item} className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Avec <span className="text-teal-600">Find</span>, achetez et vendez en toute simplicité
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Une expérience utilisateur intuitive pour toutes vos transactions agricoles
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {cards.map((card, index) => (
+              <motion.div
+                key={index}
+                variants={scaleUp}
+                className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all overflow-hidden"
+              >
+                <img
+                  className="w-full h-64 object-cover"
+                  src={card.image}
+                  alt={card.title}
+                />
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-800 mb-3">{card.title}</h3>
+                  <p className="text-gray-600">{card.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Map Section */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="bg-white py-12"
+      >
+        <div className="max-w-[80%] mx-auto px-4">
+          <div className="rounded-xl overflow-hidden shadow-lg">
+            <iframe
+              className="w-full h-96"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2637604.364951658!2d8.5619416!3d34.2269715!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd8a715b5f857f%3A0xc9d1e9c6971b7d9b!2sTunisie!5e0!3m2!1sfr!2stn!4v1620000000000!5m2!1sfr!2stn"
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+      </motion.section>
+{/* Features Section */}
+<motion.section 
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+        variants={container}
+        className="py-20 bg-white"
+      >
+        <div className="max-w-[90%] mx-auto px-4">
+          
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <motion.div 
+                key={index}
+                variants={item}
+                className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-md transition-all"
+              >
+                <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center mb-6">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-3">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      <Footer />
+    </div>
+  );
 }

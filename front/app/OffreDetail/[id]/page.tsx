@@ -14,7 +14,7 @@ import { useParams } from 'next/navigation';
 export default function OffreDetail() {
     const { id } = useParams();
     const offreId = Array.isArray(id) ? id[0] : id;
-    console.log("Offer ID:", offreId);
+    
 
     const [offre, setOffre] = useState<any>(null);
 
@@ -25,7 +25,7 @@ export default function OffreDetail() {
             try {
                 const data = await eventService.getOffre(offreId);
                 setOffre(data);
-                console.log("Offer data:", data);
+                
             } catch (error) {
                 console.error("Error fetching offer:", error);
             }
@@ -44,7 +44,7 @@ export default function OffreDetail() {
                 <>
                     <OffreImages images={offre.images} titre={offre.titre} />
                     <Detail offre={offre} /> {/* Pass entire offre object to Detail */}
-                    {offre.localisation && <Maps localisation={offre.localisation} />} {/* Ensure localisation exists */}
+                    {/* {offre.localisation && <Maps localisation={offre.localisation} />} Ensure localisation exists */}
                     </>
             ) : (
                 <p>Loading images...</p>

@@ -12,10 +12,13 @@ const UserSchema = new mongoose.Schema({
     password:{
         type : String  , 
         required : true 
-    }
-
-    
-});
+    },
+    Role:{
+        type : Number  , 
+        default: 0
+    }},
+    { timestamps: true, discriminatorKey: 'propertyType' }
+);
 
 const User = mongoose.model('User', UserSchema);
 
