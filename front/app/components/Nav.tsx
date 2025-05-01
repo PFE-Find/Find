@@ -12,24 +12,52 @@ import { HiOutlineMenuAlt3, HiX } from 'react-icons/hi';
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
 
+
   const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Tout Les Offres', href: '/OffrePage' },
-    { name: 'Pricing', href: '/pricing' },
+    { name: 'Accueil', href: '/' },
+    { name: 'Explorer', href: '/OffrePage' },
+    { name: 'àpropos', href: '/aboutUs' },
     { name: 'Services', href: '/services' },
-    { name: 'Contact', href: '/contact' }
+    { name: 'Contact', href: '/Chat' }
   ];
 
   const userDropdownItems = [
-    { icon: <FiUser className="mr-2" />, name: 'Dashboard', href: '/Admin/DashBoard' },
-    { icon: <FiSettings className="mr-2" />, name: 'Settings', href: '/profile' },
-    { icon: <FiDollarSign className="mr-2" />, name: 'Earnings', href: '/' },
-    { icon: <FiPlus className="mr-2" />, name: 'Add Offre', href: '/FormPages' }
+    ...(session?.user?.role === 1 || session?.user?.role === 2 ? [
+      {
+        icon: <FiUser className="mr-2" />,
+        name: 'Tableau de bord',
+        href: '/Admin/DashBoard'
+      }
+    ] : []),
+    { icon: <FiSettings className="mr-2" />, name: 'Paramètres', href: '/profile' },
+    { icon: <FiDollarSign className="mr-2" />, name: 'Revenus', href: '/' },
+    { icon: <FiPlus className="mr-2" />, name: 'Ajouter une offre', href: '/FormPages' }
   ];
+
+  const handleNewOfferClick = () => {
+    if (!session) {
+      router.push('/signin');
+    } else {
+      router.push('/FormPages');
+    }
+    setMenuOpen(false);
+  };
+
+  // Fermer le dropdown si on clique à l'extérieur
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownOpen && !(event.target as HTMLElement).closest('.user-dropdown')) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen]);
+
 
   return (
     <nav className="bg-white bg-opacity-90 shadow-sm w-full sticky top-0 z-50 backdrop-blur-sm p-4">
@@ -52,49 +80,84 @@ export default function Navbar() {
             </Link>
           </motion.div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* Navigation Desktop */}
+          <div className="hidden md:flex items-center space-x-6">
             {navLinks.map((link, index) => (
               <Link
                 key={index}
                 href={link.href}
-                className="text-gray-700 hover:text-teal-600 transition-colors font-medium text-lg"
+                className={`relative px-3 py-2 text-gray-700 hover:text-teal-600 transition-colors font-medium ${router.pathname === link.href
+                  ? 'text-teal-600 font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-teal-600'
+                  : ''
+                  }`}
               >
                 {link.name}
               </Link>
             ))}
-
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => router.push("/FormPages")}
-              className="ml-4 px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors flex items-center"
+              
+              whileTap={{ scale: 0.98 }}
+              onClick={handleNewOfferClick}
+              className="w-full flex items-center justify-center px-3 py-2 mt-2 bg-gradient-to-r from-teal-400 to-teal-700 text-white rounded-md shadow-sm"
             >
               <FiPlus className="mr-2" />
-              Create new
+              Nouvelle offre
             </motion.button>
           </div>
 
-          {/* User/Auth Controls */}
+          {/* Contrôles utilisateur/connexion */}
           <div className="flex items-center">
             {session ? (
-              <div className="relative ml-4">
+              <div className="relative ml-4 user-dropdown">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center focus:outline-none"
                 >
-                  {session.user?.image ? (
+                  {session?.user?.image ? (
                     <img
-                      className="w-16 h-16 rounded-full object-cover border-2 border-green-100"
-                      src={session.user.image}
-                      alt="User profile"
+                      className="w-16 h-16 rounded-full object-cover border-2 border-teal-100"
+                      src={
+                        session.user.image.startsWith('/uploads/')
+                          ? `http://your-backend-domain${session.user.image}`
+                          : session.user.image
+                      }
+                      alt="Profile"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
+                        const img = e.target as HTMLImageElement;
+                        img.style.display = 'none';
+
+                        // Create fallback container
+                        const fallbackContainer = document.createElement('div');
+                        fallbackContainer.className = 'w-16 h-16 rounded-full border-2 border-teal-100 bg-gray-100 flex items-center justify-center';
+
+                        // Create user icon
+                        const userIcon = document.createElement('div');
+                        userIcon.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        `;
+                        fallbackContainer.appendChild(userIcon);
+                        img.parentNode?.insertBefore(fallbackContainer, img);
                       }}
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full border-2 border-green-100 bg-gray-100 flex items-center justify-center">
-                      <FiUser className="w-8 h-8 text-gray-500" />
+                    <div className="w-16 h-16 rounded-full border-2 border-teal-100 bg-gray-100 flex items-center justify-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
                     </div>
                   )}
                 </button>
@@ -102,12 +165,13 @@ export default function Navbar() {
                 <AnimatePresence>
                   {dropdownOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 20 }}
-                      className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50"
+                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                      className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-1 z-50 border border-gray-100"
                     >
-                      <div className="px-4 py-2 border-b">
+                      <div className="px-4 py-2 border-b border-gray-100">
                         <p className="text-sm font-medium text-gray-900">{session.user?.name}</p>
                         <p className="text-xs text-gray-500 truncate">{session.user?.email}</p>
                       </div>
@@ -116,7 +180,7 @@ export default function Navbar() {
                         <Link
                           key={index}
                           href={item.href}
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 transition-colors"
                           onClick={() => setDropdownOpen(false)}
                         >
                           {item.icon}
@@ -126,40 +190,40 @@ export default function Navbar() {
 
                       <button
                         onClick={() => signOut()}
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 transition-colors border-t border-gray-100"
                       >
                         <FiLogOut className="mr-2" />
-                        Sign out
+                        Déconnexion
                       </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => router.push('/signin')}
                   className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors"
                 >
-                  Login
+                  Connexion
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => router.push('/signup')}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors"
                 >
-                  Register
+                  Inscription
                 </motion.button>
               </div>
             )}
 
-            {/* Mobile menu button */}
+            {/* Bouton menu mobile */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden ml-4 p-2 rounded-md text-gray-700 hover:text-green-600 hover:bg-gray-100 focus:outline-none"
+              className="md:hidden ml-4 p-2 rounded-md text-gray-700 hover:text-teal-600 hover:bg-gray-100 focus:outline-none transition-colors"
             >
               {menuOpen ? (
                 <HiX className="h-6 w-6" />
@@ -171,21 +235,25 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Menu mobile */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white shadow-lg"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="md:hidden bg-white shadow-lg overflow-hidden"
           >
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navLinks.map((link, index) => (
                 <Link
                   key={index}
                   href={link.href}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${router.pathname === link.href
+                    ? 'text-teal-600 bg-teal-50'
+                    : 'text-gray-700 hover:text-teal-600 hover:bg-gray-50'
+                    }`}
                   onClick={() => setMenuOpen(false)}
                 >
                   {link.name}
@@ -193,35 +261,32 @@ export default function Navbar() {
               ))}
 
               <button
-                onClick={() => {
-                  router.push("/FormPages");
-                  setMenuOpen(false);
-                }}
-                className="w-full flex items-center px-3 py-2 rounded-md text-base font-medium text-white bg-teal-600 hover:bg-teal-700"
+                onClick={handleNewOfferClick}
+                className="w-full flex items-center px-3 py-2 rounded-md text-base font-medium text-white bg-teal-600 hover:bg-teal-700 mt-2"
               >
                 <FiPlus className="mr-2" />
-                Create new
+                Ajouter une offre
               </button>
 
               {!session && (
-                <div className="pt-4 pb-2 border-t border-gray-200">
+                <div className="pt-4 pb-2 border-t border-gray-200 space-y-2">
                   <button
                     onClick={() => {
-                      router.push('/login');
+                      router.push('/signin');
                       setMenuOpen(false);
                     }}
                     className="w-full px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
                   >
-                    Login
+                    Connexion
                   </button>
                   <button
                     onClick={() => {
                       router.push('/signup');
                       setMenuOpen(false);
                     }}
-                    className="w-full mt-2 px-3 py-2 rounded-md text-base font-medium text-white bg-teal-600 hover:bg-green-700"
+                    className="w-full px-3 py-2 rounded-md text-base font-medium text-white bg-teal-600 hover:bg-teal-700"
                   >
-                    Register
+                    Inscription
                   </button>
                 </div>
               )}

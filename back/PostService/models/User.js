@@ -13,7 +13,11 @@ const UserSchema = new mongoose.Schema({
         type : String  , 
         required : true 
     },
-    Role:{
+    image:{
+        type : String  , 
+        default: null
+    },
+    role:{
         type : Number  , 
         default: 0
     }},

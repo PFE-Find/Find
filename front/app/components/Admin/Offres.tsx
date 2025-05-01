@@ -5,14 +5,32 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiSearch, FiChevronDown, FiExternalLink, FiRefreshCw } from 'react-icons/fi'
-import { Offer } from '../../types/Offer'
 
+interface Offre {
+    _id: string;
+    titre: string;
+    description: string;
+    prix: string;
+    Superficie: string;
+    unit: string;
+    id_user: string;
+    localisation: [number, number];
+    placeName: string[];
+    equipements: string[];
+    etat: string;
+    images?: { path: string }[];
+    propertyType: string;
+    propertyId: number | null;
+    isNew?: boolean;
+    isPromoted?: boolean;
+  }
 interface OffresProps {
-    offres: Offer[]
+    offres: Offre[]
     isLoading: boolean
     error: string | null
     onRefresh: () => void
 }
+
 
 const Offres: React.FC<OffresProps> = ({
     offres,
@@ -116,7 +134,7 @@ const Offres: React.FC<OffresProps> = ({
                             />
                         </div>
 
-                        <div className="relative w-full md:w-48">
+                        <div className=" w-full md:w-48">
                             <select
                                 value={selectedCategory}
                                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -127,9 +145,9 @@ const Offres: React.FC<OffresProps> = ({
                                 <option value="farm">Farm</option>
                                 <option value="property">Property</option>
                             </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            {/* <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <FiChevronDown className="text-gray-400" />
-                            </div>
+                            </div> */}
                         </div>
                     </motion.div>
 

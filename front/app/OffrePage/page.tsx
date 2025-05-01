@@ -1,6 +1,5 @@
 
 import Offre from "../components/OffrePage/Offres";
-import Search  from "../components/OffrePage/Search"
 import Navbar from "../components/Nav";
 import Footer from "../components/Footer";
 import ChatBot from "../components/Chat/Chatbot";

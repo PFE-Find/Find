@@ -35,7 +35,7 @@ const Offres = {
   },
   async getAllOffresByUserId(id: string) {
     try {
-      console.log(id);
+      
       
       const response = await axios.get(`${API_URL}GetAll3/${id}`);
       return response.data;
@@ -46,8 +46,7 @@ const Offres = {
   },
   async getAllOffresByUserId2(id: string) {
     try {
-      console.log(id);
-      
+   
       const response = await axios.get(`${API_URL}GetAll4/${id}`);
       return response.data;
     } catch (error) {
@@ -81,7 +80,7 @@ const Offres = {
   // Delete an offre
   async deleteOffre(id: string) {
     try {
-      const response = await axios.delete(`${API_URL}Offre/${id}`);
+      const response = await axios.delete(`${API_URL}deleteItem/${id}`);
       return response.data;
     } catch (error) {
       console.error("Error deleting offre:", error);
@@ -92,7 +91,7 @@ const Offres = {
   // Update an offre
   async updateOffre(id: string, offreData: any) {
     try {
-      const response = await axios.put(`${API_URL}${id}`, offreData);
+      const response = await axios.put(`${API_URL}updateItem/${id}`, offreData);
       return response.data;
     } catch (error) {
       console.error("Error updating offre:", error);

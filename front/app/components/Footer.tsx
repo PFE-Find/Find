@@ -33,36 +33,37 @@ export default function Footer() {
     <motion.footer 
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true }}
+      viewport={{ once: true, margin: "0px 0px -100px 0px" }}
       variants={footerVariants}
-      className="w-full bg-gray-50 border-t border-gray-200"
+      className="w-full bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 py-12">
-          {/* Logo and About */}
-          <div className="lg:col-span-1">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 py-8 sm:py-12">
+          {/* Logo and About - Full width on mobile */}
+          <div className="sm:col-span-2 lg:col-span-1">
             <motion.div 
               whileHover={{ scale: 1.02 }}
-              className="flex items-center mb-6"
+              className="flex items-center mb-4 sm:mb-6"
             >
               <img 
                 src="/assets/logo.png" 
                 alt="Find Agri Logo" 
-                className="w-12 h-12"
+                className="w-10 h-10 sm:w-12 sm:h-12"
               />
-              <span className="ml-3 text-2xl font-bold text-green-600">Find</span>
+              <span className="ml-3 text-xl sm:text-2xl font-bold text-teal-600 dark:text-teal-400">Find</span>
             </motion.div>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">
               La plateforme leader pour trouver et louer des terrains agricoles en Tunisie.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-3 sm:space-x-4">
               {socialLinks.map((social, index) => (
                 <motion.a
                   key={index}
                   href="#"
                   whileHover={{ y: -3, scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-green-100 hover:text-green-600 transition-colors"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-teal-100 dark:hover:bg-teal-900 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
                   aria-label={social.name}
                 >
                   {social.icon}
@@ -73,15 +74,18 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Navigation</h3>
-            <ul className="space-y-3">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">Navigation</h3>
+            <ul className="space-y-2 sm:space-y-3">
               {['Accueil', 'Explorer', 'Comment ça marche', 'Témoignages'].map((item, index) => (
                 <motion.li 
                   key={index}
                   whileHover={{ x: 5 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <a href="#" className="text-gray-600 hover:text-green-600 transition-colors">
+                  <a 
+                    href="#" 
+                    className="text-sm sm:text-base text-gray-600 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                  >
                     {item}
                   </a>
                 </motion.li>
@@ -91,15 +95,18 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Services</h3>
-            <ul className="space-y-3">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">Services</h3>
+            <ul className="space-y-2 sm:space-y-3">
               {['Location terrain', 'Vente terrain', 'Conseils agricoles', 'Analyses sol'].map((item, index) => (
                 <motion.li 
                   key={index}
                   whileHover={{ x: 5 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <a href="#" className="text-gray-600 hover:text-green-600 transition-colors">
+                  <a 
+                    href="#" 
+                    className="text-sm sm:text-base text-gray-600 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                  >
                     {item}
                   </a>
                 </motion.li>
@@ -107,10 +114,10 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Contact</h3>
-            <ul className="space-y-4">
+          {/* Contact - Full width on small mobile */}
+          <div className="col-span-1 sm:col-span-1">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">Contact</h3>
+            <ul className="space-y-3 sm:space-y-4">
               {contactInfo.map((info, index) => (
                 <motion.li 
                   key={index}
@@ -118,29 +125,29 @@ export default function Footer() {
                   className="flex items-start"
                   transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <span className="text-green-600 mr-3 mt-0.5">
+                  <span className="text-teal-600 dark:text-teal-400 mr-3 mt-0.5">
                     {info.icon}
                   </span>
-                  <span className="text-gray-600">{info.text}</span>
+                  <span className="text-sm sm:text-base text-gray-600 dark:text-gray-300">{info.text}</span>
                 </motion.li>
               ))}
             </ul>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-200 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-500 mb-4 md:mb-0">
+        {/* Bottom Bar - Stacked on mobile */}
+        <div className="border-t border-gray-200 dark:border-gray-700 py-6">
+          <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-4">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
               © {new Date().getFullYear()} Find Agri. Tous droits réservés.
             </p>
-            <div className="flex space-x-6">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-6">
               {['Conditions', 'Politique de confidentialité', 'Mentions légales'].map((item, index) => (
                 <motion.a
                   key={index}
                   href="#"
                   whileHover={{ scale: 1.05 }}
-                  className="text-gray-500 hover:text-green-600 transition-colors"
+                  className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors whitespace-nowrap"
                 >
                   {item}
                 </motion.a>

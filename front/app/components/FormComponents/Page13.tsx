@@ -109,7 +109,7 @@ export default function ConditionForm({ data, updateFields }: ConditionPageProps
                 </p>
               </div>
 
-              <div className="w-full max-w-md bg-gray-50 rounded-lg p-4">
+              <div className="w-full max-w-lg bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <StarIcon className="w-5 h-5 text-yellow-500" />
                   <span className="font-medium">Conseil :</span>

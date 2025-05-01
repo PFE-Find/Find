@@ -14,24 +14,27 @@ export const options: NextAuthOptions = {
             clientSecret: process.env.GITHUB_SECRET as string,
             profile(profile) {
                 return {
-                  id: profile.id.toString(),
-                  name: profile.name,
-                  email: profile.email,
-                  image: profile.avatar_url,
+                    id: profile.id.toString(),
+                    name: profile.name || profile.login,
+                    email: profile.email,
+                    image: profile.avatar_url,
+                    role: 0, // Default role
+                    createdAt: new Date(), // Current timestamp
                 };
-              },
+            },
         }),
         GoogleProvider({
-            clientId:process.env.GOOGLE_CLIENT_ID as string, 
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
-            profile(profile)
-            {
+            clientId: process.env.GOOGLE_CLIENT_ID as string,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+            profile(profile) {
                 return {
                     id: profile.sub,
                     name: profile.name,
                     email: profile.email,
+                    role: 0, // Default role
                     image: profile.picture,
-                  };
+                    createdAt: new Date(), // Current timestamp
+                };
             }
         }),
       
