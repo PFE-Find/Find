@@ -28,8 +28,7 @@ export const createImage = async (req, res, next) => {
         // Use backticks for proper string interpolation
         const imagePath = `/uploads/${req.file.filename}`; // Corrected line
 
-        console.log('Fichier téléchargé:', req.file);
-        console.log('ID du post:', postId);
+      
 
         const image = new Image({
             postId,

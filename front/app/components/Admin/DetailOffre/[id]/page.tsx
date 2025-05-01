@@ -224,10 +224,17 @@ const Details: React.FC = () => {
             <div className="flex items-center mb-4">
               <FiInfo className="text-gray-700 mr-2 text-xl" />
               <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Détails de l'offre</h2>
+              
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
               {offre.titre || "Aucune titre disponible"}
             </h1>
+            {offre.placeName && (
+                        <p className="mt-4 text-gray-600 flex items-center">
+                          <FiMapPin className="mr-2" />
+                          {offre.placeName}
+                        </p>
+                      )}
             <div className="mt-4 flex items-center text-gray-500">
               <FiCalendar className="mr-2" />
               <span>Publié le {format(new Date(offre.createdAt), 'dd/MM/yyyy')}</span>
@@ -267,7 +274,7 @@ const Details: React.FC = () => {
                   <div>
                     <h3 className="text-sm text-gray-500 font-medium">Superficie</h3>
                     <p className="text-2xl font-bold text-gray-900">
-                      {offre.Superficie} m²
+                      {offre.Superficie} {offre.unit}
                     </p>
                   </div>
                 </motion.div>

@@ -64,16 +64,16 @@ export const getItems = async (req, res, next) => {
 };
 export const getItems1 = async (req, res, next) => {
   try {
-    const items = await Post.find({ statut: true })// Only fetch posts with statut = 0
+    const items = await Post.find({ statut: true })
       .populate({
-        path: 'images', // This will populate the 'images' field with Image documents
-        select: 'path date', // Only select the 'path' and 'date' fields from the Image model
+        path: 'images',
+        select: 'path date',
       })
       .exec();
 
     const allItems = items.map((post) => ({
       ...post.toObject(),
-      images: post.images || [], // Ensure images are included even if none are found
+      images: post.images || [], 
     }));
 
     res.json(allItems);
@@ -83,16 +83,16 @@ export const getItems1 = async (req, res, next) => {
 };
 export const getItems2 = async (req, res, next) => {
   try {
-    const items = await Post.find({ statut: false })// Only fetch posts with statut = 0
+    const items = await Post.find({ statut: false }) 
       .populate({
-        path: 'images', // This will populate the 'images' field with Image documents
-        select: 'path date', // Only select the 'path' and 'date' fields from the Image model
+        path: 'images', 
+        select: 'path date', 
       })
       .exec();
 
     const allItems = items.map((post) => ({
       ...post.toObject(),
-      images: post.images || [], // Ensure images are included even if none are found
+      images: post.images || [], 
     }));
 
     res.json(allItems);
@@ -217,24 +217,56 @@ export const getItemById = async (req, res, next) => {
 
 export const updateItem = async (req, res, next) => {
   try {
-    const updatedItem = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedItem) {
+    const itemId = req.params.id;
+    const { photos, ...updateData } = req.body;
+
+    // Find the item to update
+    const item = await Post.findById(itemId);
+    if (!item) {
       return res.status(404).json({ message: 'Item not found' });
     }
-    res.json(updatedItem);
+
+    // Update the item's data
+    Object.assign(item, updateData); //Safely update existing fields
+
+    // Handle image updates
+    if (photos && Array.isArray(photos)) {
+      // Delete existing images (optional, depends on your requirements)
+      await Image.deleteMany({ postId: itemId });
+
+      const imagesToInsert = photos.map((path) => ({ postId: itemId, path }));
+      const savedImages = await Image.insertMany(imagesToInsert);
+      item.images = savedImages.map((image) => image._id);
+    }
+
+    await item.save();
+    res.json(item);
   } catch (error) {
-    next(error);
+    console.error("Error updating item:", error); // Log the error for debugging
+    next(error); // Pass the error to the error handling middleware
   }
 };
 
 export const deleteItem = async (req, res, next) => {
+  
   try {
-    const deletedItem = await Post.findByIdAndDelete(req.params.id);
-    if (!deletedItem) {
+    const itemId = req.params.id;
+
+    // Find the item to delete
+    const item = await Post.findById(itemId);
+    if (!item) {
       return res.status(404).json({ message: 'Item not found' });
     }
+
+    // Delete associated images (important to avoid orphaned images)
+    await Image.deleteMany({ postId: itemId });
+
+    // Delete the item
+    await Post.findByIdAndDelete(itemId);
+
     res.json({ message: 'Item deleted' });
   } catch (error) {
-    next(error);
+    console.error("Error deleting item:", error); // Log the error for debugging
+    next(error); // Pass the error to the error handling middleware
   }
 };

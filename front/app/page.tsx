@@ -10,12 +10,7 @@ import { redirect } from "next/navigation";
 export default async function Home() {
 
   const session = await getServerSession(options);
-  if (!session) {
-    redirect('/api/auth/signin');
-  }
-  else {
-      console.log(session);
-    }
+
     return (
       <div>
         

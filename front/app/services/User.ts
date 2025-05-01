@@ -67,6 +67,21 @@ const userService = {
       throw error;
     }
   },
+  async UpadetUser(id: string, formData: FormData) {
+    
+    
+    try {
+      const response = await axios.put(`${API_URL}/updateUser/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw error;
+    }
+  }
 
 }
 

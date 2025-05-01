@@ -7,9 +7,9 @@ import { Comment } from "@/app/models/Comment";
 import CommentService from "@/app/services/Comment";
 import UserService from "@/app/services/User";
 import { format } from 'date-fns';
-import { 
-  FiFlag, FiMessageSquare, FiStar, FiCheckCircle, 
-  FiCalendar, FiMapPin, FiDollarSign, FiChevronRight 
+import {
+  FiFlag, FiMessageSquare, FiStar, FiCheckCircle,
+  FiCalendar, FiMapPin, FiDollarSign, FiChevronRight
 } from 'react-icons/fi';
 import { FaLeaf, FaShieldAlt } from 'react-icons/fa';
 import { motion, AnimatePresence } from "framer-motion";
@@ -131,8 +131,8 @@ export default function Detail({ offre }: Offre) {
 
   const tabContentVariants = {
     hidden: { opacity: 0, y: 10 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: { duration: 0.3, ease: "easeInOut" }
     },
@@ -148,7 +148,7 @@ export default function Detail({ offre }: Offre) {
     };
 
     return (
-      <motion.div 
+      <motion.div
         whileHover={{ scale: 1.05 }}
         className="inline-flex items-center px-3 py-1 bg-gray-100 rounded-full text-sm font-medium text-gray-700 mr-2 mb-2"
       >
@@ -157,27 +157,44 @@ export default function Detail({ offre }: Offre) {
       </motion.div>
     );
   };
+  const calculateYearsSince = (dateString: string) => {
+    try {
+      const createdAt = new Date(dateString);
+      const now = new Date();
+      let years = now.getFullYear() - createdAt.getFullYear();
 
+      // Ajustement si l'anniversaire de la date n'est pas encore arrivé cette année
+      const monthDiff = now.getMonth() - createdAt.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < createdAt.getDate())) {
+        years--;
+      }
+
+      return years > 0 ? years : 1; // Minimum 1 an
+    } catch (error) {
+      console.error("Erreur de calcul de date:", error);
+      return 1; // Valeur par défaut
+    }
+  };
   return (
     <div className="bg-gray-50 mx-auto max-w-[80%]">
       {/* Main Content */}
-      <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white rounded-xl shadow-md overflow-hidden mb-8"
-        >
-          <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">{offre.titre}</h1>
-            <div className="flex items-center text-gray-600 mb-4">
-              <FiMapPin className="mr-1" />
-              <span>{offre.placeName || "Localisation non spécifiée"}</span>
-            </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white rounded-xl shadow-md overflow-hidden mb-8"
+      >
+        <div className="p-6">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">{offre.titre}</h1>
+          <div className="flex items-center text-gray-600 mb-4">
+            <FiMapPin className="mr-1" />
+            <span>{offre.placeName || "Localisation non spécifiée"}</span>
           </div>
-        </motion.div>
+        </div>
+      </motion.div>
       <div className="container   py-8 px-4">
         {/* Property Header */}
-       
+
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -196,36 +213,41 @@ export default function Detail({ offre }: Offre) {
                 </div>
               </div>
             ) : (
-              <motion.div 
-                
+              <motion.div
+
                 className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-center gap-4 mb-6">
-                  <motion.img 
+                  <motion.img
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-green-100" 
-                    src={user?.image || "/default-avatar.png"} 
-                    alt="Profile" 
+                    className="w-16 h-16 rounded-full object-cover border-2 border-green-100"
+                    src={user?.image || "/default-avatar.png"}
+                    alt="Profile"
                   />
                   <div>
                     <h2 className="text-xl font-semibold text-gray-800">{user?.name || "Propriétaire"}</h2>
-                    <p className="text-gray-600">Propriétaire du terrain</p>
-                    <div className="flex items-center mt-1">
-                      <FiStar className="text-yellow-400 mr-1" />
-                      <span className="text-gray-700">4.8 (24 avis)</span>
-                    </div>
+                    <p className="text-gray-600">Propriétaire du l'offre</p>
+
                   </div>
                 </div>
 
                 <div className="border-t border-gray-200 pt-4">
                   <h3 className="font-medium text-gray-700 mb-3">À propos du propriétaire</h3>
                   <p className="text-gray-600">
-                    Membre depuis 3 ans. Spécialisé dans les terrains agricoles avec une expertise en cultures saisonnières.
-                    Répond généralement en moins d'une heure.
+                    {user?.createdAt ? (
+                      <>
+                        Membre depuis {calculateYearsSince(user.createdAt)} {calculateYearsSince(user.createdAt) === 1 ? 'an' : 'ans'}.
+                        {user?.specialization && ` Spécialisé dans ${user.specialization}.`}
+
+                      </>
+                    ) : (
+                      "Informations sur le propriétaire non disponibles"
+                    )}
                   </p>
                 </div>
+
               </motion.div>
             )}
 
@@ -237,11 +259,10 @@ export default function Detail({ offre }: Offre) {
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center transition-colors ${
-                        activeTab === tab 
-                          ? 'border-green-500 text-green-600' 
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
+                      className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === tab
+                        ? 'border-green-500 text-green-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
                     >
                       {tab === 'description' && 'Description'}
                       {tab === 'features' && 'Caractéristiques'}
@@ -271,20 +292,20 @@ export default function Detail({ offre }: Offre) {
                     {activeTab === 'features' && (
                       <div>
                         <h3 className="text-xl font-semibold text-gray-800 mb-4">Caractéristiques</h3>
-                        
+
                         {offre.propertyType === 'land' ? (
                           <>
                             <div className="mb-6">
                               <h4 className="font-medium text-gray-700 mb-2">Superficie</h4>
                               <p className="text-lg">{offre.Superficie} {offre.unit}</p>
                             </div>
-                            
+
                             {offre.equipements && offre.equipements.length > 0 && (
                               <>
                                 <h4 className="font-medium text-gray-700 mb-2">Équipements disponibles</h4>
                                 <div className="flex flex-wrap mb-6">
                                   {offre.equipements.map((equip, index) => (
-                                    <motion.div 
+                                    <motion.div
                                       key={index}
                                       initial={{ opacity: 0, scale: 0.9 }}
                                       animate={{ opacity: 1, scale: 1 }}
@@ -299,26 +320,26 @@ export default function Detail({ offre }: Offre) {
                           </>
                         ) : (
                           <>
-                          {offre.etat && offre.etat !== "0" && (
-                            <div className="mb-6">
-                              <h4 className="font-medium text-gray-700 mb-2">État</h4>
-                              <div className="flex items-center">
-                                {[...Array(5)].map((_, i) => (
-                                  <FiStar 
-                                    key={i} 
-                                    className={`${i < etatStars ? 'text-yellow-400' : 'text-gray-300'} w-5 h-5`} 
-                                  />
-                                ))}
+                            {offre.etat && offre.etat !== "0" && (
+                              <div className="mb-6">
+                                <h4 className="font-medium text-gray-700 mb-2">État</h4>
+                                <div className="flex items-center">
+                                  {[...Array(5)].map((_, i) => (
+                                    <FiStar
+                                      key={i}
+                                      className={`${i < etatStars ? 'text-yellow-400' : 'text-gray-300'} w-5 h-5`}
+                                    />
+                                  ))}
                                   <span className="ml-2 text-gray-600">{offre.etat}/100</span>
-                              </div>
-                            </div>)}
-                            
+                                </div>
+                              </div>)}
+
                             {offre.equipements?.length > 0 && (
                               <>
                                 <h4 className="font-medium text-gray-700 mb-2">Équipements inclus</h4>
                                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-6">
                                   {offre.equipements.map((equip, index) => (
-                                    <motion.li 
+                                    <motion.li
                                       key={index}
                                       initial={{ x: -10, opacity: 0 }}
                                       animate={{ x: 0, opacity: 1 }}
@@ -350,7 +371,7 @@ export default function Detail({ offre }: Offre) {
             </div>
 
             {/* Comments Section */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
@@ -359,7 +380,7 @@ export default function Detail({ offre }: Offre) {
               <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
                 <FiMessageSquare className="mr-2" /> Commentaires
               </h3>
-              
+
               <form onSubmit={handleSubmitComment} className="mb-8">
                 <div className="mb-4">
                   <textarea
@@ -385,33 +406,33 @@ export default function Detail({ offre }: Offre) {
 
           {/* Right Column - Booking Card */}
           <div className="lg:col-span-1">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="bg-white rounded-xl shadow-md sticky top-6 p-6 hover:shadow-lg transition-shadow"
             >
               <div className="space-y-4">
-                
+
                 <div className=" border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                            <div className="flex items-center space-x-3">
-                              {offre.Superficie && offre.Superficie !== "0" && (
-                                <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
-                                  <p className="text-m text-gray-500 dark:text-gray-400">Superficie</p>
-                                  <p className="font-bold text-xl  text-gray-900 dark:text-white">
-                                    {offre.Superficie} {offre.unit}
-                                  </p>
-                                </div>
-                              )}
-                              
-                            </div>
-                            <div className="text-right">
-                              <p className="text-m text-gray-500 dark:text-gray-400">Prix</p>
-                              <h4 className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                                {offre.prix} TND
-                              </h4>
-                            </div>
-                          </div>
+                  <div className="flex items-center space-x-3">
+                    {offre.Superficie && offre.Superficie !== "0" && (
+                      <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
+                        <p className="text-m text-gray-500 dark:text-gray-400">Superficie</p>
+                        <p className="font-bold text-xl  text-gray-900 dark:text-white">
+                          {offre.Superficie} {offre.unit}
+                        </p>
+                      </div>
+                    )}
+
+                  </div>
+                  <div className="text-right">
+                    <p className="text-m text-gray-500 dark:text-gray-400">Prix</p>
+                    <h4 className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                      {offre.prix} TND
+                    </h4>
+                  </div>
+                </div>
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-gray-600">
@@ -481,7 +502,7 @@ export default function Detail({ offre }: Offre) {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Raison du signalement</label>
                     <div className="space-y-2">
                       {reportReasons.map((reason) => (
-                        <motion.div 
+                        <motion.div
                           key={reason}
                           whileHover={{ x: 5 }}
                           className="flex items-center"
