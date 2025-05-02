@@ -11,7 +11,7 @@ import { FiUser, FiEdit2, FiSave, FiX, FiPlus, FiAlertCircle } from "react-icons
 import { log } from "console";
 
 export default function Profile() {
-    const { data: session, status } = useSession();
+    const { data: session, update,status } = useSession();
 
 
     const [offres, setOffres] = useState<any[]>([]);
@@ -21,7 +21,9 @@ export default function Profile() {
     const [editedEmail, setEditedEmail] = useState(session?.user?.email || '');
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [previewImage, setPreviewImage] = useState(session?.user?.image || '');
-
+    console.log(previewImage);
+    
+    
     useEffect(() => {
         async function fetchOffres() {
             if (session?.user?.id) {
@@ -75,7 +77,8 @@ export default function Profile() {
     const handleSave = async () => {
         try {
             const user = session?.user?.user || session?.user;
-
+            console.log(user);
+            
             if (!user) {
                 console.error('No user session found');
                 return;
@@ -92,9 +95,10 @@ export default function Profile() {
             }
 
             // 1. Update user in the database
-            const updatedUser = await UserService.UpadetUser(user.id, updatedUserData);
+            const updatedUser = await UserService.UpadetUser(user._id, updatedUserData);
 
             // 2. Update the NextAuth.js session
+            await update();
             updateSession(async ({ session }) => {
                 return {
                     ...session,
@@ -142,7 +146,9 @@ export default function Profile() {
                                         {previewImage ? (
                                             <div className="relative">
                                                 <img
-                                                    src={previewImage}
+                                                   src={previewImage?.startsWith('/uploads') 
+                                                    ? `http://localhost:3001${previewImage}`
+                                                    : previewImage}
                                                     className={`w-[200px] h-[200px] object-cover rounded-full border-4 ${isEditing ? 'border-blue-300' : 'border-white'
                                                         } shadow-lg transition-all duration-300 ${isEditing ? 'ring-2 ring-blue-500' : ''
                                                         }`}

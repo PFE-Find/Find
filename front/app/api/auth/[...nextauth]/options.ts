@@ -89,10 +89,41 @@ export const options: NextAuthOptions = {
         secret: process.env.NEXTAUTH_SECRET,
     },
     callbacks: {
-        async jwt({ token, user }) {
-            if (user) {
+        async jwt({ token, user,trigger }) {
+            console.log(user);
+            
+              if (user) {
                 token.user = user;
             }
+
+            // Always fetch updated user data from DB on subsequent requests
+            if (token?.user?.id) {
+                try {
+                    const updatedUser = await userService.getUserById(token.user.id);
+                    console.log(updatedUser);
+                    
+                    if (updatedUser) {
+                        token.user = updatedUser;
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch updated user:", error);
+                }
+            }
+            if (trigger === "update") {
+                
+                
+                try {
+                    const updatedUser = await userService.getUserById(token.user._id);
+                    console.log(updatedUser);
+                    
+                    if (updatedUser) {
+                        token.user = updatedUser;
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch updated user:", error);
+                }
+            }
+
             return token;
         },
         async session({ session, token }) {
