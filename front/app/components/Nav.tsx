@@ -116,11 +116,9 @@ export default function Navbar() {
                   {session?.user?.image ? (
                     <img
                       className="w-16 h-16 rounded-full object-cover border-2 border-teal-100"
-                      src={
-                        session.user.image.startsWith('/uploads/')
-                          ? `http://your-backend-domain${session.user.image}`
-                          : session.user.image
-                      }
+                      src={session.user.image.startsWith('/uploads') 
+                        ? `http://localhost:3001${session.user.image}`
+                        : session.user.image}
                       alt="Profile"
                       onError={(e) => {
                         const img = e.target as HTMLImageElement;

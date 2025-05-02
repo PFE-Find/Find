@@ -9,7 +9,7 @@ import UserRouter from './routes/user.js';
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import Message from './models/Message.js'; // Import the Message model
-
+import path from 'path';
 const app = express();
 const server = http.createServer(app); // Create the HTTP server
  // Create the WebSocket server
@@ -19,7 +19,10 @@ const server = http.createServer(app); // Create the HTTP server
 // Middleware setup
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
+app.use(
+    '/uploads',
+    express.static(path.join(process.cwd(), 'uploads'))
+  );
 const PORT = process.env.PORT || 3001;
 
 // CORS Configuration
@@ -117,19 +120,19 @@ wss.on('connection', (ws, req) => {
                     break;
                     case 'user_converstion':
                     // Update the message in the database
-                    const message = await Message.findByIdAndUpdate(
+                    const message2 = await Message.findByIdAndUpdate(
                         data.messageId,
                         { $set: { text: data.text, isEdited: true } },
                         { new: true }
                     );
 
-                    if (message) {
+                    if (message2) {
                         // Emit the updated message to all connected clients
                         wss.clients.forEach((client) => {
                             if (client.readyState === WebSocket.OPEN) {
                                 client.send(JSON.stringify({
                                     type: 'MESSAGE_UPDATED',
-                                    message,
+                                    message2,
                                 }));
                             }
                         });
