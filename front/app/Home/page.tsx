@@ -7,7 +7,7 @@ import Nav from "@/app/components/Nav";
 import Footer from "@/app/components/Footer";
 import Offres from "@/app/components/Home/OffreSection";
 import Image from 'next/image';
-
+import ChatBot from "../components/Chat/Chatbot";
 // Animation variants
 const container = {
   hidden: { opacity: 0 },
@@ -356,6 +356,8 @@ export default function Home() {
       </motion.section>
 
       <Footer />
+    <ChatBot></ChatBot>
+
     </div>
   );
 }
