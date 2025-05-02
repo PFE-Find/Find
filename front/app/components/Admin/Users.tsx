@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiSearch, FiChevronDown, FiExternalLink, FiRefreshCw, FiEdit, FiTrash2 } from 'react-icons/fi'
+import { User } from 'lucide-react'
 
 interface UsersProps {
     users: User[]
@@ -20,8 +21,8 @@ interface User {
     _id: string
     name: string
     email: string
-    role: string
-    avatar?: string
+    role: number
+    image: string
     createdAt: string
     status: 'active' | 'inactive' | 'suspended'
 }
@@ -37,17 +38,20 @@ const UsersTable: React.FC<UsersProps> = ({
     const [searchQuery, setSearchQuery] = useState<string>('')
     const [selectedRole, setSelectedRole] = useState<string>('all')
 
-    // Memoize filtered users to prevent unnecessary recalculations
     const filteredUsers = useMemo(() => {
         return users.filter((user) => {
-            const matchesRole = 
-                selectedRole === 'all' || user.role === selectedRole
-            const matchesSearch = 
+            const matchesRole = selectedRole === 'all' ||
+                (selectedRole === '0' && user.role === 0) ||
+                (selectedRole === '1' && user.role === 1) ||
+                (selectedRole === '2' && user.role === 2);
+
+            const matchesSearch =
                 user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                user.email.toLowerCase().includes(searchQuery.toLowerCase())
-            return matchesRole && matchesSearch
-        })
-    }, [users, searchQuery, selectedRole])
+                user.email.toLowerCase().includes(searchQuery.toLowerCase());
+
+            return matchesRole && matchesSearch;
+        });
+    }, [users, searchQuery, selectedRole]);
 
     // Animation variants
     const containerVariants = {
@@ -152,21 +156,21 @@ const UsersTable: React.FC<UsersProps> = ({
                             />
                         </div>
 
-                        <div className="relative w-full md:w-48">
+                        <div className=" w-full md:w-48">
                             <select
                                 value={selectedRole}
                                 onChange={handleRoleChange}
                                 className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 cursor-pointer"
                                 disabled={isLoading}
                             >
-                                <option value="all">All Roles</option>
-                                <option value="admin">Admin</option>
-                                <option value="user">User</option>
-                                <option value="moderator">Moderator</option>
+                                <option value="all">Tous les rôles</option>
+                                <option value="1">Administrateur</option>
+                                <option value="0">Utilisateur</option>
+                                <option value="2">Administrateur (accès limité)</option>
                             </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            {/* <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <FiChevronDown className="text-gray-400" />
-                            </div>
+                            </div> */}
                         </div>
                     </motion.div>
 
@@ -203,8 +207,8 @@ const UsersTable: React.FC<UsersProps> = ({
                                             <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ACTIONS</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        <AnimatePresence>
+                                    <tbody className="bg-white divide-y divide-gray-200 ">
+                                        <AnimatePresence >
                                             {filteredUsers.length > 0 ? (
                                                 filteredUsers.map((user) => (
                                                     <motion.tr
@@ -214,19 +218,25 @@ const UsersTable: React.FC<UsersProps> = ({
                                                         animate="visible"
                                                         exit={{ opacity: 0 }}
                                                         whileHover={{ scale: 1.01 }}
-                                                        className="border-b hover:bg-gray-50 transition-all duration-200"
+                                                        className="border-b hover:bg-gray-100 transition-all duration-200 "
                                                     >
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <motion.div
                                                                 whileHover={{ scale: 1.05 }}
-                                                                className="w-12 h-12 rounded-full overflow-hidden shadow-md"
+                                                                className="w-12 h-12 rounded-full overflow-hidden shadow-md relative" // Added relative for icon positioning
                                                             >
-                                                                <img
-                                                                    src={user.avatar || "/default-avatar.png"}
-                                                                    alt={user.name}
-                                                                    className="w-full h-full object-cover"
-                                                                    loading="lazy"
-                                                                />
+                                                                {user.image ? (
+                                                                    <img
+                                                                        src={user.image}
+                                                                        alt={user.name}
+                                                                        className="w-full h-full object-cover"
+                                                                        loading="lazy"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="flex items-center justify-center w-full h-full bg-gray-200"> {/* Background for the icon */}
+                                                                        <User className="w-6 h-6 text-gray-500" />
+                                                                    </div>
+                                                                )}
                                                             </motion.div>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap">
@@ -241,24 +251,26 @@ const UsersTable: React.FC<UsersProps> = ({
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <div className="text-sm text-gray-500 capitalize">
-                                                                {user.role}
+                                                                {user.role === 0 ? "Utilisateur" :
+                                                                    user.role === 1 ? "Administrateur" :
+                                                                        user.role === 2 ? "Administrateur (accès limité)" :
+                                                                            "Rôle inconnu"}
                                                             </div>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap">
-                                                            {/* <div className="text-sm text-gray-500">
-                                                                {format(new Date(user.createdAt), 'MMM dd, yyyy')}
-                                                            </div> */}
+                                                            <div className="text-sm text-gray-500">
+                                                                {user.createdAt ? format(new Date(user.createdAt), 'MMM dd, yyyy') : "N/A"}
+                                                            </div>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <motion.span
                                                                 whileHover={{ scale: 1.05 }}
-                                                                className={`px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center ${
-                                                                    user.status === 'active'
-                                                                        ? "bg-green-100 text-green-800"
-                                                                        : user.status === 'inactive'
+                                                                className={`px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center ${user.status === 'active'
+                                                                    ? "bg-green-100 text-green-800"
+                                                                    : user.status === 'inactive'
                                                                         ? "bg-yellow-100 text-yellow-800"
                                                                         : "bg-red-100 text-red-800"
-                                                                }`}
+                                                                    }`}
                                                             >
                                                                 {/* {user.status.charAt(0).toUpperCase() + user.status.slice(1)} */}
                                                             </motion.span>

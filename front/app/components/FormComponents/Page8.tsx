@@ -26,7 +26,7 @@ export default function TitleForm({
     }, [titre]);
 
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        const newValue = event.target.value.slice(0, 50);
+        const newValue = event.target.value.slice(0, 80);
         updateFields({ titre: newValue });
     };
 
@@ -85,8 +85,8 @@ export default function TitleForm({
                                     <Info className="w-4 h-4 inline" />
                                 </button>
                             </label>
-                            <span className={`text-xs ${characterCount === 50 ? 'text-red-500' : 'text-gray-500'}`}>
-                                {characterCount}/50
+                            <span className={`text-xs ${characterCount === 80 ? 'text-red-500' : 'text-gray-500'}`}>
+                                {characterCount}/80
                             </span>
                         </div>
 
@@ -121,13 +121,13 @@ export default function TitleForm({
                             placeholder="Ex: Terrain agricole 5ha avec source d'eau..."
                             value={titre}
                             onChange={handleChange}
-                            maxLength={50}
+                            maxLength={80}
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
                         />
                     </motion.div>
 
-                    {characterCount === 50 && (
+                    {characterCount === 80 && (
                         <motion.div 
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { FiHeart, FiArrowLeft, FiArrowRight, FiStar, FiMapPin } from "react-icons/fi";
+import { FiHeart, FiArrowLeft, FiArrowRight, FiStar, FiMapPin, FiPlay } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import eventService from "../../services/Offres";
 
@@ -43,6 +43,10 @@ export default function Offres() {
     fetchOffres();
   }, []);
 
+  const item = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+  };
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -255,6 +259,32 @@ export default function Offres() {
           </button>
         </div>
       </div>
+      <motion.div
+                  variants={item}
+                  className="flex flex-col sm:flex-row justify-center gap-4"
+                >
+                  <Link href="/OffrePage">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="flex items-center px-8 py-4 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-all"
+                    >
+                      Explorer les offres
+                      <FiArrowRight className="ml-2" />
+                    </motion.button>
+                  </Link>
+      
+                  <Link href="/inscription">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="flex items-center px-8 py-4 border border-teal-600 text-teal-600 rounded-lg font-medium hover:bg-teal-50 transition-all"
+                    >
+                      <FiPlay className="mr-2" />
+                      Voir la démo
+                    </motion.button>
+                  </Link>
+                </motion.div>
     </section>
   );
 }

@@ -140,7 +140,7 @@ export default function FormPages() {
         return "text-gray-400 border-gray-400";
     }, []);
 
-    // Optimisation: Construction dynamique des pages avec useMemo
+    // Optimisation: Construction dynamique des validateCurrentStep avec useMemo
     const pages = useMemo(() => {
         const basePages = [
             <Page1 key="page1" />,
