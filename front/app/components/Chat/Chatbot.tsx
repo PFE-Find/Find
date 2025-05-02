@@ -1,37 +1,67 @@
 'use client';
 
+import axios from "axios";
 import { useState } from "react";
 
 const ChatBot = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { text: "hello", sender: "user" },
-    { text: "This is a response from the chatbot.", sender: "bot" },
-    { text: "this example of chat", sender: "user" },
-    { text: "This is a response from the chatbot.", sender: "bot" },
-    { text: "design with tailwind", sender: "user" },
-    { text: "This is a response from the chatbot.", sender: "bot" },
+  
   ]);
   const [userInput, setUserInput] = useState("");
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
   };
-
-  const sendMessage = () => {
-    if (userInput.trim() === "") return;
-    const newMessages = [...messages, { text: userInput, sender: "user" }];
-    setMessages(newMessages);
+  async function sendMessage() {
+    if (!userInput.trim()) return;
+  
+    // Add the user's message
+    setMessages(prev => [...prev, { text: userInput, sender: "user" }]);
     setUserInput("");
-
-    setTimeout(() => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: "This is a response from the chatbot.", sender: "bot" },
-      ]);
-    }, 500);
-  };
-
+  
+    // Show a "Thinking..." message
+    setMessages(prev => [...prev, { text: "Thinking...", sender: "bot", loading: true }]);
+  
+    try {
+      const response = await fetch("http://localhost:8000/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userInput })
+      });
+  
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+  
+      // Parse the JSON response
+      const data = await response.json();
+      const botReply = data.response;
+  
+      // Update the bot message with the real response
+      setMessages(prev => {
+        const allMessages = [...prev];
+        allMessages[allMessages.length - 1] = {
+          text: botReply,
+          sender: "bot",
+          loading: false
+        };
+        return allMessages;
+      });
+  
+    } catch (error) {
+      console.error("Error:", error);
+      // Show error message
+      setMessages(prev => {
+        const allMessages = [...prev];
+        allMessages[allMessages.length - 1] = {
+          text: "Error: " + error.message,
+          sender: "bot",
+          error: true
+        };
+        return allMessages;
+      });
+    }
+  }
+  
   return (
     
     <div className="fixed bottom-4 right-4">

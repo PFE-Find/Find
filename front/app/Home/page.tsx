@@ -320,6 +320,8 @@ export default function Home() {
      
 
       <Footer />
+    <ChatBot></ChatBot>
+
     </div>
   );
 }
