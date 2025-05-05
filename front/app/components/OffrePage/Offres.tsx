@@ -327,13 +327,7 @@ export default function Offres() {
                                                                 </p>
                                                             </div>
                                                         )}
-                                                        {/* Note */}
-                                                        {offre.etat && offre.etat !== "0" && (
-                                                            <div className="absolute bottom-4 left-4 flex items-center bg-black/50 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm">
-                                                                <FiStar className="text-yellow-400 mr-1" />
-                                                                {offre.etat}/10
-                                                            </div>
-                                                        )}
+                                                        
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="text-xs text-gray-500 dark:text-gray-400">Prix</p>

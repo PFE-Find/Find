@@ -77,10 +77,10 @@ export default function FormPages() {
     const memoizedStepsLabels = useMemo(() => stepsLabels, []);
 
     useEffect(() => {
-        if (session?.user?.id) {
+        if (session?.user?._id) {
             setData(prevData => ({
                 ...prevData,
-                id_user: session.user.id,
+                id_user: session.user._id,
             }));
         }
     }, [session]);

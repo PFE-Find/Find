@@ -1,6 +1,6 @@
 'use client';
-
-import { useEffect, useState } from "react";
+import { useSession } from 'next-auth/react';
+import { useEffect, useState, useRef } from "react";
 import { Report } from "@/app/models/Report";
 import reportService from "@/app/services/Report";
 import { Comment } from "@/app/models/Comment";
@@ -9,11 +9,14 @@ import UserService from "@/app/services/User";
 import { format } from 'date-fns';
 import {
   FiFlag, FiMessageSquare, FiStar, FiCheckCircle,
-  FiCalendar, FiMapPin, FiDollarSign, FiChevronRight
+  FiCalendar, FiMapPin, FiDollarSign, FiChevronRight,
+  FiX
 } from 'react-icons/fi';
 import { FaLeaf, FaShieldAlt } from 'react-icons/fa';
 import { motion, AnimatePresence } from "framer-motion";
 import Map from "./Maps";
+import Conversation from "../Chat/conversation";
+import messageService from "@/app/services/Message";
 
 interface Offre {
   offre: {
@@ -45,6 +48,7 @@ interface User {
 }
 
 export default function Detail({ offre }: Offre) {
+  // Existing state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [description, setDescription] = useState('');
@@ -53,12 +57,25 @@ export default function Detail({ offre }: Offre) {
   const [activeTab, setActiveTab] = useState('description');
   const [isLoading, setIsLoading] = useState(true);
 
+  const { data: session } = useSession();
+  // Chat state
+  const [showChat, setShowChat] = useState(false);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+
+  const ws = useRef<WebSocket | null>(null);
+  const currentUserId = session?.user?._id as string;
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
         setIsLoading(true);
         const data = await UserService.getUserById(offre.id_user);
         setUser(data);
+        console.log("id", data?._id);
+
+        // In a real app, you'd get the current user ID from your auth system
+
       } catch (error) {
         console.error("Error fetching user:", error);
       } finally {
@@ -67,6 +84,61 @@ export default function Detail({ offre }: Offre) {
     };
     fetchUser();
   }, [offre.id_user]);
+
+  // WebSocket setup
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001';
+    ws.current = new WebSocket(`${socketUrl}?userId=${currentUserId}`);
+
+    ws.current.onopen = () => console.log('WebSocket connected');
+
+    ws.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+    };
+
+    ws.current.onerror = (error) => console.error('WebSocket error:', error);
+    ws.current.onclose = () => console.log('WebSocket disconnected');
+
+    return () => {
+      ws.current?.close();
+      ws.current = null;
+    };
+  }, [currentUserId]);
+
+  const handleContactOwner = async () => {
+    console.log("currentUserId", currentUserId);
+
+    if (!currentUserId) {
+      alert('Please log in to contact the owner');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const conversation = await messageService.getConversation(currentUserId, offre.id_user);
+      setMessages(conversation);
+
+      const ownerUser = {
+        _id: offre.id_user,
+        name: user?.name || "Property Owner",
+        role: "owner",
+        image: user?.image,
+        lastMessage: conversation.length > 0 ? conversation[conversation.length - 1].text : undefined,
+        unreadCount: 0,
+        online: false
+      };
+
+      setUsers([ownerUser]);
+      setShowChat(true);
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Convertir l'état en nombre d'étoiles (1-5)
   const etatStars = Math.min(5, Math.max(1, Math.floor(parseInt(offre.etat) / 20)));
@@ -157,26 +229,27 @@ export default function Detail({ offre }: Offre) {
       </motion.div>
     );
   };
+
   const calculateYearsSince = (dateString: string) => {
     try {
       const createdAt = new Date(dateString);
       const now = new Date();
       let years = now.getFullYear() - createdAt.getFullYear();
 
-      // Ajustement si l'anniversaire de la date n'est pas encore arrivé cette année
       const monthDiff = now.getMonth() - createdAt.getMonth();
       if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < createdAt.getDate())) {
         years--;
       }
 
-      return years > 0 ? years : 1; // Minimum 1 an
+      return years > 0 ? years : 1;
     } catch (error) {
       console.error("Erreur de calcul de date:", error);
-      return 1; // Valeur par défaut
+      return 1;
     }
   };
+
   return (
-    <div className="bg-gray-50 mx-auto max-w-[80%]">
+    <div className="bg-gray-50 mx-auto max-w-[80%] relative">
       {/* Main Content */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -192,15 +265,10 @@ export default function Detail({ offre }: Offre) {
           </div>
         </div>
       </motion.div>
-      <div className="container   py-8 px-4">
-        {/* Property Header */}
 
-
-        {/* Main Grid */}
+      <div className="container py-8 px-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Owner Section */}
             {isLoading ? (
               <div className="bg-white rounded-xl shadow-md p-6 animate-pulse">
                 <div className="flex items-center gap-4 mb-6">
@@ -214,7 +282,6 @@ export default function Detail({ offre }: Offre) {
               </div>
             ) : (
               <motion.div
-
                 className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-center gap-4 mb-6">
@@ -223,13 +290,14 @@ export default function Detail({ offre }: Offre) {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
                     className="w-16 h-16 rounded-full object-cover border-2 border-green-100"
-                    src={user?.image || "/default-avatar.png"}
+                    src={user?.image?.startsWith('/uploads')
+                      ? `http://localhost:3001${user.image}`
+                      : user?.image || '/default-profile.png'}
                     alt="Profile"
                   />
                   <div>
                     <h2 className="text-xl font-semibold text-gray-800">{user?.name || "Propriétaire"}</h2>
                     <p className="text-gray-600">Propriétaire du l'offre</p>
-
                   </div>
                 </div>
 
@@ -240,18 +308,15 @@ export default function Detail({ offre }: Offre) {
                       <>
                         Membre depuis {calculateYearsSince(user.createdAt)} {calculateYearsSince(user.createdAt) === 1 ? 'an' : 'ans'}.
                         {user?.specialization && ` Spécialisé dans ${user.specialization}.`}
-
                       </>
                     ) : (
                       "Informations sur le propriétaire non disponibles"
                     )}
                   </p>
                 </div>
-
               </motion.div>
             )}
 
-            {/* Tabs Section */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
               <div className="border-b border-gray-200">
                 <nav className="flex -mb-px">
@@ -370,7 +435,6 @@ export default function Detail({ offre }: Offre) {
               </div>
             </div>
 
-            {/* Comments Section */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -404,7 +468,6 @@ export default function Detail({ offre }: Offre) {
             </motion.div>
           </div>
 
-          {/* Right Column - Booking Card */}
           <div className="lg:col-span-1">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -413,7 +476,6 @@ export default function Detail({ offre }: Offre) {
               className="bg-white rounded-xl shadow-md sticky top-6 p-6 hover:shadow-lg transition-shadow"
             >
               <div className="space-y-4">
-
                 <div className=" border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                   <div className="flex items-center space-x-3">
                     {offre.Superficie && offre.Superficie !== "0" && (
@@ -424,7 +486,6 @@ export default function Detail({ offre }: Offre) {
                         </p>
                       </div>
                     )}
-
                   </div>
                   <div className="text-right">
                     <p className="text-m text-gray-500 dark:text-gray-400">Prix</p>
@@ -448,6 +509,7 @@ export default function Detail({ offre }: Offre) {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  onClick={handleContactOwner}
                   className="w-full py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
                 >
                   Contacter le propriétaire
@@ -565,6 +627,56 @@ export default function Detail({ offre }: Offre) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Chat Overlay */}
+      {/* Chat Overlay */}
+<AnimatePresence>
+  {showChat && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex justify-end bg-black/30 backdrop-blur-sm"
+    >
+      <motion.div
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        className="relative w-full max-w-md h-screen flex flex-col bg-gradient-to-b from-white to-gray-50 border-l border-gray-200 shadow-2xl"
+      >
+        {/* Close Button - Positioned absolutely at the top left of the chat panel */}
+        <button
+          onClick={() => setShowChat(false)}
+          className="absolute left-4 top-4 p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors z-10"
+        >
+          <FiX size={20} />
+        </button>
+        
+        {/* Conversation */}
+        <div className="flex-1 overflow-hidden pt-12"> {/* Added padding-top for the close button */}
+          {users.length > 0 && (
+            <Conversation
+              selectedUser={users[0]}
+              messages={messages}
+              isLoading={isLoading}
+              currentUserId={currentUserId}
+              ws={ws.current}
+              setMessages={setMessages}
+              setUsers={setUsers}
+              users={users}
+            />
+          )}
+        </div>
+
+        {/* Subtle Branding */}
+        <div className="px-4 py-2 text-center text-xs text-gray-400 border-t border-gray-100">
+          Messages sécurisés • {new Date().getFullYear()}
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
     </div>
   );
 }

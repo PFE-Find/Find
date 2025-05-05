@@ -268,7 +268,7 @@ export default function Offres({
                             {/* Action Buttons */}
                             <div className="absolute top-4 right-4 flex flex-col space-y-2 z-20">
                               {/* Show edit/delete buttons if user is owner or admin */}
-                              {session?.user?.id === offre.id_user && (
+                              {session?.user?._id === offre.id_user && (
                                 <>
                                   <button
                                     onClick={() => router.push(`/UpdateForm/${offre._id}`)}
