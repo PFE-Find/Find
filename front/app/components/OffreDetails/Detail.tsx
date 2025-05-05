@@ -64,8 +64,12 @@ export default function Detail({ offre }: Offre) {
   const [users, setUsers] = useState<any[]>([]);
 
   const ws = useRef<WebSocket | null>(null);
-  const currentUserId = session?.user?._id as string;
 
+  const currentUserId = session?.user?.user?._id || session?.user?._id || null;
+
+  console.log("Current User ID:", currentUserId);
+  console.log("Session:", session);
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {

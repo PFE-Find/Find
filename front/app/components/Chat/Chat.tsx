@@ -39,7 +39,7 @@ export interface Message {
 export default function ChatPage() {
   const [users, setUsers] = useState<User[]>([]);
   const { data: session } = useSession();
-  const currentUserId = session?.user?._id as string;
+  const currentUserId = session?.user?.user?._id || session?.user?._id || null;
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
