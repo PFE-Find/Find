@@ -75,12 +75,12 @@ export default function FormPages() {
 
     // Optimisation: Utilisation de useMemo pour éviter les recalculs inutiles
     const memoizedStepsLabels = useMemo(() => stepsLabels, []);
-
+    const currentUserId = session?.user?.user?._id || session?.user?._id || null;
     useEffect(() => {
-        if (session?.user?._id) {
+        if (currentUserId) {
             setData(prevData => ({
                 ...prevData,
-                id_user: session.user._id,
+                id_user: currentUserId,
             }));
         }
     }, [session]);

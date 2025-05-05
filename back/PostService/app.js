@@ -7,7 +7,7 @@ import MessageRouter from './routes/message.js';
 import CommentRouter from './routes/comment.js';
 import UserRouter from './routes/user.js';
 import http from 'http';
-import { WebSocketServer } from 'ws';
+import { WebSocketServer , WebSocket  } from 'ws';
 import Message from './models/Message.js'; // Import the Message model
 import path from 'path';
 const app = express();
