@@ -14,7 +14,7 @@ export default function OffrePage() {
         {/* <Search /> */}
         <Offre />
         <Footer></Footer>
-        <ChatBot/>
+        {/* <ChatBot/> */}
         
         </div>
         </>

@@ -12,9 +12,9 @@ import Message from './models/Message.js'; // Import the Message model
 import path from 'path';
 const app = express();
 const server = http.createServer(app); // Create the HTTP server
- // Create the WebSocket server
+// Create the WebSocket server
 
- const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ server });
 
 // Middleware setup
 app.use(express.json({ limit: '50mb' }));
@@ -22,7 +22,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(
     '/uploads',
     express.static(path.join(process.cwd(), 'uploads'))
-  );
+);
 const PORT = process.env.PORT || 3001;
 
 // CORS Configuration
@@ -55,7 +55,11 @@ wss.on('connection', (ws, req) => {
             switch (data.type) {
                 case 'NEW_MESSAGE':
                     // Save message to the database
-                    const newMessage = new Message(data.message); 
+                    const messageData = { ...data.message };
+                    //Crucial change: remove the _id field
+                    delete messageData._id; 
+
+                    const newMessage = new Message(messageData);
                     const savedMessage = await newMessage.save();
 
                     // Emit the saved message to the receiver and sender
@@ -118,7 +122,7 @@ wss.on('connection', (ws, req) => {
                         }));
                     }
                     break;
-                    case 'user_converstion':
+                case 'user_converstion':
                     // Update the message in the database
                     const message2 = await Message.findByIdAndUpdate(
                         data.messageId,

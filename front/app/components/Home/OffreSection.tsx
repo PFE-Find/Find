@@ -168,13 +168,6 @@ export default function Offres() {
                             <FiHeart className={`w-5 h-5 ${favorites[offre._id] ? 'fill-current' : ''}`} />
                           </button>
                           
-                          {/* Rating */}
-                          {offre.etat && offre.etat !== "0" && (
-                            <div className="absolute bottom-4 left-4 flex items-center bg-black/80 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm">
-                              <FiStar className="text-yellow-400 mr-1" />
-                              {offre.etat}/10
-                            </div>
-                          )}
                           
                           {/* Hover Overlay */}
                           <AnimatePresence>

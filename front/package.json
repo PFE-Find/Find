@@ -29,6 +29,7 @@
     "compressorjs": "^1.2.1",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
+    "emoji-picker-react": "^4.12.2",
     "firebase": "^11.5.0",
     "framer-motion": "^12.7.3",
     "leaflet": "^1.9.4",

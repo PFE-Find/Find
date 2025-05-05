@@ -26,9 +26,9 @@ export default function Profile() {
     
     useEffect(() => {
         async function fetchOffres() {
-            if (session?.user?.id) {
+            if (session?.user?._id) {
                 try {
-                    const offres2 = await eventService.getAllOffresByUserId(session.user.id);
+                    const offres2 = await eventService.getAllOffresByUserId(session.user._id);
                     setOffres2(offres2);
                 } catch (error) {
                     console.error("Error fetching offres:", error);
@@ -36,9 +36,9 @@ export default function Profile() {
             }
         }
         async function fetchOffres2() {
-            if (session?.user?.id) {
+            if (session?.user?._id) {
                 try {
-                    const offres = await eventService.getAllOffresByUserId2(session.user.id);
+                    const offres = await eventService.getAllOffresByUserId2(session.user._id);
                     setOffres(offres);
                 } catch (error) {
                     console.error("Error fetching offres2:", error);
