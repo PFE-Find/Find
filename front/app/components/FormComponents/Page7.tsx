@@ -4,22 +4,26 @@ import { useState, useEffect } from "react";
 import Compressor from "compressorjs";
 import { X, UploadCloud, Image as ImageIcon, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import * as nsfwjs from "nsfwjs"; // named import per docs :contentReference[oaicite:9]{index=9}
 import "../../globals.css";
 
 export default function ImageUploader({ data, updateFields }) {
   const [imageURLs, setImageURLs] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [model, setModel] = useState<nsfwjs.NSFWJS | null>(null);
 
-  // Load saved images from localStorage on mount
+  // 1. Load NSFWJS model once :contentReference[oaicite:10]{index=10}
   useEffect(() => {
-    const savedImages = localStorage.getItem("uploadedPhotos");
-    if (savedImages) {
-      setImageURLs(JSON.parse(savedImages));
-    }
+    nsfwjs.load().then(setModel);
   }, []);
 
-  // Save images to localStorage whenever imageURLs change
+  // 2. Load/save images to localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("uploadedPhotos");
+    if (saved) setImageURLs(JSON.parse(saved));
+  }, []);
+
   useEffect(() => {
     if (imageURLs.length > 0) {
       localStorage.setItem("uploadedPhotos", JSON.stringify(imageURLs));
@@ -36,61 +40,71 @@ export default function ImageUploader({ data, updateFields }) {
     setIsDragging(false);
   };
 
+ 
+
+  const checkImageProfanity = async (base64: string): Promise<boolean> => {
+    if (!model) return false;
+    const img = new Image();
+    img.src = base64;
+    await new Promise((res) => { img.onload = res; }); 
+    const preds = await model.classify(img,1);
+    console.log(preds);
+    return preds.some(p => p.className != "Neutral");
+  };
+
+  // 4. Handle new uploads synchronously
+  const handleUpdatePhotos = async (files: FileList) => {
+    const selected = Array.from(files);
+    if (imageURLs.length + selected.length > 10) {
+      setError("Vous ne pouvez pas télécharger plus de 10 photos");
+      return void setTimeout(() => setError(null), 5000);
+    }
+
+    try {
+      setError(null);
+      // Compress all files
+      const compressed: string[] = await Promise.all(
+        selected.map(f => new Promise<string>((res, rej) => {
+          new Compressor(f, {
+            quality: 0.7, maxWidth: 1200, maxHeight: 1200, convertSize: 1e6,
+            success(file) {
+              const reader = new FileReader();
+              reader.onloadend = () => res(reader.result as string);
+              reader.onerror = rej;
+              reader.readAsDataURL(file);
+            },
+            error: rej,
+          });
+        }))
+      );
+
+      // 5. Check each for NSFW :contentReference[oaicite:14]{index=14}
+      /*for (let b64 of compressed) {
+        if (await checkImageProfanity(b64)) {
+          alert("⚠️ Contenu inapproprié détecté.");
+          return;
+        }
+      }*/
+      // 6. Safe: append and update state
+      setImageURLs(prev => [...prev, ...compressed]);
+    } catch (err) {
+      console.error(err);
+      setError("Erreur lors du traitement des images");
+    }
+  };
+
+  // 7. Drag & drop / remove handlers
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    if (e.dataTransfer.files.length) {
       handleUpdatePhotos(e.dataTransfer.files);
     }
   };
 
-  async function handleUpdatePhotos(files: FileList) {
-    const selectedFiles = Array.from(files);
-    
-    // Check if adding these files would exceed 10 images
-    if (imageURLs.length + selectedFiles.length > 10) {
-      setError("Vous ne pouvez pas télécharger plus de 10 photos");
-      setTimeout(() => setError(null), 5000);
-      return;
-    }
+  const handleRemovePhoto = (idx: number) =>
+    setImageURLs(u => u.filter((_, i) => i !== idx));
 
-    const compressAndSave = (file: File) => {
-      return new Promise<string>((resolve, reject) => {
-        new Compressor(file, {
-          quality: 0.7,
-          maxWidth: 1200,
-          maxHeight: 1200,
-          convertSize: 1000000, // Convert to JPEG if over 1MB
-          success(compressedFile) {
-            const reader = new FileReader();
-            reader.readAsDataURL(compressedFile);
-            reader.onloadend = () => {
-              resolve(reader.result as string);
-            };
-            reader.onerror = reject;
-          },
-          error(err) {
-            reject(err);
-          },
-        });
-      });
-    };
-
-    try {
-      setError(null);
-      const compressedImages = await Promise.all(selectedFiles.map(compressAndSave));
-      const updatedImages = [...imageURLs, ...compressedImages];
-      setImageURLs(updatedImages);
-    } catch (error) {
-      console.error("Error processing images:", error);
-      setError("Une erreur est survenue lors du traitement des images");
-    }
-  }
-
-  function handleRemovePhoto(index: number) {
-    const updatedImages = imageURLs.filter((_, i) => i !== index);
-    setImageURLs(updatedImages);
-  }
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },

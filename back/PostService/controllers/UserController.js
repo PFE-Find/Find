@@ -17,6 +17,7 @@ export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
     let updates = { ...req.body };
+   
     
     // Handle password hashing if provided
     if (updates.password) {
@@ -66,10 +67,12 @@ export const updateUser = async (req, res) => {
 // Get user by ID
 export const getUserById = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
+    const id = req.params.id || req.query.id || req.body.id;
+    const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+  
     res.status(200).json(user);
   } catch (error) {
     console.error("Error fetching user:", error);
