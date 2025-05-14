@@ -89,6 +89,8 @@ export default function Detail({ offre }: Offre) {
     fetchUser();
   }, [offre.id_user]);
 
+
+
   // WebSocket setup
   useEffect(() => {
     if (!currentUserId) return;
@@ -155,10 +157,14 @@ export default function Detail({ offre }: Offre) {
 
   const submitReport = async (data: Report) => {
     try {
+      
       await reportService.addReport(data);
       alert('Report added successfully!');
     } catch (error) {
       console.error('Error adding report:', error);
+      console.log(data);
+      
+      alert('error added successfully!');
     }
   };
 
@@ -173,13 +179,16 @@ export default function Detail({ offre }: Offre) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
     const report: Report = {
       text: description,
-      userId: user.id,
-      postId: offre.id,
+      userId: currentUserId,
+      postId: offre._id,
       reason: reportReason,
       status: Status.Pending,
     };
+    console.log(report);
+    
     submitReport(report);
     setReportReason('');
     setDescription('');

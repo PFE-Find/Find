@@ -33,6 +33,27 @@ const Offres = {
       throw error;
     }
   },
+
+  async getLands() {
+    try {
+      const response = await axios.get(`${API_URL}GetLand`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Lands:", error);
+      throw error;
+    }
+  },
+  async getMaterials() {
+    try {
+      const response = await axios.get(`${API_URL}GetMaterials`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Materials:", error);
+      throw error;
+    }
+  },
+
+
   async getAllOffresByUserId(id: string) {
     try {
       

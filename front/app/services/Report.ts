@@ -28,6 +28,7 @@ const reportService = {
   async addReport(eventData: any) {
     try {
       const response = await axios.post(`${API_URL}/`, eventData);
+      
       return response.data;
     } catch (error) {
       console.error("Error adding report:", error);

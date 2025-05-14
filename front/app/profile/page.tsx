@@ -78,7 +78,6 @@ export default function Profile() {
         try {
             const user = session?.user?.user || session?.user;
             console.log(user);
-            
             if (!user) {
                 console.error('No user session found');
                 return;
@@ -95,6 +94,8 @@ export default function Profile() {
             }
 
             // 1. Update user in the database
+            console.log(user._id,  updatedUserData);
+             
             const updatedUser = await UserService.UpadetUser(user._id, updatedUserData);
 
             // 2. Update the NextAuth.js session

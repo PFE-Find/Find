@@ -73,7 +73,7 @@ export const getItems1 = async (req, res, next) => {
 
     const allItems = items.map((post) => ({
       ...post.toObject(),
-      images: post.images || [], 
+      images: post.images || [],
     }));
 
     res.json(allItems);
@@ -83,16 +83,16 @@ export const getItems1 = async (req, res, next) => {
 };
 export const getItems2 = async (req, res, next) => {
   try {
-    const items = await Post.find({ statut: false }) 
+    const items = await Post.find({ statut: false })
       .populate({
-        path: 'images', 
-        select: 'path date', 
+        path: 'images',
+        select: 'path date',
       })
       .exec();
 
     const allItems = items.map((post) => ({
       ...post.toObject(),
-      images: post.images || [], 
+      images: post.images || [],
     }));
 
     res.json(allItems);
@@ -106,7 +106,7 @@ export const getItems2 = async (req, res, next) => {
 export const getItems3 = async (req, res, next) => {
   try {
     const userId = req.params.id;
-    
+
 
     const items = await Post.find({ id_user: userId, statut: true })
       .populate({
@@ -115,7 +115,7 @@ export const getItems3 = async (req, res, next) => {
       })
       .exec();
 
-    
+
 
     if (!items || items.length === 0) {
       return res.status(404).json({ message: 'No items found for this user' });
@@ -126,7 +126,7 @@ export const getItems3 = async (req, res, next) => {
       images: item.images || [],
     }));
 
-   
+
 
     res.json(itemsPlain);
   } catch (error) {
@@ -137,7 +137,7 @@ export const getItems3 = async (req, res, next) => {
 export const getItems4 = async (req, res, next) => {
   try {
     const userId = req.params.id;
-    
+
 
     const items = await Post.find({ id_user: userId, statut: false })
       .populate({
@@ -146,7 +146,7 @@ export const getItems4 = async (req, res, next) => {
       })
       .exec();
 
-    
+
 
     if (!items || items.length === 0) {
       return res.status(404).json({ message: 'No items found for this user' });
@@ -157,7 +157,7 @@ export const getItems4 = async (req, res, next) => {
       images: item.images || [],
     }));
 
-    
+
 
     res.json(itemsPlain);
   } catch (error) {
@@ -248,7 +248,7 @@ export const updateItem = async (req, res, next) => {
 };
 
 export const deleteItem = async (req, res, next) => {
-  
+
   try {
     const itemId = req.params.id;
 
@@ -269,4 +269,39 @@ export const deleteItem = async (req, res, next) => {
     console.error("Error deleting item:", error); // Log the error for debugging
     next(error); // Pass the error to the error handling middleware
   }
+
+
+
 };
+export const getLands = async (req, res, next) => {
+  try {
+    const lands = await Post.find({ 'propertyType': 'Land' });
+    if (!lands) {
+      return res.status(404).json({ message: 'Land not found' });
+    }
+    else {
+      res.json(lands.length);
+    }
+  }
+  catch (err) {
+    next(err)
+
+  }
+
+};
+export const getMaterials = async (req, res, next) => {
+  try {
+    const Material = await Post.find({ 'propertyType': 'Material' });
+    if (!Material) {
+      return res.status(404).json({ message: 'Materials not found' });
+    }
+    else {
+      res.json(Material.length);
+    }
+  }
+  catch (err) {
+    next(err)
+
+  };
+};
+
