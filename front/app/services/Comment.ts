@@ -18,8 +18,10 @@ const CommentService = {
   // Fetch a single event by ID
   async getComment(id: string) {
     try {
-      const response = await axios.get(`${API_URL}/${id}`);
-      return response.data;
+      const response = await axios.get(`${API_URL}/post/${id}`);
+      return response.data.Comments || [];;
+     
+      
     } catch (error) {
       console.error("Error fetching event:", error);
       throw error;
@@ -38,7 +40,7 @@ const CommentService = {
   // Delete an report
   async deleteComment(id: string) {
     try {
-      const response = await axios.delete(`${API_URL}/${id}`);
+      const response = await axios.delete(`${API_URL}/delete/${id}`);
       return response.data;
     } catch (error) {
       console.error("Error deleting event:", error);

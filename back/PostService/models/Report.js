@@ -16,18 +16,13 @@ const Status = {
 }
 
 const ReportSchema = new mongoose.Schema({
-    postId: {
-        type: String,
-       
-        required: true
-    },
+    
     userId: {
         type: String,
         required: true
     },
     text: {
         type: String,
-        required: true,
     },
     reason: {
         type: [String], 
