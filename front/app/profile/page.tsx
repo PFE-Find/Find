@@ -113,6 +113,7 @@ export default function Profile() {
     const handleSave = async () => {
         try {
             const user = session?.user?.user || session?.user;
+
             if (!user) {
                 console.error('No user session found');
                 return;
@@ -127,6 +128,7 @@ export default function Profile() {
             if (selectedImage) {
                 updatedUserData.image = selectedImage;
             }
+
 
             const updatedUser = await UserService.UpadetUser(user._id, updatedUserData);
 

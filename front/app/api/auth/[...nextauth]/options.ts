@@ -97,9 +97,13 @@ export const options: NextAuthOptions = {
             }
 
             // Always fetch updated user data from DB on subsequent requests
-            if (token?.user?.id) {
+            const id = token?.user?.id ||token?.user?._id
+            
+            if (id) {
                 try {
-                    const updatedUser = await userService.getUserById(token.user.id);
+                    console.log("hello world"+id);
+                    
+                    const updatedUser = await userService.getUserById(id);
                     console.log(updatedUser);
                     
                     if (updatedUser) {
@@ -113,7 +117,8 @@ export const options: NextAuthOptions = {
                 
                 
                 try {
-                    const updatedUser = await userService.getUserById(token.user._id);
+                    console.log("hello world 2"+id);
+                    const updatedUser = await userService.getUserById(id);
                     console.log(updatedUser);
                     
                     if (updatedUser) {

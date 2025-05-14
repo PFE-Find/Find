@@ -18,6 +18,8 @@ const Navbar: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
+  console.log(session);
+  
   const userDropdownItems = [
     { icon: <FiUser className="mr-2" />, name: 'Home', href: '/' },
     { icon: <FiSettings className="mr-2" />, name: 'Settings', href: '/profile' },
@@ -59,7 +61,13 @@ const Navbar: React.FC = () => {
                 >
                   <img
                     className="w-16 h-16 rounded-full object-cover border-2 border-green-100"
-                    src={session.user?.image || '/default-avatar.png'}
+                    src={
+                      session.user?.image
+                        ? session.user.image.startsWith('/uploads')
+                          ? `http://localhost:3001${session.user.image}`
+                          : session.user.image
+                        : '/default-avatar.png' // Fallback image
+                    }
                     alt="User profile"
                   />
                 </button>
@@ -120,7 +128,7 @@ const Navbar: React.FC = () => {
                 </motion.button>
               </div>
             )}
-           
+
           </div>
 
 

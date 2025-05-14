@@ -1,20 +1,48 @@
 
-import Report from  "../models/Report.js"; 
+import Report from "../models/Report.js";
 
 
 export const createReport = async (req, res, next) => {
 
-    try{
-        const  newItem =  new  Report(req.body)  ;  
-        await  newItem.save();  
-        res.status(201).json({report : newItem}) ;  
+    try {
+        console.log(req.body);
+        const newItem = new Report(req.body);
+        await newItem.save();
+        res.status(201).json({ report: newItem });
     }
-    catch(error)
-    {
-        next(error) ; 
+    catch (error) {
+        next(error);
     }
 
 }
+export const deleteReport = async (req, res , next) => {
+    try{
+        const deleted_report = await Report.findByIdAndDelete(req.params.id);
+        if(!deleted_report)
+        {
+               return res.status(404).json({ message: "report not found" });
+        }
+        res.status(200).json({ message: "report deleted successfully" });
+    }
+    catch(error)
+    {
+        next(error); 
+    }
+}
+export const getReports = async (req, res, next) => {
+
+    try {
+        const reports = await Report.find();
+        res.status(200).json(reports);
+
+
+    }
+    catch (error) {
+        next(error);
+    }
+
+}
+
 
 export const updateReport = async (req, res, next) => {
     try {

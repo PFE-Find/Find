@@ -4,7 +4,7 @@ import { ChangeEvent, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Info, AlertCircle } from 'lucide-react';
 import "../../globals.css";
-
+import leoProfanity from 'leo-profanity';
 type FormData = {
     titre: string;
 };
@@ -13,22 +13,47 @@ type UserFormProps = FormData & {
     updateFields: (fields: Partial<FormData>) => void;
 };
 
+
+
+
+
 export default function TitleForm({
     titre = "",
     updateFields,
 }: UserFormProps) {
     const [isFocused, setIsFocused] = useState(false);
-    const [showTooltip, setShowTooltip] = useState(false);
-    const [characterCount, setCharacterCount] = useState(titre.length);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [characterCount, setCharacterCount] = useState(titre.length);
+  const [isProfane, setIsProfane] = useState(false);
 
-    useEffect(() => {
-        setCharacterCount(titre.length);
-    }, [titre]);
+  // Load both French + English profanity lists once
+  useEffect(() => {
+    const fr = leoProfanity.getDictionary('fr');
+    const en = leoProfanity.getDictionary('en');
+    leoProfanity.loadDictionary([...new Set([...fr, ...en])]);
+  }, []);
 
-    const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        const newValue = event.target.value.slice(0, 80);
-        updateFields({ titre: newValue });
-    };
+  // Keep character count up to date
+  useEffect(() => {
+    setCharacterCount(titre.length);
+  }, [titre]);
+
+  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = event.target.value.slice(0, 80);
+
+    // Check directly on the newValue
+    const containsProfanity = leoProfanity.check(newValue);
+    setIsProfane(containsProfanity);
+
+    if (containsProfanity) {
+      // Block it: clear the field and warn
+      updateFields({ titre: "" });
+      alert('⚠️ Langage inapproprié détecté !');
+    } else {
+      // Safe to update
+      updateFields({ titre: newValue });
+    }
+  };
 
     const variants = {
         hidden: { opacity: 0, y: 20 },

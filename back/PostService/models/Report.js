@@ -34,10 +34,7 @@ const ReportSchema = new mongoose.Schema({
         enum:Status,
         default: "pending"
     },
-    OffreId: {
-        type: String,
-        required: true
-    },
+   
     date: {
         type: Date,
         default: Date.now

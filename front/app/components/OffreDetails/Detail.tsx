@@ -119,6 +119,8 @@ export default function Detail({ offre }: Offre) {
     fetchUser();
   }, [offre.id_user]);
 
+
+
   // WebSocket setup
   useEffect(() => {
     if (!currentUserId) return;
@@ -185,6 +187,7 @@ export default function Detail({ offre }: Offre) {
 
   const submitReport = async (data: Report) => {
     try {
+
       const response = await reportService.addReport(data);
       if (!response.report) {
         throw new Error(response.message || 'Failed to submit report');
@@ -193,6 +196,7 @@ export default function Detail({ offre }: Offre) {
     } catch (error) {
       console.error('Error adding report:', error);
       throw error;
+
     }
   };
 
@@ -207,6 +211,7 @@ export default function Detail({ offre }: Offre) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
 
     // Validate reason selection
     if (!reportReason) {
@@ -247,6 +252,7 @@ export default function Detail({ offre }: Offre) {
         type: 'error'
       });
     }
+
   };
 
   const handleSubmitComment = (e: React.FormEvent) => {
