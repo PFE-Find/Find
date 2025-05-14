@@ -1,52 +1,114 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiUser, FiSettings, FiDollarSign, FiPlus, FiLogOut } from 'react-icons/fi';
+import { FiUser, FiSettings, FiDollarSign, FiPlus, FiLogOut, FiBell } from 'react-icons/fi';
 import { HiOutlineMenuAlt3, HiX } from 'react-icons/hi';
+import NotifService from '@/app/services/Notification';
+import { toast } from 'react-toastify';
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const router = useRouter();
   const { data: session } = useSession();
-
+  const ws = useRef<WebSocket | null>(null);
 
   const navLinks = [
-    { name: 'Accueil', href: '/' },
-    { name: 'Explorer', href: '/OffrePage' },
-    { name: 'àpropos', href: '/aboutUs' },
-    { name: 'Services', href: '/services' },
-    { name: 'Contact', href: '/Chat' }
+    { name: 'Accueil', href: '/', protected: false },
+    { name: 'Explorer', href: '/OffrePage', protected: false },
+    { name: 'Àpropos', href: '/aboutUs', protected: false },
+    { name: 'Notifications', href: '/Notification', protected: true },
+    { name: 'Contact', href: '/Chat', protected: true }
   ];
 
-  const userDropdownItems = [
-    ...(session?.user?.role === 1 || session?.user?.role === 2 ? [
-      {
-        icon: <FiUser className="mr-2" />,
-        name: 'Tableau de bord',
-        href: '/Admin/DashBoard'
+  useEffect(() => {
+    if (!session?.user?.user?._id && !session?.user?._id) return;
+
+    const currentUserId = session?.user?.user?._id || session?.user?._id;
+
+    const fetchUnreadCount = async () => {
+      try {
+        const count = await NotifService.getUnreadCount(currentUserId);
+        setUnreadCount(count);
+      } catch (error) {
+        console.error('Erreur:', error);
+        setUnreadCount(0);
       }
-    ] : []),
-    { icon: <FiSettings className="mr-2" />, name: 'Paramètres', href: '/profile' },
-    { icon: <FiDollarSign className="mr-2" />, name: 'Revenus', href: '/' },
-    { icon: <FiPlus className="mr-2" />, name: 'Ajouter une offre', href: '/FormPages' }
-  ];
+    };
 
-  const handleNewOfferClick = () => {
+    fetchUnreadCount();
+
+    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001';
+    ws.current = new WebSocket(`${socketUrl}?userId=${currentUserId}`);
+
+    ws.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      
+      if (data.notification?.type === 'MESSAGE') return;
+      
+      switch (data.type) {
+        case 'ALL_NOTIFICATIONS_READ':
+          if(data.userId == currentUserId){
+            setUnreadCount(0);
+          }
+          break;
+        case 'NEW_NOTIFICATION':
+          if (data.notification?.receiverId === currentUserId) {
+            setUnreadCount(prev => prev + 1);
+          }
+          break;
+        case 'NOTIFICATION_READ':
+          if (data.notification?.type !== 'MESSAGE') {
+            setUnreadCount(prev => Math.max(0, prev - 1));
+          }
+          break;
+        case 'NOTIFICATION_DELETED':
+          if (!data.notification?.isRead && data.notification?.type !== 'MESSAGE') {
+            setUnreadCount(prev => Math.max(0, prev - 1));
+          }
+          break;
+        case 'UNREAD_COUNT_UPDATE':
+          setUnreadCount(data.count);
+          break;
+      }
+    };
+
+    ws.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    ws.current.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+      }
+    };
+  }, [session]);
+
+  const handleProtectedRouteClick = (href: string) => {
     if (!session) {
+      toast.error('Veuillez vous connecter pour accéder à cette page');
       router.push('/signin');
     } else {
-      router.push('/FormPages');
+      router.push(href);
     }
     setMenuOpen(false);
+    setDropdownOpen(false);
   };
 
-  // Fermer le dropdown si on clique à l'extérieur
+  const handleNewOfferClick = () => {
+    handleProtectedRouteClick('/FormPages');
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownOpen && !(event.target as HTMLElement).closest('.user-dropdown')) {
@@ -58,6 +120,22 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [dropdownOpen]);
 
+  const userDropdownItems = [
+    ...(session?.user?.role === 1 || session?.user?.role === 2 ? [
+      {
+        icon: <FiUser className="mr-2" />,
+        name: 'Tableau de bord',
+        href: '/Admin/DashBoard'
+      }
+    ] : []),
+    { icon: <FiSettings className="mr-2" />, name: 'Paramètres', href: '/profile' },
+    {
+      icon: <FiBell className="mr-2" />,
+      name: 'Notifications',
+      href: '/Notification'
+    },
+    { icon: <FiPlus className="mr-2" />, name: 'Ajouter une offre', href: '/FormPages' }
+  ];
 
   return (
     <nav className="bg-white bg-opacity-90 shadow-sm w-full sticky top-0 z-50 backdrop-blur-sm p-4">
@@ -83,19 +161,38 @@ export default function Navbar() {
           {/* Navigation Desktop */}
           <div className="hidden md:flex items-center space-x-6">
             {navLinks.map((link, index) => (
-              <Link
-                key={index}
-                href={link.href}
-                className={`relative px-3 py-2 text-gray-700 hover:text-teal-600 transition-colors font-medium ${router.pathname === link.href
-                  ? 'text-teal-600 font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-teal-600'
-                  : ''
+              link.protected ? (
+                <button
+                  key={index}
+                  onClick={() => handleProtectedRouteClick(link.href)}
+                  className={`relative px-3 py-2 text-gray-700 hover:text-teal-600 transition-colors font-medium ${
+                    router.pathname === link.href
+                      ? 'text-teal-600 font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-teal-600'
+                      : ''
                   }`}
-              >
-                {link.name}
-              </Link>
+                >
+                  {link.name}
+                  {link.href === '/Notification' && unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+              ) : (
+                <Link
+                  key={index}
+                  href={link.href}
+                  className={`relative px-3 py-2 text-gray-700 hover:text-teal-600 transition-colors font-medium ${
+                    router.pathname === link.href
+                      ? 'text-teal-600 font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-teal-600'
+                      : ''
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              )
             ))}
             <motion.button
-              
               whileTap={{ scale: 0.98 }}
               onClick={handleNewOfferClick}
               className="w-full flex items-center justify-center px-3 py-2 mt-2 bg-gradient-to-r from-teal-400 to-teal-700 text-white rounded-md shadow-sm"
@@ -111,12 +208,12 @@ export default function Navbar() {
               <div className="relative ml-4 user-dropdown">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center focus:outline-none"
+                  className="flex items-center focus:outline-none relative"
                 >
                   {session?.user?.image ? (
                     <img
                       className="w-16 h-16 rounded-full object-cover border-2 border-teal-100"
-                      src={session.user.image.startsWith('/uploads') 
+                      src={session.user.image.startsWith('/uploads')
                         ? `http://localhost:3001${session.user.image}`
                         : session.user.image}
                       alt="Profile"
@@ -124,18 +221,16 @@ export default function Navbar() {
                         const img = e.target as HTMLImageElement;
                         img.style.display = 'none';
 
-                        // Create fallback container
                         const fallbackContainer = document.createElement('div');
                         fallbackContainer.className = 'w-16 h-16 rounded-full border-2 border-teal-100 bg-gray-100 flex items-center justify-center';
 
-                        // Create user icon
                         const userIcon = document.createElement('div');
                         userIcon.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        `;
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                          </svg>
+                        `;
                         fallbackContainer.appendChild(userIcon);
                         img.parentNode?.insertBefore(fallbackContainer, img);
                       }}
@@ -158,6 +253,11 @@ export default function Navbar() {
                       </svg>
                     </div>
                   )}
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow">
+                      {unreadCount}
+                    </span>
+                  )}
                 </button>
 
                 <AnimatePresence>
@@ -175,15 +275,19 @@ export default function Navbar() {
                       </div>
 
                       {userDropdownItems.map((item, index) => (
-                        <Link
+                        <button
                           key={index}
-                          href={item.href}
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 transition-colors"
-                          onClick={() => setDropdownOpen(false)}
+                          onClick={() => handleProtectedRouteClick(item.href)}
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 transition-colors"
                         >
                           {item.icon}
                           {item.name}
-                        </Link>
+                          {item.href === '/Notification' && unreadCount > 0 && (
+                            <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                              {unreadCount}
+                            </span>
+                          )}
+                        </button>
                       ))}
 
                       <button
@@ -245,17 +349,39 @@ export default function Navbar() {
           >
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navLinks.map((link, index) => (
-                <Link
-                  key={index}
-                  href={link.href}
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${router.pathname === link.href
-                    ? 'text-teal-600 bg-teal-50'
-                    : 'text-gray-700 hover:text-teal-600 hover:bg-gray-50'
+                link.protected ? (
+                  <button
+                    key={index}
+                    onClick={() => handleProtectedRouteClick(link.href)}
+                    className={`block px-3 py-2 rounded-md text-base font-medium ${
+                      router.pathname === link.href
+                        ? 'text-teal-600 bg-teal-50'
+                        : 'text-gray-700 hover:text-teal-600 hover:bg-gray-50'
                     }`}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {link.name}
-                </Link>
+                  >
+                    <div className="flex items-center">
+                      {link.name}
+                      {link.href === '/Notification' && unreadCount > 0 && (
+                        <span className="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                ) : (
+                  <Link
+                    key={index}
+                    href={link.href}
+                    className={`block px-3 py-2 rounded-md text-base font-medium ${
+                      router.pathname === link.href
+                        ? 'text-teal-600 bg-teal-50'
+                        : 'text-gray-700 hover:text-teal-600 hover:bg-gray-50'
+                    }`}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                )
               ))}
 
               <button

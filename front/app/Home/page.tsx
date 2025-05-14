@@ -11,6 +11,7 @@ import OffreSearch from "../components/Search"; // Import OffreSearch
 import { useRouter } from 'next/navigation'; // Import useRouter
 import { useState } from 'react';
 import ChatBot from "../components/Chat/Chatbot";
+import Comments from "./comments"
 
 // Animation variants
 const container = {
@@ -318,8 +319,10 @@ export default function Home() {
 
 
 
-     
-
+        <div className="p-5 m-5">
+            <Comments></Comments>
+        </div>
+    
       <Footer />
     <ChatBot></ChatBot>
 

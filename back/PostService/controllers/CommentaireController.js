@@ -13,19 +13,20 @@ export const CreateComment = async (req, res, next) => {
     }
 }
 
-export const GetCommentByPostId =  async (req,res,next)  => {
+export const GetCommentByPostId = async (req, res, next) => {
+    const offreId = req.params.id;  // No destructuring
+  
 
-    const {post_Id} = req.params;   
-    try{
-        const comments = await Comment.find({postId : post_Id}); 
-        res.status(201).json({Comments : comments}); 
-    }
-    catch(error)
-    {
-        next(error); 
-    }
+    try {
+        const comments = await Comment.find({ OffreId: offreId });
+        
 
-}
+        res.status(200).json({ Comments: comments });  // 200 is more appropriate for GET
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 export const GetCommentByUserId = async (req, res , next) => {
 
@@ -42,4 +43,17 @@ export const GetCommentByUserId = async (req, res , next) => {
         next(error); 
     }
 
-}
+};
+
+export const DeleteComment = async (req, res, next) => {
+    const commentId = req.params.id;
+    try {
+        const deletedComment = await Comment.findByIdAndDelete(commentId);
+        if (!deletedComment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+        res.status(200).json({ message: 'Comment deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+};

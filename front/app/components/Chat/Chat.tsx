@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import messageService from '../../services/Message';
 import { useSession } from 'next-auth/react';
@@ -46,6 +46,7 @@ export default function ChatPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const ws = useRef<WebSocket | null>(null);
+  const lastConversationUserRef = useRef<string | null>(null);
 
   const formatRelativeTime = (dateString: string) => {
     return formatDistanceToNow(new Date(dateString), {
@@ -53,6 +54,50 @@ export default function ChatPage() {
       locale: fr,
     });
   };
+
+  // Get the last user from localStorage on initial load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const lastUser = localStorage.getItem('lastConversationUser');
+      if (lastUser) {
+        lastConversationUserRef.current = lastUser;
+      }
+    }
+  }, []);
+
+  const updateUserList = useCallback((newMessage: Message) => {
+    setUsers(prevUsers => {
+      const senderId = newMessage.senderId;
+      const receiverId = newMessage.receiverId;
+
+      // Find the other user's ID (not the current user)
+      const otherUserId = senderId === currentUserId ? receiverId : senderId;
+
+      // Find the user in the list
+      const userToUpdateIndex = prevUsers.findIndex(user => user._id === otherUserId);
+
+      if (userToUpdateIndex === -1) {
+        // User not found in the list, return the previous state
+        return prevUsers;
+      }
+
+      // Create a new array with the updated user
+      const updatedUsers = [...prevUsers];
+      updatedUsers[userToUpdateIndex] = {
+        ...updatedUsers[userToUpdateIndex],
+        lastMessage: newMessage.text,
+        lastMessageTime: newMessage.createdAt,
+      };
+
+      // Store the last conversation user in localStorage and ref
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('lastConversationUser', otherUserId);
+        lastConversationUserRef.current = otherUserId;
+      }
+
+      return updatedUsers;
+    });
+  }, [currentUserId, setUsers]);
 
   // WebSocket setup
   useEffect(() => {
@@ -65,11 +110,38 @@ export default function ChatPage() {
     ws.current.onerror = (error) => console.error('WebSocket error:', error);
     ws.current.onclose = () => console.log('WebSocket disconnected');
 
+    if (ws.current) {
+      ws.current.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        switch (data.type) {
+          case 'NEW_MESSAGE':
+            // Update the message list
+            setMessages(prevMessages => [...prevMessages, data.message]);
+
+            // Update the user list
+            updateUserList(data.message);
+            
+            // Update last conversation user in real-time
+            const otherUserId = data.message.senderId === currentUserId 
+              ? data.message.receiverId 
+              : data.message.senderId;
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('lastConversationUser', otherUserId);
+              lastConversationUserRef.current = otherUserId;
+            }
+            break;
+          // Handle other WebSocket message types
+          default:
+            break;
+        }
+      };
+    }
+
     return () => {
       ws.current?.close();
       ws.current = null;
     };
-  }, [currentUserId]);
+  }, [currentUserId, updateUserList]);
 
   // Data fetching
   useEffect(() => {
@@ -80,8 +152,19 @@ export default function ChatPage() {
       try {
         const data = await messageService.getUsersConversations(currentUserId);
         setUsers(data);
+        
+        // Try to select the last conversation user if it exists
+        if (lastConversationUserRef.current) {
+          const lastUser = data.find(user => user._id === lastConversationUserRef.current);
+          if (lastUser) {
+            await handleConversation(lastUser._id);
+            return;
+          }
+        }
+        
+        // Otherwise select the first user if available
         if (data.length > 0) {
-          handleConversation(data[0]._id);
+          await handleConversation(data[0]._id);
         }
       } catch (error) {
         console.error('Error fetching conversations:', error);
@@ -94,25 +177,34 @@ export default function ChatPage() {
   }, [currentUserId]);
 
   const handleConversation = async (userId: string) => {
-    if (!currentUserId) return;
+  if (!currentUserId) return;
 
-    setIsLoading(true);
-    try {
-      const conversation = await messageService.getConversation(currentUserId, userId);
-      setMessages(conversation);
+  setIsLoading(true);
+  try {
+    const conversation = await messageService.getConversation(currentUserId, userId);
+    setMessages(conversation);
 
-      setUsers(prevUsers => prevUsers.map(user => 
-        user._id === userId ? { ...user, unreadCount: 0 } : user
-      ));
+    setUsers(prevUsers => prevUsers.map(user => 
+      user._id === userId ? { ...user, unreadCount: 0 } : user
+    ));
 
-      const user = users.find(u => u._id === userId);
-      setSelectedUser(user || null);
-    } catch (error) {
-      console.error('Error fetching conversation:', error);
-    } finally {
-      setIsLoading(false);
+    // Find and set the selected user from the users array
+    const user = users.find(u => u._id === userId);
+    if (user) {
+      setSelectedUser(user);
     }
-  };
+    
+    // Store the last conversation user
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lastConversationUser', userId);
+      lastConversationUserRef.current = userId;
+    }
+  } catch (error) {
+    console.error('Error fetching conversation:', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const filteredUsers = users.filter(user => 
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -293,6 +385,7 @@ export default function ChatPage() {
                   setMessages={setMessages}
                   setUsers={setUsers}
                   users={users}
+                  updateUserList={updateUserList}
                 />
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-gray-50">

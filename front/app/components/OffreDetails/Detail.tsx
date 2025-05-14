@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Map from "./Maps";
 import Conversation from "../Chat/conversation";
 import messageService from "@/app/services/Message";
+import CommentSection from './CommentSection';
 
 interface Offre {
   offre: {
@@ -47,7 +48,15 @@ interface User {
   };
 }
 
+
+
 export default function Detail({ offre }: Offre) {
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({ show: false, message: '', type: 'success' });
   // Existing state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
@@ -67,16 +76,37 @@ export default function Detail({ offre }: Offre) {
 
   const currentUserId = session?.user?.user?._id || session?.user?._id || null;
 
-  console.log("Current User ID:", currentUserId);
-  console.log("Session:", session);
-  
+
+  const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) => {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        className={`fixed bottom-4 right-4 z-50 flex items-center justify-between p-4 rounded-lg shadow-lg ${type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          } text-white max-w-md`}
+      >
+        <div className="flex items-center">
+          {type === 'success' ? (
+            <FiCheckCircle className="mr-2 text-xl" />
+          ) : (
+            <FiX className="mr-2 text-xl" />
+          )}
+          <span>{message}</span>
+        </div>
+        <button onClick={onClose} className="ml-4 text-white hover:text-gray-200">
+          <FiX />
+        </button>
+      </motion.div>
+    );
+  };
   useEffect(() => {
     const fetchUser = async () => {
       try {
         setIsLoading(true);
         const data = await UserService.getUserById(offre.id_user);
         setUser(data);
-        console.log("id", data?._id);
+
 
         // In a real app, you'd get the current user ID from your auth system
 
@@ -113,7 +143,7 @@ export default function Detail({ offre }: Offre) {
   }, [currentUserId]);
 
   const handleContactOwner = async () => {
-    console.log("currentUserId", currentUserId);
+
 
     if (!currentUserId) {
       alert('Please log in to contact the owner');
@@ -155,10 +185,14 @@ export default function Detail({ offre }: Offre) {
 
   const submitReport = async (data: Report) => {
     try {
-      await reportService.addReport(data);
-      alert('Report added successfully!');
+      const response = await reportService.addReport(data);
+      if (!response.report) {
+        throw new Error(response.message || 'Failed to submit report');
+      }
+      return response;
     } catch (error) {
       console.error('Error adding report:', error);
+      throw error;
     }
   };
 
@@ -171,26 +205,55 @@ export default function Detail({ offre }: Offre) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const report: Report = {
-      text: description,
-      userId: user.id,
-      postId: offre.id,
-      reason: reportReason,
-      status: Status.Pending,
-    };
-    submitReport(report);
-    setReportReason('');
-    setDescription('');
-    setIsModalOpen(false);
+
+    // Validate reason selection
+    if (!reportReason) {
+      setValidationError('Veuillez sélectionner une raison pour le signalement');
+      return;
+    }
+
+    setValidationError(null); // Clear any previous errors
+
+    try {
+      const report: Report = {
+        text: description,
+        userId: currentUserId,
+        OffreId: offre._id,
+        reason: reportReason,
+      };
+
+      await submitReport(report);
+
+      setToast({
+        show: true,
+        message: 'Report submitted successfully! Our team will review it shortly.',
+        type: 'success'
+      });
+
+      setReportReason('');
+      setDescription('');
+      setIsModalOpen(false);
+
+      setTimeout(() => {
+        setToast(prev => ({ ...prev, show: false }));
+      }, 5000);
+
+    } catch (error) {
+      setToast({
+        show: true,
+        message: 'Échec de l\'envoi du signalement. Veuillez réessayer.',
+        type: 'error'
+      });
+    }
   };
 
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
     const comment: Comment = {
-      userId: user.id,
-      postId: offre.id,
+      userId: currentUserId,
+      OffreId: offre._id,
       text: comments
     };
     submitComment(comment);
@@ -302,11 +365,13 @@ export default function Detail({ offre }: Offre) {
                   <div>
                     <h2 className="text-xl font-semibold text-gray-800">{user?.name || "Propriétaire"}</h2>
                     <p className="text-gray-600">Propriétaire du l'offre</p>
+
                   </div>
                 </div>
 
                 <div className="border-t border-gray-200 pt-4">
                   <h3 className="font-medium text-gray-700 mb-3">À propos du propriétaire</h3>
+                  <p className="text-gray-600">Email : {user?.email}</p>
                   <p className="text-gray-600">
                     {user?.createdAt ? (
                       <>
@@ -439,37 +504,11 @@ export default function Detail({ offre }: Offre) {
               </div>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="bg-white rounded-xl shadow-md p-6"
-            >
-              <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                <FiMessageSquare className="mr-2" /> Commentaires
-              </h3>
 
-              <form onSubmit={handleSubmitComment} className="mb-8">
-                <div className="mb-4">
-                  <textarea
-                    value={comments}
-                    onChange={(e) => setComments(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                    rows={4}
-                    placeholder="Partagez votre expérience..."
-                    required
-                  ></textarea>
-                </div>
-                <motion.button
-                  type="submit"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="px-6 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  Publier un commentaire
-                </motion.button>
-              </form>
-            </motion.div>
+            <CommentSection
+              offreId={offre._id}
+              currentUserId={currentUserId}
+            />
           </div>
 
           <div className="lg:col-span-1">
@@ -514,20 +553,33 @@ export default function Detail({ offre }: Offre) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleContactOwner}
-                  className="w-full py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+                  disabled={!currentUserId}
+                  className="w-full py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors
+             disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  Contacter le propriétaire
+                  {currentUserId ? "Contacter le propriétaire" : "Connectez-vous pour contacter"}
                 </motion.button>
+
 
                 <div className="text-center pt-2">
                   <motion.button
                     whileHover={{ x: 2 }}
-                    onClick={() => setIsModalOpen(true)}
-                    className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1"
+                    onClick={() => {
+                      if (!currentUserId ) return;
+                      setIsModalOpen(true);
+                    }}
+                    disabled={!currentUserId }
+                    className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1
+             disabled:text-gray-400 disabled:cursor-not-allowed"
                   >
                     <FiFlag className="text-red-400" />
-                    <span>Signaler cette annonce</span>
+                    <span>
+                      {currentUserId
+                          ? "Signaler cette annonce"
+                          : "Connectez-vous pour signaler"}
+                    </span>
                   </motion.button>
+
                 </div>
               </div>
             </motion.div>
@@ -565,7 +617,18 @@ export default function Detail({ offre }: Offre) {
 
                 <form onSubmit={handleSubmit}>
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Raison du signalement</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Raison du signalement <span className="text-red-500">*</span>
+                    </label>
+                    {validationError && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-sm text-red-500 mb-2"
+                      >
+                        {validationError}
+                      </motion.p>
+                    )}
                     <div className="space-y-2">
                       {reportReasons.map((reason) => (
                         <motion.div
@@ -579,7 +642,10 @@ export default function Detail({ offre }: Offre) {
                             name="reportReason"
                             value={reason}
                             checked={reportReason === reason}
-                            onChange={(e) => setReportReason(e.target.value)}
+                            onChange={(e) => {
+                              setReportReason(e.target.value);
+                              setValidationError(null); // Clear error when user selects something
+                            }}
                             className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                             required
                           />
@@ -602,7 +668,7 @@ export default function Detail({ offre }: Offre) {
                       onChange={(e) => setDescription(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 transition-colors"
                       placeholder="Veuillez décrire le problème..."
-                      required
+
                     ></textarea>
                   </div>
 
@@ -620,9 +686,21 @@ export default function Detail({ offre }: Offre) {
                       type="submit"
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.98 }}
-                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                      disabled={isLoading}
+                      className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading ? 'bg-green-400' : 'bg-green-600 hover:bg-green-700'
+                        } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors`}
                     >
-                      Envoyer le signalement
+                      {isLoading ? (
+                        <span className="flex items-center justify-center">
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Processing...
+                        </span>
+                      ) : (
+                        'Envoyer le signalement'
+                      )}
                     </motion.button>
                   </div>
                 </form>
@@ -634,53 +712,64 @@ export default function Detail({ offre }: Offre) {
 
       {/* Chat Overlay */}
       {/* Chat Overlay */}
-<AnimatePresence>
-  {showChat && (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex justify-end bg-black/30 backdrop-blur-sm"
-    >
-      <motion.div
-        initial={{ x: '100%' }}
-        animate={{ x: 0 }}
-        exit={{ x: '100%' }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="relative w-full max-w-md h-screen flex flex-col bg-gradient-to-b from-white to-gray-50 border-l border-gray-200 shadow-2xl"
-      >
-        {/* Close Button - Positioned absolutely at the top left of the chat panel */}
-        <button
-          onClick={() => setShowChat(false)}
-          className="absolute left-4 top-4 p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors z-10"
-        >
-          <FiX size={20} />
-        </button>
-        
-        {/* Conversation */}
-        <div className="flex-1 overflow-hidden pt-12"> {/* Added padding-top for the close button */}
-          {users.length > 0 && (
-            <Conversation
-              selectedUser={users[0]}
-              messages={messages}
-              isLoading={isLoading}
-              currentUserId={currentUserId}
-              ws={ws.current}
-              setMessages={setMessages}
-              setUsers={setUsers}
-              users={users}
-            />
-          )}
-        </div>
+      <AnimatePresence>
+        {showChat && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex justify-end bg-black/30 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="relative w-full max-w-md h-screen flex flex-col bg-gradient-to-b from-white to-gray-50 border-l border-gray-200 shadow-2xl"
+            >
+              {/* Close Button - Positioned absolutely at the top left of the chat panel */}
+              <button
+                onClick={() => setShowChat(false)}
+                className="absolute left-4 top-4 p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors z-10"
+              >
+                <FiX size={20} />
+              </button>
 
-        {/* Subtle Branding */}
-        <div className="px-4 py-2 text-center text-xs text-gray-400 border-t border-gray-100">
-          Messages sécurisés • {new Date().getFullYear()}
-        </div>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
-    </div>
+              {/* Conversation */}
+              <div className="flex-1 overflow-hidden pt-12"> {/* Added padding-top for the close button */}
+                {users.length > 0 && (
+                  <Conversation
+                    selectedUser={users[0]}
+                    messages={messages}
+                    isLoading={isLoading}
+                    currentUserId={currentUserId}
+                    ws={ws.current}
+                    setMessages={setMessages}
+                    setUsers={setUsers}
+                    users={users}
+                  />
+                )}
+              </div>
+
+              {/* Subtle Branding */}
+              <div className="px-4 py-2 text-center text-xs text-gray-400 border-t border-gray-100">
+                Messages sécurisés • {new Date().getFullYear()}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Toast Notification - should be outside any conditional rendering */}
+      <AnimatePresence>
+        {toast.show && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(prev => ({ ...prev, show: false }))}
+          />
+        )}
+      </AnimatePresence>
+
+    </div >
   );
 }
