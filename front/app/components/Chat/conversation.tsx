@@ -81,6 +81,9 @@ const Conversation: React.FC<ConversationProps> = ({
 
   // Scroll to bottom when messages change
   useEffect(() => {
+   
+    console.log("selctedId2",selectedUser._id);
+    
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
@@ -100,9 +103,20 @@ const Conversation: React.FC<ConversationProps> = ({
     const handleWebSocketMessage = (event: MessageEvent) => {
       const data = JSON.parse(event.data);
       switch (data.type) {
+
         case 'NEW_MESSAGE':
-          handleNewMessage(data.message);
+          // Always use the current selectedUser from state, not from closure
+          const currentSelectedUser = selectedUser;
+          console.log("selctedId",selectedUser._id);
+          console.log("message sender",data.message.senderId );
+          console.log("message reciver",data.message.receiverId );
+          
+
+          if (data.message.senderId ==  currentSelectedUser._id || data.message.receiverId ==  currentSelectedUser._id) {
+            handleNewMessage(data.message);
+          }
           break;
+
         case 'MESSAGE_READ':
           handleMessageRead(data.senderId, data.receiverId);
           break;
@@ -125,23 +139,30 @@ const Conversation: React.FC<ConversationProps> = ({
     return () => {
       ws.onmessage = null;
     };
-  }, [ws]);
+  }, [ws,selectedUser]);
+
+
+
+
 
   const handleNewMessage = useCallback((message: Message) => {
+
+
     setMessages(prev => [...prev, message]);
+
 
     setUsers(prevUsers => prevUsers.map(user => {
       if (user._id === message.senderId || user._id === message.receiverId) {
-        const isCurrentConversation = selectedUser._id === message.senderId || 
-                                     selectedUser._id === message.receiverId;
+        const isCurrentConversation = selectedUser._id === message.senderId ||
+          selectedUser._id === message.receiverId;
         const isReceiver = user._id === message.receiverId;
-        
+
         return {
           ...user,
           lastMessage: message.text,
           lastMessageTime: message.createdAt,
-          unreadCount: isReceiver && !isCurrentConversation 
-            ? (user.unreadCount || 0) + 1 
+          unreadCount: isReceiver && !isCurrentConversation
+            ? (user.unreadCount || 0) + 1
             : user.unreadCount || 0,
         };
       }
@@ -158,7 +179,7 @@ const Conversation: React.FC<ConversationProps> = ({
 
     setUsers(prevUsers => prevUsers.map(user => {
       if ((user._id === message.senderId || user._id === message.receiverId) &&
-          user.lastMessageTime === message.createdAt) {
+        user.lastMessageTime === message.createdAt) {
         return { ...user, lastMessage: message.text };
       }
       return user;
@@ -174,7 +195,7 @@ const Conversation: React.FC<ConversationProps> = ({
           .filter(m => (m.senderId === user._id || m.receiverId === user._id) && m._id !== messageId)
           .pop();
 
-        return lastMsg 
+        return lastMsg
           ? { ...user, lastMessage: lastMsg.text, lastMessageTime: lastMsg.createdAt }
           : user;
       }));
@@ -182,7 +203,7 @@ const Conversation: React.FC<ConversationProps> = ({
   }, [messages, setMessages, setUsers]);
 
   const handleUserStatus = useCallback((userId: string, isOnline: boolean) => {
-    setUsers(prevUsers => prevUsers.map(user => 
+    setUsers(prevUsers => prevUsers.map(user =>
       user._id === userId ? { ...user, online: isOnline } : user
     ));
   }, [setUsers]);
@@ -195,23 +216,33 @@ const Conversation: React.FC<ConversationProps> = ({
       receiverId: selectedUser._id,
       text: newMessage,
     };
+    const newNotification = {
+      senderId: currentUserId,
+      receiverId: selectedUser._id,
+      text: newMessage,
+    };
 
     setNewMessage('');
     setShowEmojiPicker(false);
 
     try {
       ws.send(JSON.stringify({
+        type: 'NEW_NOTIFICATION',
+        notification: newNotification,
+      }));
+      ws.send(JSON.stringify({
         type: 'NEW_MESSAGE',
         message: newMsg,
       }));
 
-      setUsers(prevUsers => prevUsers.map(user => 
+
+      setUsers(prevUsers => prevUsers.map(user =>
         user._id === selectedUser._id
           ? {
-              ...user,
-              lastMessage: newMessage,
-              lastMessageTime: new Date().toISOString(),
-            }
+            ...user,
+            lastMessage: newMessage,
+            lastMessageTime: new Date().toISOString(),
+          }
           : user
       ));
     } catch (error) {
@@ -228,17 +259,17 @@ const Conversation: React.FC<ConversationProps> = ({
         messageId,
       }));
 
-      await messageService.deleteMessage(messageId);
+
       setMessages(prev => prev.filter(msg => msg._id !== messageId));
 
       if (messages.length > 0 && messages[messages.length - 1]?._id === messageId) {
-        setUsers(prevUsers => prevUsers.map(user => 
+        setUsers(prevUsers => prevUsers.map(user =>
           user._id === selectedUser._id
             ? {
-                ...user,
-                lastMessage: messages.length > 1 ? messages[messages.length - 2].text : 'No message',
-                lastMessageTime: messages.length > 1 ? messages[messages.length - 2].createdAt : undefined,
-              }
+              ...user,
+              lastMessage: messages.length > 1 ? messages[messages.length - 2].text : 'No message',
+              lastMessageTime: messages.length > 1 ? messages[messages.length - 2].createdAt : undefined,
+            }
             : user
         ));
       }
@@ -248,6 +279,8 @@ const Conversation: React.FC<ConversationProps> = ({
       setMessageToDelete(null);
     }
   };
+  // Update last conversation user in real-time
+
 
   const startEditing = (message: Message) => {
     setEditingMessageId(message._id);
@@ -271,20 +304,20 @@ const Conversation: React.FC<ConversationProps> = ({
       }));
 
       await messageService.updateMessage(editingMessageId, editMessageText);
-      setMessages(prev => prev.map(msg => 
+      setMessages(prev => prev.map(msg =>
         msg._id === editingMessageId
           ? { ...msg, text: editMessageText, isEdited: true }
           : msg
       ));
 
       if (messages.length > 0 && messages[messages.length - 1]._id === editingMessageId) {
-        setUsers(prevUsers => prevUsers.map(user => 
+        setUsers(prevUsers => prevUsers.map(user =>
           user._id === selectedUser._id
             ? {
-                ...user,
-                lastMessage: editMessageText,
-                lastMessageTime: new Date().toISOString(),
-              }
+              ...user,
+              lastMessage: editMessageText,
+              lastMessageTime: new Date().toISOString(),
+            }
             : user
         ));
       }
@@ -381,7 +414,7 @@ const Conversation: React.FC<ConversationProps> = ({
       <div className="border-b border-gray-200 bg-white p-4 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           {onBack && (
-            <button 
+            <button
               onClick={onBack}
               className="md:hidden p-2 text-gray-500 hover:text-teal-600 rounded-full hover:bg-gray-100 transition-colors"
             >
@@ -391,7 +424,7 @@ const Conversation: React.FC<ConversationProps> = ({
           <div className="relative">
             <img
               className="w-10 h-10 rounded-full object-cover border-2 border-teal-100"
-              src={selectedUser.image?.startsWith('/uploads') 
+              src={selectedUser.image?.startsWith('/uploads')
                 ? `http://localhost:3001${selectedUser.image}`
                 : selectedUser.image || '/default-profile.png'}
               alt={selectedUser.name}
@@ -416,7 +449,7 @@ const Conversation: React.FC<ConversationProps> = ({
       </div>
 
       {/* Messages Area */}
-      <div 
+      <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 bg-gray-50"
       >
@@ -440,11 +473,10 @@ const Conversation: React.FC<ConversationProps> = ({
                   exit="exit"
                   variants={messageVariants}
                   transition={{ duration: 0.2 }}
-                  className={`flex ${
-                    msg.senderId === currentUserId
+                  className={`flex ${msg.senderId === currentUserId
                       ? 'justify-end'
                       : 'justify-start'
-                  }`}
+                    }`}
                 >
                   {editingMessageId === msg._id ? (
                     <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-3 border border-teal-200">
@@ -494,21 +526,19 @@ const Conversation: React.FC<ConversationProps> = ({
                     </div>
                   ) : (
                     <div
-                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl relative group ${
-                        msg.senderId === currentUserId
+                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl relative group ${msg.senderId === currentUserId
                           ? 'bg-teal-500 text-white'
                           : 'bg-white shadow'
-                      }`}
+                        }`}
                     >
                       <p className="text-sm break-words">{msg.text}</p>
                       <div className="flex justify-between items-center mt-1">
                         <div className="flex items-center">
                           <p
-                            className={`text-xs ${
-                              msg.senderId === currentUserId
+                            className={`text-xs ${msg.senderId === currentUserId
                                 ? 'text-teal-100'
                                 : 'text-gray-400'
-                            }`}
+                              }`}
                           >
                             {formatTime(msg.createdAt)}
                           </p>
@@ -557,7 +587,7 @@ const Conversation: React.FC<ConversationProps> = ({
           </div>
         )}
         <div className="flex items-center gap-2">
-         
+
           <div className="relative">
             <button
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}

@@ -54,7 +54,7 @@ export default function Footer() {
               <span className="ml-3 text-xl sm:text-2xl font-bold text-teal-600 dark:text-teal-400">Find</span>
             </motion.div>
             <p className="text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">
-              La plateforme leader pour trouver et louer des terrains agricoles en Tunisie.
+              La plateforme leader pour trouver des terrains ou materiel agricoles en Tunisie.
             </p>
             <div className="flex space-x-3 sm:space-x-4">
               {socialLinks.map((social, index) => (

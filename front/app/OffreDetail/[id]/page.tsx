@@ -86,7 +86,7 @@ export default function OffreDetail() {
     return (
         <>
         <Navbar />
-        <section className="py-4   min-h-screen">
+        <section className=" min-h-screen">
             <div className=" bg-gradient-to-b from-teal-600 to-white ">
             <OffreSearch // Use OffreSearch component
                 onSearch={handleSearch}
