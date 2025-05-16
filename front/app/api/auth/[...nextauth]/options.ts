@@ -7,6 +7,7 @@ import { log } from "console";
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import client from "@/app/lib/db";
 import clientPromise from "@/app/lib/db";
+import { generateVerificationToken } from "@/lib/token";
 export const options: NextAuthOptions = {
     providers: [
         GithubProvider({
@@ -37,7 +38,7 @@ export const options: NextAuthOptions = {
                 };
             }
         }),
-      
+
         CredentialsProvider({
             name: "Credentials",
             credentials: {
@@ -61,15 +62,15 @@ export const options: NextAuthOptions = {
                         },
                     });
 
+
+
                     if (!res.ok) {
-                        console.error("Failed to log in:", res.statusText);
                         return null;
                     }
-
+                   
                     const user = await res.json();
-
+                   
                     if (user) {
-
                         return user;
                     }
 
@@ -89,23 +90,36 @@ export const options: NextAuthOptions = {
         secret: process.env.NEXTAUTH_SECRET,
     },
     callbacks: {
-        async jwt({ token, user,trigger }) {
-            console.log(user);
-            
-              if (user) {
+
+        async signIn({ user, account }) {
+            if (account?.provider !== "credentials") {
+                return true
+            }
+            const id = user?.id || user?._id || user?.user?._id || user?.user?.id
+            const existingUser = await userService.getUserById(id);
+            if (!existingUser?.emailVerified) {
+                return false;
+            }
+            return true;
+        },
+
+
+        async jwt({ token, user, trigger }) {
+
+            if (user) {
                 token.user = user;
             }
 
             // Always fetch updated user data from DB on subsequent requests
-            const id = token?.user?.id ||token?.user?._id
-            
+            const id = token?.user?.id || token?.user?._id || token?.user?.user?._id || token?.user?.user?.id
+
+
             if (id) {
                 try {
-                    console.log("hello world"+id);
-                    
+
+
                     const updatedUser = await userService.getUserById(id);
-                    console.log(updatedUser);
-                    
+
                     if (updatedUser) {
                         token.user = updatedUser;
                     }
@@ -114,19 +128,19 @@ export const options: NextAuthOptions = {
                 }
             }
             if (trigger === "update") {
-                
-                
-                try {
-                    console.log("hello world 2"+id);
-                    const updatedUser = await userService.getUserById(id);
-                    console.log(updatedUser);
-                    
-                    if (updatedUser) {
-                        token.user = updatedUser;
+
+                if (id) {
+                    try {
+
+                        const updatedUser = await userService.getUserById(id);
+                        if (updatedUser) {
+                            token.user = updatedUser;
+                        }
+                    } catch (error) {
+                        console.error("Failed to fetch updated user:", error);
                     }
-                } catch (error) {
-                    console.error("Failed to fetch updated user:", error);
                 }
+
             }
 
             return token;
@@ -134,6 +148,8 @@ export const options: NextAuthOptions = {
         async session({ session, token }) {
             if (token?.user) {
                 session.user = token.user;
+                console.log(token);
+
             }
             return session;
         },

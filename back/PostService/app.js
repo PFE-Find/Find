@@ -7,6 +7,7 @@ import MessageRouter from './routes/message.js';
 import NotificationRouter from './routes/notification.js';
 import CommentRouter from './routes/comment.js';
 import UserRouter from './routes/user.js';
+import VerifTokenRouter from  './routes/veriftoken.js'; 
 import http from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import Message from './models/Message.js'; // Import the Message model
@@ -42,6 +43,9 @@ app.use('/api/auth', UserRouter);
 app.use('/api/Comments', CommentRouter);
 app.use('/api/Reports', ReportRouter);
 app.use('/api/Message', MessageRouter);
+
+app.use('/api/VerificationToken',VerifTokenRouter)
+
 app.use('/api/Notification', NotificationRouter);
 
 // WebSocket Logic

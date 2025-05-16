@@ -51,6 +51,7 @@ const userService = {
   },
   async getUserById(id: string) {
     try {
+      
       const response = await axios.get(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {

@@ -28,7 +28,12 @@ export default function Connexion() {
     })
 
     if (result?.error) {
-      setError('Identifiants incorrects')
+      console.log(result?.error);
+      
+     if(result?.error == "AccessDenied") {setError('Please Verify your email!')}
+      else{
+        setError('Identifiants incorrects')
+      }
       setIsLoading(false)
     } else {
       router.push('/')
