@@ -103,7 +103,9 @@ export default function SignUp() {
               <FiCheckCircle className="text-green-500 text-xl mr-3 mt-0.5 flex-shrink-0" />
               <div>
                 <h3 className="text-green-800 font-medium">Account created successfully!</h3>
+                <p className="text-green-600 text-sm mt-1">Email Verification Was Sent!</p>
                 <p className="text-green-600 text-sm mt-1">Redirecting to login page...</p>
+
               </div>
             </motion.div>
           )}

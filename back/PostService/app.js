@@ -6,6 +6,7 @@ import ReportRouter from './routes/Report.js';
 import MessageRouter from './routes/message.js';
 import CommentRouter from './routes/comment.js';
 import UserRouter from './routes/user.js';
+import VerifTokenRouter from  './routes/veriftoken.js'; 
 import http from 'http';
 import { WebSocketServer , WebSocket  } from 'ws';
 import Message from './models/Message.js'; // Import the Message model
@@ -40,7 +41,7 @@ app.use('/api/auth', UserRouter);
 app.use('/api/Comments', CommentRouter);
 app.use('/api/Reports', ReportRouter);
 app.use('/api/Message', MessageRouter);
-
+app.use('/api/VerificationToken',VerifTokenRouter)
 // WebSocket Logic
 wss.on('connection', (ws, req) => {
     const userId = req.url.split('?userId=')[1];
