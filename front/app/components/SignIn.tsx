@@ -220,16 +220,9 @@ export default function Connexion() {
           {/* Social Login */}
           <motion.div 
             variants={containerVariants}
-            className="grid grid-cols-3 gap-3 px-8 pb-8"
+            className="grid grid-cols-2 gap-3 px-8 pb-8"
           >
-            <motion.button
-              variants={itemVariants}
-              type="button"
-              whileHover={{ y: -2 }}
-              className="flex items-center justify-center py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <FaFacebook className="text-blue-600 text-xl" />
-            </motion.button>
+         
             
             <motion.button
               variants={itemVariants}
