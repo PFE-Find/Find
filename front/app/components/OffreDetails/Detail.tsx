@@ -135,7 +135,7 @@ export default function Detail({ offre }: Offre) {
 
     };
 
-    ws.current.onerror = (error) => console.error('WebSocket error:', error);
+    
     ws.current.onclose = () => console.log('WebSocket disconnected');
 
     return () => {

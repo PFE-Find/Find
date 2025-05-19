@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Home, Users, Settings, User, ShoppingCart, DollarSign, Bell, Search, LogIn, UserPlus, Table } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from "framer-motion";
+import Image from 'next/image';
 
 import { useSession, signOut } from 'next-auth/react';
 import { FiDollarSign, FiLogOut, FiPlus, FiSettings, FiUser } from "react-icons/fi";
@@ -18,36 +19,40 @@ const Navbar: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
-  console.log(session);
+  
   
   const userDropdownItems = [
-    { icon: <FiUser className="mr-2" />, name: 'Home', href: '/' },
-    { icon: <FiSettings className="mr-2" />, name: 'Settings', href: '/profile' },
-    { icon: <FiDollarSign className="mr-2" />, name: 'Earnings', href: '/' },
-    { icon: <FiPlus className="mr-2" />, name: 'Add Offre', href: '/FormPages' }
+    { name: 'Accueil', href: '/', protected: false },
+    { name: 'Explorer', href: '/OffrePage', protected: false },
+    { name: 'Àpropos', href: '/aboutUs', protected: false },
+    { name: 'Notifications', href: '/Notification', protected: true },
+    { name: 'Contact', href: '/Chat', protected: true }
   ];
   return (
     <div className="grid bg-opacity-80 bg-white shadow-md fixed w-[83%] rounded-lg ">
       <div className="px-6 py-4 flex items-center justify-between">
         {/* Breadcrumb */}
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-500">Home</span>
-          <span className="text-sm text-gray-500">/</span>
-          <span className="text-sm text-gray-700 font-semibold">Home</span>
-        </div>
+        <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="flex items-center"
+          >
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/assets/logo.png"
+                alt="Find Logo"
+                width={40}
+                height={40}
+                className="rounded-lg"
+              />
+              <span className="ml-3 text-2xl font-bold text-teal-600">Find</span>
+            </Link>
+          </motion.div>
 
         {/* Search and Actions */}
 
         <div className="flex items-center space-x-4">
 
-          {/* Search Bar */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search"
-              className="px-4 py-2 text-sm border rounded-md shadow-sm w-64 focus:outline-none focus:ring focus:ring-gray-200"
-            />
-          </div>
+         
 
           {/* Icons */}
 

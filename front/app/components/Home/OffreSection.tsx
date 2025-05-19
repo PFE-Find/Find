@@ -35,7 +35,7 @@ export default function Offres() {
       try {
         const data = await eventService.getOffres1();
         setOffres(data);
-        console.log("Fetched offres:", data);
+        
       } catch (error) {
         console.error("Error fetching offres:", error);
       }
@@ -157,7 +157,7 @@ export default function Offres() {
                           />
                           
                           {/* Favorite Button */}
-                          <button
+                          {/* <button
                             onClick={(e) => toggleFavorite(offre._id, e)}
                             className={`absolute top-4 right-4 p-2 rounded-full transition-all ${
                               favorites[offre._id] 
@@ -166,7 +166,7 @@ export default function Offres() {
                             }`}
                           >
                             <FiHeart className={`w-5 h-5 ${favorites[offre._id] ? 'fill-current' : ''}`} />
-                          </button>
+                          </button> */}
                           
                           
                           {/* Hover Overlay */}

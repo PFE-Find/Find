@@ -51,7 +51,6 @@ app.use('/api/Notification', NotificationRouter);
 // WebSocket Logic
 wss.on('connection', (ws, req) => {
     const userId = req.url.split('?userId=')[1];
-    console.log(`User ${userId} connected`);
 
     // Store the userId with the WebSocket connection
     ws.userId = userId;
@@ -194,7 +193,6 @@ wss.on('connection', (ws, req) => {
                             }
                         });
                     } else {
-                        console.log(`Message with ID ${data.messageId} not found`);
                         ws.send(JSON.stringify({
                             type: 'messageError',
                             error: 'Message not found',
@@ -220,7 +218,6 @@ wss.on('connection', (ws, req) => {
                             }
                         });
                     } else {
-                        console.log(`Message with ID ${data.messageId} not found`);
                         ws.send(JSON.stringify({
                             type: 'messageError',
                             error: 'Message not found',
@@ -246,7 +243,6 @@ wss.on('connection', (ws, req) => {
                             }
                         });
                     } else {
-                        console.log(`Message with ID ${data.messageId} not found`);
                         ws.send(JSON.stringify({
                             type: 'messageError',
                             error: 'Message not found',
@@ -273,10 +269,8 @@ wss.on('connection', (ws, req) => {
                     });
                     break;
                 default:
-                    console.log('Unknown message type:', data.type);
             }
         } catch (error) {
-            console.error("Error handling message:", error);
             ws.send(JSON.stringify({
                 type: 'messageError',
                 error: 'Failed to handle message',
@@ -285,7 +279,6 @@ wss.on('connection', (ws, req) => {
     });
 
     ws.on('close', () => {
-        console.log(`User ${userId} disconnected`);
     });
 });
 

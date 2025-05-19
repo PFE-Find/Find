@@ -49,6 +49,18 @@ const userService = {
       throw error;
     }
   },
+
+async updateUserRole(id: string, role: number) {
+  console.log("role",role);
+    try {
+      const response = await axios.put(`${API_URL}/updateUserRole/${id}`, { role });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      throw error;
+    }
+  },
+
   async getUserById(id: string) {
     try {
       
@@ -82,7 +94,17 @@ const userService = {
       console.error('Error updating user:', error);
       throw error;
     }
-  }
+  },
+  async deleteUser(id: string) {
+    try {
+      const response = await axios.delete(`${API_URL}/deleteUser/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting User:", error);
+      throw error;
+    }
+  },
+
 
 }
 

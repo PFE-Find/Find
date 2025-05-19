@@ -10,6 +10,7 @@ import {
   FiMoreVertical,
   FiUser,
   FiX,
+  FiArrowLeft,
 } from 'react-icons/fi';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -45,6 +46,7 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showConversation, setShowConversation] = useState(false);
   const ws = useRef<WebSocket | null>(null);
   const lastConversationUserRef = useRef<string | null>(null);
 
@@ -69,19 +71,11 @@ export default function ChatPage() {
     setUsers(prevUsers => {
       const senderId = newMessage.senderId;
       const receiverId = newMessage.receiverId;
-
-      // Find the other user's ID (not the current user)
       const otherUserId = senderId === currentUserId ? receiverId : senderId;
 
-      // Find the user in the list
       const userToUpdateIndex = prevUsers.findIndex(user => user._id === otherUserId);
+      if (userToUpdateIndex === -1) return prevUsers;
 
-      if (userToUpdateIndex === -1) {
-        // User not found in the list, return the previous state
-        return prevUsers;
-      }
-
-      // Create a new array with the updated user
       const updatedUsers = [...prevUsers];
       updatedUsers[userToUpdateIndex] = {
         ...updatedUsers[userToUpdateIndex],
@@ -89,7 +83,6 @@ export default function ChatPage() {
         lastMessageTime: newMessage.createdAt,
       };
 
-      // Store the last conversation user in localStorage and ref
       if (typeof window !== 'undefined') {
         localStorage.setItem('lastConversationUser', otherUserId);
         lastConversationUserRef.current = otherUserId;
@@ -107,32 +100,22 @@ export default function ChatPage() {
     ws.current = new WebSocket(`${socketUrl}?userId=${currentUserId}`);
 
     ws.current.onopen = () => console.log('WebSocket connected');
-    ws.current.onerror = (error) => console.error('WebSocket error:', error);
+    
     ws.current.onclose = () => console.log('WebSocket disconnected');
 
     if (ws.current) {
       ws.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        switch (data.type) {
-          case 'NEW_MESSAGE':
-            // Update the message list
-            setMessages(prevMessages => [...prevMessages, data.message]);
-
-            // Update the user list
-            updateUserList(data.message);
-            
-            // Update last conversation user in real-time
-            const otherUserId = data.message.senderId === currentUserId 
-              ? data.message.receiverId 
-              : data.message.senderId;
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('lastConversationUser', otherUserId);
-              lastConversationUserRef.current = otherUserId;
-            }
-            break;
-          // Handle other WebSocket message types
-          default:
-            break;
+        if (data.type === 'NEW_MESSAGE') {
+          setMessages(prev => [...prev, data.message]);
+          updateUserList(data.message);
+          const otherUserId = data.message.senderId === currentUserId 
+            ? data.message.receiverId 
+            : data.message.senderId;
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('lastConversationUser', otherUserId);
+            lastConversationUserRef.current = otherUserId;
+          }
         }
       };
     }
@@ -153,7 +136,6 @@ export default function ChatPage() {
         const data = await messageService.getUsersConversations(currentUserId);
         setUsers(data);
         
-        // Try to select the last conversation user if it exists
         if (lastConversationUserRef.current) {
           const lastUser = data.find(user => user._id === lastConversationUserRef.current);
           if (lastUser) {
@@ -162,7 +144,6 @@ export default function ChatPage() {
           }
         }
         
-        // Otherwise select the first user if available
         if (data.length > 0) {
           await handleConversation(data[0]._id);
         }
@@ -177,34 +158,32 @@ export default function ChatPage() {
   }, [currentUserId]);
 
   const handleConversation = async (userId: string) => {
-  if (!currentUserId) return;
+    if (!currentUserId) return;
 
-  setIsLoading(true);
-  try {
-    const conversation = await messageService.getConversation(currentUserId, userId);
-    setMessages(conversation);
-
-    setUsers(prevUsers => prevUsers.map(user => 
-      user._id === userId ? { ...user, unreadCount: 0 } : user
-    ));
-
-    // Find and set the selected user from the users array
-    const user = users.find(u => u._id === userId);
-    if (user) {
-      setSelectedUser(user);
+    setIsLoading(true);
+    try {
+      const conversation = await messageService.getConversation(currentUserId, userId);
+      setMessages(conversation);
+      setUsers(prev => prev.map(user => 
+        user._id === userId ? { ...user, unreadCount: 0 } : user
+      ));
+      
+      const user = users.find(u => u._id === userId);
+      if (user) {
+        setSelectedUser(user);
+        setShowConversation(true);
+      }
+      
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('lastConversationUser', userId);
+        lastConversationUserRef.current = userId;
+      }
+    } catch (error) {
+      console.error('Error fetching conversation:', error);
+    } finally {
+      setIsLoading(false);
     }
-    
-    // Store the last conversation user
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('lastConversationUser', userId);
-      lastConversationUserRef.current = userId;
-    }
-  } catch (error) {
-    console.error('Error fetching conversation:', error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   const filteredUsers = users.filter(user => 
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -212,16 +191,16 @@ export default function ChatPage() {
 
   const UserAvatar = ({ user, size = 'md' }: { user: User, size?: 'sm' | 'md' | 'lg' }) => {
     const sizeClasses = {
-      sm: 'w-10 h-10',
-      md: 'w-12 h-12',
-      lg: 'w-16 h-16'
+      sm: 'w-8 h-8',
+      md: 'w-10 h-10',
+      lg: 'w-12 h-12'
     };
 
     return (
       <div className={`relative ${sizeClasses[size]}`}>
         {user.image ? (
           <img
-            className="w-16 h-16 rounded-full object-cover border-2 border-teal-100"
+            className={`${sizeClasses[size]} rounded-full object-cover border-2 border-teal-100`}
             src={user.image.startsWith('/uploads') 
               ? `http://localhost:3001${user.image}`
               : user.image}
@@ -229,12 +208,8 @@ export default function ChatPage() {
             onError={(e) => {
               const img = e.target as HTMLImageElement;
               img.style.display = 'none';
-
-              // Create fallback container
               const fallbackContainer = document.createElement('div');
-              fallbackContainer.className = 'w-16 h-16 rounded-full border-2 border-teal-100 bg-gray-100 flex items-center justify-center';
-
-              // Create user icon
+              fallbackContainer.className = `${sizeClasses[size]} rounded-full border-2 border-teal-100 bg-gray-100 flex items-center justify-center`;
               const userIcon = document.createElement('div');
               userIcon.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -247,11 +222,11 @@ export default function ChatPage() {
             }}
           />
         ) : (
-          <div className="w-16 h-16 rounded-full border-2 border-teal-100 bg-gray-100 flex items-center justify-center">
+          <div className={`${sizeClasses[size]} rounded-full border-2 border-teal-100 bg-gray-100 flex items-center justify-center`}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -265,10 +240,10 @@ export default function ChatPage() {
           </div>
         )}
         {user.online && (
-          <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+          <span className="absolute bottom-0 right-0 w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full border-2 border-white"></span>
         )}
         {user.unreadCount ? (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow">
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center shadow">
             {user.unreadCount}
           </span>
         ) : null}
@@ -278,125 +253,166 @@ export default function ChatPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen overflow-hidden">
-      <section className="relative bg-gradient-to-b from-teal-600 to-white pt-20 px-4 h-screen">
-        <section className="bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl h-[calc(100vh-120px)] flex items-center justify-center py-16 overflow-hidden">
-          <div className="w-full h-full max-w-7xl bg-white shadow-xl rounded-2xl flex overflow-hidden">
-            {/* Sidebar */}
-            <div className="w-full md:w-1/3 border-r p-4 flex flex-col bg-gray-50">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Messages</h2>
-                <div className="relative">
-                  <button
-                    className="flex items-center gap-1 px-3 py-1 bg-white rounded-full shadow-sm text-sm hover:bg-gray-100 transition-colors"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    aria-label="Menu"
-                  >
-                    <FiMoreVertical className="text-gray-500" />
-                  </button>
-                  <AnimatePresence>
-                    {isMenuOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-100"
+      <section className="relative bg-gradient-to-b from-teal-600 to-white pt-16 sm:pt-20 px-0 sm:px-4 h-screen">
+        <section className="bg-white bg-opacity-80 backdrop-blur-sm rounded-none sm:rounded-2xl h-[calc(100vh-64px)] sm:h-[calc(100vh-120px)] flex items-center justify-center py-0 sm:py-16 overflow-hidden">
+          <div className="w-full h-full bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-2xl flex overflow-hidden">
+            {/* Sidebar - Hidden on mobile when conversation is open */}
+            <AnimatePresence>
+              {(!showConversation || window.innerWidth >= 768) && (
+                <motion.div
+                  initial={{ x: -300, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -300, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  className={`w-full md:w-1/3 border-r p-2 sm:p-4 flex flex-col bg-gray-50 ${showConversation ? 'hidden md:flex' : 'flex'}`}
+                >
+                  <div className="flex justify-between items-center mb-4 sm:mb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Messages</h2>
+                    <div className="relative">
+                      <button
+                        className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-white rounded-full shadow-sm text-sm hover:bg-gray-100 transition-colors"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        aria-label="Menu"
                       >
-                        <div className="py-1">
-                          <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                            <FiUser className="mr-2" /> New conversation
-                          </button>
-                          <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                            <FiMessageSquare className="mr-2" /> Settings
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-
-              {/* Search bar */}
-              <div className="relative mb-6">
-                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search conversations..."
-                  className="w-full pl-10 pr-4 py-2 border-0 bg-white rounded-full shadow-sm focus:ring-2 focus:ring-teal-500 focus:outline-none transition-all"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-
-              {/* Users list */}
-              <div className="flex-1 overflow-y-auto space-y-2" style={{ maxHeight: 'calc(100% - 120px)' }}>
-                {isLoading && filteredUsers.length === 0 ? (
-                  <div className="flex justify-center items-center h-20">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
+                        <FiMoreVertical className="text-gray-500" />
+                      </button>
+                      <AnimatePresence>
+                        {isMenuOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-100"
+                          >
+                            <div className="py-1">
+                              <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                <FiUser className="mr-2" /> New conversation
+                              </button>
+                              <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                <FiMessageSquare className="mr-2" /> Settings
+                              </button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
-                ) : filteredUsers.length === 0 ? (
-                  <div className="text-center py-10 text-gray-400">
-                    <FiMessageSquare className="mx-auto text-2xl mb-2" />
-                    <p>No conversations found</p>
+
+                  {/* Search bar */}
+                  <div className="relative mb-4 sm:mb-6">
+                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      className="w-full pl-9 pr-4 py-2 border-0 bg-white rounded-full shadow-sm focus:ring-2 focus:ring-teal-500 focus:outline-none transition-all text-sm sm:text-base"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                   </div>
-                ) : (
-                  filteredUsers.map((user) => (
-                    <motion.div
-                      key={user._id}
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`flex items-center gap-3 p-3 cursor-pointer rounded-xl transition-all ${
-                        selectedUser?._id === user._id
-                          ? 'bg-teal-100 border border-teal-200'
-                          : 'bg-white hover:bg-gray-100'
-                      }`}
-                      onClick={() => handleConversation(user._id)}
-                    >
-                      <UserAvatar user={user} size="lg" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-baseline">
-                          <p className="font-bold text-gray-800 truncate">
-                            {user.name}
-                          </p>
-                          {user.lastMessageTime && (
-                            <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
-                              {formatRelativeTime(user.lastMessageTime)}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-500 truncate">
-                          {user.lastMessage || 'No messages'}
-                        </p>
+
+                  {/* Users list */}
+                  <div className="flex-1 overflow-y-auto space-y-1 sm:space-y-2" style={{ maxHeight: 'calc(100% - 100px)' }}>
+                    {isLoading && filteredUsers.length === 0 ? (
+                      <div className="flex justify-center items-center h-20">
+                        <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-t-2 border-b-2 border-teal-500"></div>
                       </div>
-                    </motion.div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Chat area */}
-            <div className="flex-1 hidden md:flex">
-              {selectedUser ? (
-                <Conversation
-                  selectedUser={selectedUser}
-                  messages={messages}
-                  isLoading={isLoading}
-                  currentUserId={currentUserId}
-                  ws={ws.current}
-                  setMessages={setMessages}
-                  setUsers={setUsers}
-                  users={users}
-                  updateUserList={updateUserList}
-                />
-              ) : (
-                <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
-                  <FiMessageSquare className="text-5xl mb-4" />
-                  <p className="text-lg">Select a conversation</p>
-                  <p className="text-sm mt-2 text-gray-500">
-                    or start a new discussion
-                  </p>
-                </div>
+                    ) : filteredUsers.length === 0 ? (
+                      <div className="text-center py-8 text-gray-400">
+                        <FiMessageSquare className="mx-auto text-xl sm:text-2xl mb-2" />
+                        <p className="text-sm sm:text-base">No conversations</p>
+                      </div>
+                    ) : (
+                      filteredUsers.map((user) => (
+                        <motion.div
+                          key={user._id}
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 cursor-pointer rounded-lg sm:rounded-xl transition-all ${
+                            selectedUser?._id === user._id
+                              ? 'bg-teal-100 border border-teal-200'
+                              : 'bg-white hover:bg-gray-100'
+                          }`}
+                          onClick={() => handleConversation(user._id)}
+                        >
+                          <UserAvatar user={user} size="md" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-baseline">
+                              <p className="font-medium sm:font-bold text-sm sm:text-base text-gray-800 truncate">
+                                {user.name}
+                              </p>
+                              {user.lastMessageTime && (
+                                <span className="text-xs text-gray-500 whitespace-nowrap ml-1 sm:ml-2">
+                                  {formatRelativeTime(user.lastMessageTime)}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs sm:text-sm text-gray-500 truncate">
+                              {user.lastMessage || 'No messages'}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))
+                    )}
+                  </div>
+                </motion.div>
               )}
-            </div>
+            </AnimatePresence>
+
+            {/* Chat area - Full screen on mobile when conversation is selected */}
+            <AnimatePresence>
+              {(showConversation || window.innerWidth >= 768) && (
+                <motion.div
+                  initial={{ x: 300, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: 300, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  className={`flex-1 ${!showConversation ? 'hidden md:flex' : 'flex'}`}
+                >
+                  {selectedUser ? (
+                    <div className="flex flex-col h-full w-full">
+                      {/* Mobile header with back button */}
+                      <div className="md:hidden flex items-center p-3 border-b bg-white">
+                        <button 
+                          onClick={() => setShowConversation(false)}
+                          className="mr-2 p-1 rounded-full hover:bg-gray-100"
+                        >
+                          <FiArrowLeft className="text-lg" />
+                        </button>
+                        <div className="flex items-center">
+                          <UserAvatar user={selectedUser} size="sm" />
+                          <div className="ml-2">
+                            <p className="font-medium text-gray-800">{selectedUser.name}</p>
+                            <p className="text-xs text-gray-500">
+                              {selectedUser.online ? 'Online' : 'Offline'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <Conversation
+                        selectedUser={selectedUser}
+                        messages={messages}
+                        isLoading={isLoading}
+                        currentUserId={currentUserId}
+                        ws={ws.current}
+                        setMessages={setMessages}
+                        setUsers={setUsers}
+                        users={users}
+                        updateUserList={updateUserList}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+                      <FiMessageSquare className="text-3xl sm:text-5xl mb-3 sm:mb-4" />
+                      <p className="text-base sm:text-lg">Select a conversation</p>
+                      <p className="text-xs sm:text-sm mt-1 sm:mt-2 text-gray-500">
+                        or start a new discussion
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </section>
       </section>

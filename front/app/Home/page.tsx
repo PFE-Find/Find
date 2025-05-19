@@ -319,12 +319,12 @@ export default function Home() {
 
 
 
-        <div className="p-5 m-5">
+        {/* <div className="p-5 m-5">
             <Comments></Comments>
         </div>
-    
+     */}
       <Footer />
-    <ChatBot></ChatBot>
+    {/* <ChatBot></ChatBot> */}
 
     </div>
   );

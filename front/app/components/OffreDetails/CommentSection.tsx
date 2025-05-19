@@ -191,7 +191,7 @@ export default function CommentSection({ offreId, currentUserId }: CommentSectio
                     <span className="font-medium text-gray-700 truncate">
                       {comment.user?.name || `User ${comment.userId?.slice(-4)}`}
                     </span>
-                    <span className="text-xs text-gray-500 whitespace-nowrap">
+                    <span className="text-xs text-gray-500 whitespace-nowrap mr-5">
                       {new Date(comment.date || Date.now()).toLocaleDateString('fr-FR', {
                         day: 'numeric',
                         month: 'long',
