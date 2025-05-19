@@ -79,12 +79,12 @@ export default function ImageUploader({ data, updateFields }) {
       );
 
       // 5. Check each for NSFW :contentReference[oaicite:14]{index=14}
-      /*for (let b64 of compressed) {
+      for (let b64 of compressed) {
         if (await checkImageProfanity(b64)) {
           alert("⚠️ Contenu inapproprié détecté.");
           return;
         }
-      }*/
+      }
       // 6. Safe: append and update state
       setImageURLs(prev => [...prev, ...compressed]);
     } catch (err) {

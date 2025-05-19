@@ -103,7 +103,9 @@ export default function SignUp() {
               <FiCheckCircle className="text-green-500 text-xl mr-3 mt-0.5 flex-shrink-0" />
               <div>
                 <h3 className="text-green-800 font-medium">Account created successfully!</h3>
+                <p className="text-green-600 text-sm mt-1">Email Verification Was Sent!</p>
                 <p className="text-green-600 text-sm mt-1">Redirecting to login page...</p>
+
               </div>
             </motion.div>
           )}
@@ -274,17 +276,9 @@ export default function SignUp() {
                 {/* Social Login */}
                 <motion.div 
                   variants={containerVariants}
-                  className="grid grid-cols-3 gap-3 px-8 pb-8"
+                  className="grid grid-cols-2 gap-3 px-8 pb-8"
                 >
-                  <motion.button
-                    variants={itemVariants}
-                    type="button"
-                    whileHover={{ y: -2 }}
-                    className="flex items-center justify-center py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <FaFacebook className="text-blue-600 text-xl" />
-                  </motion.button>
-                  
+                
                   <motion.button
                     variants={itemVariants}
                     type="button"
