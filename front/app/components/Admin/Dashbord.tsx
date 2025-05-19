@@ -53,8 +53,8 @@ const Dashboard: React.FC = () => {
       setMaterialsCount(fetchedMaterials);
       setLandsCount(fetchedLands);
     } catch (err) {
-      console.error("Error loading data", err);
-      setError("Failed to load dashboard data");
+      console.error("Erreur lors du chargement des données", err);
+      setError("Échec du chargement des données du tableau de bord");
     }
   };
 
@@ -75,28 +75,28 @@ const Dashboard: React.FC = () => {
       labels: Object.keys(placeCounts),
       datasets: [
         {
-          label: "Offers by Place",
+          label: "Offres par lieu",
           data: Object.values(placeCounts),
           backgroundColor: [
-            "#FF6384",
-            "#36A2EB",
-            "#FFCE56",
-            "#4BC0C0",
-            "#9966FF",
-            "#FF9F40",
+            "#3B82F6", // Bleu
+            "#10B981", // Vert émeraude
+            "#F59E0B", // Jaune
+            "#6366F1", // Violet
+            "#EC4899", // Rose
+            "#14B8A6", // Turquoise
           ],
         },
       ],
     });
   }, [offers]);
 
-  // Monthly user registration bar chart
+  // Graphique des inscriptions utilisateurs par mois
   useEffect(() => {
     if (!users.length) return;
 
     const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December",
+      "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+      "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
     ];
 
     const monthlyCounts = Array(12).fill(0);
@@ -109,116 +109,158 @@ const Dashboard: React.FC = () => {
       labels: months,
       datasets: [
         {
-          label: "User Registrations by Month",
+          label: "Inscriptions utilisateurs par mois",
           data: monthlyCounts,
-          backgroundColor: months.map((_, i) => [
-            "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40",
-            "#E7E9ED", "#00A86B", "#8E44AD", "#E67E22", "#2ECC71", "#F1C40F",
-          ][i]),
+          backgroundColor: "#3B82F6",
+          borderRadius: 6,
+          borderSkipped: false,
         },
       ],
     });
   }, [users]);
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-50">
       <SidBar />
 
-      <main className="flex-1 p-8 overflow-y-auto h-[900px]">
+      <main className="flex-1 p-6 md:p-8 overflow-y-auto">
         <Navbar />
 
-        {/* Stats Cards */}
-        <div className="mt-28 grid grid-cols-4 gap-6">
+        {/* En-tête */}
+        <div className="mt-36 mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Tableau de Bord</h1>
+          <p className="text-gray-600">Aperçu des statistiques et performances</p>
+        </div>
+
+        {/* Cartes de statistiques */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             {
-              title: "Today's Materials",
+              title: "Matériels aujourd'hui",
               value: materialsCount,
-              change: "+55% than last week",
-              icon: <img src="/assets/icons/tractor.png" alt="Materials" />,
+              change: "+55% vs semaine dernière",
+              icon: <img src="/assets/icons/tractor.png" alt="Matériels" className="w-10 h-10" />,
+              color: "bg-blue-100",
             },
             {
-              title: "Today's Users",
+              title: "Utilisateurs",
               value: users.length,
-              change: "+3% than last month",
-              icon: <Users className="w-8 h-8 text-blue-500" />,
+              change: "+3% vs mois dernier",
+              icon: <Users className="w-10 h-10 text-blue-600" />,
+              color: "bg-green-100",
             },
             {
-              title: "Land Scapes",
+              title: "Terrains",
               value: landsCount,
-              change: "-2% than yesterday",
-              icon: <img src="/assets/icons/landscape.png" alt="Lands" className="w-8 h-8" />,
+              change: "-2% vs hier",
+              icon: <img src="/assets/icons/landscape.png" alt="Terrains" className="w-10 h-10" />,
+              color: "bg-amber-100",
             },
             {
-              title: "Offers",
+              title: "Offres",
               value: offers.length,
-              change: "+5% than yesterday",
-              icon: <ShoppingCart className="w-8 h-8 text-purple-500" />,
+              change: "+5% vs hier",
+              icon: <ShoppingCart className="w-10 h-10 text-purple-600" />,
+              color: "bg-purple-100",
             },
           ].map((stat, index) => (
             <div
               key={index}
-              className="p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition"
+              className={`p-5 rounded-xl shadow-sm border border-gray-100 transition-all hover:shadow-md ${stat.color}`}
             >
-              <div className="flex items-center space-x-4">
-                <div>{stat.icon}</div>
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-gray-800">{stat.value}</div>
-                  <div className="text-sm text-gray-500">{stat.title}</div>
+                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                  <p className="text-2xl font-bold text-gray-800 mt-1">{stat.value}</p>
+                  <p className={`text-xs mt-2 ${
+                    stat.change.includes("-") ? "text-red-500" : "text-green-500"
+                  }`}>
+                    {stat.change}
+                  </p>
                 </div>
-              </div>
-              <div
-                className={`mt-4 text-sm ${
-                  stat.change.includes("-") ? "text-red-500" : "text-green-500"
-                }`}
-              >
-                {stat.change}
+                <div className="p-3 rounded-lg bg-white bg-opacity-50">
+                  {stat.icon}
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-3 gap-6 mt-8">
-          {/* Pie Chart */}
-          <div className="p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition">
-            <div className="text-lg font-semibold">Offers per Place</div>
-            <div className="mt-6 flex items-center justify-center h-[300px]">
+        {/* Graphiques */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+          {/* Camembert */}
+          <div className="lg:col-span-1 p-6 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Répartition des offres par lieu</h2>
+            <div className="h-64 flex items-center justify-center">
               {placeChartData ? (
-                <div style={{ width: "250px", height: "250px" }}>
-                  <Pie data={placeChartData} />
+                <div className="w-full max-w-xs">
+                  <Pie 
+                    data={placeChartData} 
+                    options={{
+                      plugins: {
+                        legend: {
+                          position: 'right',
+                          labels: {
+                            usePointStyle: true,
+                            padding: 16,
+                          }
+                        }
+                      }
+                    }}
+                  />
                 </div>
               ) : (
-                <p>Loading chart...</p>
+                <p className="text-gray-500">Chargement du graphique...</p>
               )}
             </div>
-            <div className="mt-4 text-sm text-gray-500">Updated just now</div>
+            <p className="text-xs text-gray-400 text-right mt-2">Mis à jour à l'instant</p>
           </div>
 
-          {/* Bar Chart */}
-          <div className="col-span-2 p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition">
-            <div className="text-lg font-semibold">User Registrations per Month</div>
-            <div className="mt-6 h-[300px] flex items-center justify-center">
+          {/* Barres */}
+          <div className="lg:col-span-2 p-6 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Inscriptions utilisateurs par mois</h2>
+            <div className="h-64">
               {userBarData ? (
                 <Bar
                   data={userBarData}
                   options={{
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                       legend: { display: false },
+                      tooltip: {
+                        backgroundColor: '#1F2937',
+                        titleColor: '#F3F4F6',
+                        bodyColor: '#F3F4F6',
+                        borderColor: '#374151',
+                        borderWidth: 1,
+                      }
                     },
                     scales: {
                       y: {
                         beginAtZero: true,
-                        ticks: { precision: 0 },
+                        ticks: { 
+                          precision: 0,
+                          stepSize: 1 
+                        },
+                        grid: {
+                          drawBorder: false,
+                          color: '#E5E7EB'
+                        }
                       },
+                      x: {
+                        grid: {
+                          display: false
+                        }
+                      }
                     },
                   }}
                 />
               ) : (
-                <p>Loading chart...</p>
+                <p className="text-gray-500">Chargement du graphique...</p>
               )}
             </div>
-            <div className="mt-4 text-sm text-gray-500">Updated just now</div>
+            <p className="text-xs text-gray-400 text-right mt-2">Mis à jour à l'instant</p>
           </div>
         </div>
       </main>

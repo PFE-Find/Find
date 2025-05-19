@@ -14,6 +14,6 @@ router.get('/GetMaterials',getMaterials);
 router.get('/:id', getItemById);
 router.put('/updateItem/:id', updateItem);
 router.delete('/deleteItem/:id', deleteItem);
-router.patch('/:id', updateOffreStatus);
+router.put('/:id', updateOffreStatus);
 
 export default router;

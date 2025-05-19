@@ -90,7 +90,7 @@ export const options: NextAuthOptions = {
     },
     callbacks: {
         async jwt({ token, user,trigger }) {
-            console.log(user);
+            
             
               if (user) {
                 token.user = user;
@@ -101,10 +101,10 @@ export const options: NextAuthOptions = {
             
             if (id) {
                 try {
-                    console.log("hello world"+id);
+                    
                     
                     const updatedUser = await userService.getUserById(id);
-                    console.log(updatedUser);
+                   
                     
                     if (updatedUser) {
                         token.user = updatedUser;
@@ -117,9 +117,9 @@ export const options: NextAuthOptions = {
                 
                 
                 try {
-                    console.log("hello world 2"+id);
+                    
                     const updatedUser = await userService.getUserById(id);
-                    console.log(updatedUser);
+                   
                     
                     if (updatedUser) {
                         token.user = updatedUser;

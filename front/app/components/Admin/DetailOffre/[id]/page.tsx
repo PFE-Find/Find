@@ -13,13 +13,14 @@ import Map from "../../../OffreDetails/Maps";
 import Image from "next/image";
 import { Dialog } from "@headlessui/react";
 import {
-  FiInfo, FiDollarSign, FiMaximize2, FiLayers, 
+  FiInfo, FiDollarSign, FiMaximize2, FiLayers,
   FiMapPin, FiImage, FiMessageSquare, FiCheckCircle,
   FiCalendar, FiStar, FiChevronRight, FiFlag
 } from "react-icons/fi";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { X, ChevronLeft, ChevronRight, MessageCircle, Settings } from "lucide-react";
 import { FaLeaf, FaShieldAlt } from 'react-icons/fa';
+import { useSession } from "next-auth/react";
 
 const Details: React.FC = () => {
   const [offre, setOffre] = useState<any>(null);
@@ -30,7 +31,7 @@ const Details: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('description');
-  const [comments, setComments] = useState('');
+  const { data: session } = useSession();
 
   useEffect(() => {
     async function fetchDetails() {
@@ -91,11 +92,31 @@ const Details: React.FC = () => {
       });
     }
   };
+const handleDelete = async () => {
+  try {
+    await eventService.deleteOffre(id as string);
+    Swal.fire({
+      title: 'Suppression réussie !',
+      text: 'L\'offre a été supprimée avec succès.',
+      icon: 'success',
+      confirmButtonText: 'OK'
+    });
+    router.push("/Admin/OffresPage");
+  } catch (error) {
+    console.error("Error deleting offre:", error);
+    Swal.fire({
+      title: 'Échec de la suppression',
+      text: 'Une erreur est survenue lors de la suppression de l\'offre.',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+  }
+};
 
   const tabContentVariants = {
     hidden: { opacity: 0, y: 10 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: { duration: 0.3, ease: "easeInOut" }
     },
@@ -110,8 +131,9 @@ const Details: React.FC = () => {
       'clôture': <FiCheckCircle className="text-gray-500 mr-1" />,
     };
 
+
     return (
-      <motion.div 
+      <motion.div
         whileHover={{ scale: 1.05 }}
         className="inline-flex items-center px-3 py-1 bg-gray-100 rounded-full text-sm font-medium text-gray-700 mr-2 mb-2"
       >
@@ -143,7 +165,7 @@ const Details: React.FC = () => {
       <SidBar />
       <main className="flex-1 p-6 md:p-8 overflow-y-auto">
         <Navbar />
-        
+
         {/* Action Buttons - Fixed Position */}
         <div className="fixed right-[450px] top-14 z-10 flex gap-4">
           <motion.button
@@ -155,6 +177,7 @@ const Details: React.FC = () => {
             Accepter
           </motion.button>
           <motion.button
+            onClick={handleDelete}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all"
@@ -162,10 +185,10 @@ const Details: React.FC = () => {
             Refuser
           </motion.button>
         </div>
-        
+
 
         {/* Main Content */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
@@ -173,7 +196,7 @@ const Details: React.FC = () => {
         >
           {/* User Profile Section */}
           {user && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
@@ -181,34 +204,37 @@ const Details: React.FC = () => {
             >
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-gray-800 mb-6">Information du propriétaire</h3>
-                
+
                 <div className="flex flex-col md:flex-row items-start gap-6">
                   <motion.div whileHover={{ scale: 1.02 }} className="shrink-0">
-                  <motion.img 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-green-100" 
-                    src={user?.image || "/default-avatar.png"} 
-                    alt="Profile" 
-                  />
-                  </motion.div>
+                    
+
+                      <motion.img
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="w-16 h-16 rounded-full object-cover border-2 border-green-100"
+                        src={
+                          user?.image
+                            ? user.image.startsWith('/uploads')
+                              ? `http://localhost:3001${user.image}`
+                              : user.image
+                            : '/default-avatar.png' // Fallback image
+                        }
+                        alt="Profile"
+                      />
+
                   
+                  </motion.div>
+
                   <div className="flex-1">
                     <h2 className="text-2xl font-bold text-gray-800">{user.name}</h2>
                     <p className="text-gray-500 mb-4">Membre depuis {format(new Date(user.createdAt || new Date()), 'yyyy')}</p>
-                    
+
                     <div className="flex flex-wrap gap-4 mt-6">
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors"
-                      >
-                        <MessageCircle className="w-5 h-5" />
-                        <span>Envoyer un message</span>
-                      </motion.button>
                       
-                     
+
+
                     </div>
                   </div>
                 </div>
@@ -216,7 +242,7 @@ const Details: React.FC = () => {
             </motion.div>
           )}
           {/* Title Section */}
-          <motion.div 
+          <motion.div
             initial={{ y: -20 }}
             animate={{ y: 0 }}
             className="mb-8 bg-white rounded-2xl shadow-md p-6"
@@ -224,17 +250,17 @@ const Details: React.FC = () => {
             <div className="flex items-center mb-4">
               <FiInfo className="text-gray-700 mr-2 text-xl" />
               <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Détails de l'offre</h2>
-              
+
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
               {offre.titre || "Aucune titre disponible"}
             </h1>
             {offre.placeName && (
-                        <p className="mt-4 text-gray-600 flex items-center">
-                          <FiMapPin className="mr-2" />
-                          {offre.placeName}
-                        </p>
-                      )}
+              <p className="mt-4 text-gray-600 flex items-center">
+                <FiMapPin className="mr-2" />
+                {offre.placeName}
+              </p>
+            )}
             <div className="mt-4 flex items-center text-gray-500">
               <FiCalendar className="mr-2" />
               <span>Publié le {format(new Date(offre.createdAt), 'dd/MM/yyyy')}</span>
@@ -242,7 +268,7 @@ const Details: React.FC = () => {
           </motion.div>
 
           {/* Hero Section */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -262,7 +288,7 @@ const Details: React.FC = () => {
               </div>
 
               {offre.propertyType === "Land" && offre.Superficie && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
@@ -281,7 +307,7 @@ const Details: React.FC = () => {
               )}
 
               {offre.propertyType === "Material" && offre.etat && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 }}
@@ -294,9 +320,9 @@ const Details: React.FC = () => {
                     <h3 className="text-sm text-gray-500 font-medium">État</h3>
                     <div className="flex items-center mt-1">
                       {[...Array(5)].map((_, i) => (
-                        <FiStar 
-                          key={i} 
-                          className={`${i < etatStars ? 'text-yellow-400' : 'text-gray-300'} w-5 h-5`} 
+                        <FiStar
+                          key={i}
+                          className={`${i < etatStars ? 'text-yellow-400' : 'text-gray-300'} w-5 h-5`}
                         />
                       ))}
                       <span className="ml-2 text-gray-600">{offre.etat}/10</span>
@@ -315,11 +341,10 @@ const Details: React.FC = () => {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center transition-colors ${
-                      activeTab === tab 
-                        ? 'border-blue-500 text-blue-600' 
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
+                    className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === tab
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      }`}
                   >
                     {tab === 'description' && 'Description'}
                     {tab === 'gallery' && 'Galerie'}
@@ -329,7 +354,7 @@ const Details: React.FC = () => {
                 ))}
               </nav>
             </div>
-            
+
             <div className="p-6">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -351,7 +376,7 @@ const Details: React.FC = () => {
                           <h4 className="text-lg font-semibold text-gray-800 mb-3">Équipements & Caractéristiques</h4>
                           <div className="flex flex-wrap">
                             {offre.equipements.map((equip: string, index: number) => (
-                              <motion.div 
+                              <motion.div
                                 key={index}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -402,7 +427,7 @@ const Details: React.FC = () => {
                       <div className="h-96 bg-gray-100 rounded-xl overflow-hidden">
                         <Map localisation={offre.localisation} />
                       </div>
-                      
+
                     </div>
                   )}
                 </motion.div>
@@ -410,7 +435,7 @@ const Details: React.FC = () => {
             </div>
           </div>
 
-          
+
         </motion.div>
 
         {/* Image Modal */}
@@ -419,7 +444,7 @@ const Details: React.FC = () => {
           onClose={() => setIsModalOpen(false)}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm"
         >
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="relative bg-white p-2 rounded-xl shadow-2xl max-w-4xl w-full mx-4"
@@ -430,7 +455,7 @@ const Details: React.FC = () => {
             >
               <X className="w-6 h-6 text-white" />
             </button>
-            
+
             <div className="relative h-[80vh]">
               {offre.images && (
                 <>
@@ -441,17 +466,17 @@ const Details: React.FC = () => {
                     className="object-contain"
                     quality={100}
                   />
-                  
+
                   {offre.images.length > 1 && (
                     <>
-                      <button 
+                      <button
                         onClick={prevImage}
                         className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full hover:bg-black/70 transition-colors"
                       >
                         <ChevronLeft className="w-6 h-6 text-white" />
                       </button>
-                      
-                      <button 
+
+                      <button
                         onClick={nextImage}
                         className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full hover:bg-black/70 transition-colors"
                       >

@@ -9,9 +9,29 @@ import multer from 'multer';
 const router = express.Router();
 // Create __dirname equivalent for ES modules
 // controllers/UserController.js
+export const updateUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let role = req.body.role;
+console.log("role",role);
+    
+    role = Number(role);
 
+  
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
 
+    user.role = role;
+    await user.save();
 
+    res.status(200).json({ message: 'Rôle utilisateur mis à jour avec succès', user });
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du rôle de l'utilisateur :", error);
+    res.status(500).json({ message: "Erreur interne du serveur" });
+  }
+};
 
 export const updateUser = async (req, res) => {
   try {
@@ -93,6 +113,8 @@ export const getUsers = async (req, res, next) => {
 
 // Delete user
 export const deleteUser = async (req, res, next) => {
+  console.log("delete : ",req.params);
+  
   try {
     const { id } = req.params;
     const deletedUser = await User.findByIdAndDelete(id);

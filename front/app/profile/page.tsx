@@ -31,22 +31,18 @@ export default function Profile() {
     useEffect(() => {
         async function fetchOffres() {
             if (session?.user?._id) {
-                try {
+               
                     const offres2 = await eventService.getAllOffresByUserId(session.user._id);
                     setOffres2(offres2);
-                } catch (error) {
-                    console.error("Error fetching offres:", error);
-                }
+                
             }
         }
         async function fetchOffres2() {
             if (session?.user?._id) {
-                try {
+                
                     const offres = await eventService.getAllOffresByUserId2(session.user._id);
                     setOffres(offres);
-                } catch (error) {
-                    console.error("Error fetching offres2:", error);
-                }
+                
             }
         }
         fetchOffres2();

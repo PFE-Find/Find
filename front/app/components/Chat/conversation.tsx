@@ -82,7 +82,7 @@ const Conversation: React.FC<ConversationProps> = ({
   // Scroll to bottom when messages change
   useEffect(() => {
    
-    console.log("selctedId2",selectedUser._id);
+   
     
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -107,9 +107,7 @@ const Conversation: React.FC<ConversationProps> = ({
         case 'NEW_MESSAGE':
           // Always use the current selectedUser from state, not from closure
           const currentSelectedUser = selectedUser;
-          console.log("selctedId",selectedUser._id);
-          console.log("message sender",data.message.senderId );
-          console.log("message reciver",data.message.receiverId );
+         
           
 
           if (data.message.senderId ==  currentSelectedUser._id || data.message.receiverId ==  currentSelectedUser._id) {

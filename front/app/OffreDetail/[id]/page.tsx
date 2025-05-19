@@ -115,7 +115,7 @@ export default function OffreDetail() {
                 <p>Loading images...</p>
             )}
 
-            <ChatBot />
+            {/* <ChatBot /> */}
             <Footer />
             {/* </div> */}
         </section></>

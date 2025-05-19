@@ -55,36 +55,29 @@ const Offres = {
 
 
   async getAllOffresByUserId(id: string) {
-    try {
+    
       
       
       const response = await axios.get(`${API_URL}GetAll3/${id}`);
       return response.data;
-    } catch (error) {
-      console.error("Error fetching offres:", error);
-      throw error;
-    }
+   
+      
+     
   },
   async getAllOffresByUserId2(id: string) {
-    try {
+    
    
       const response = await axios.get(`${API_URL}GetAll4/${id}`);
       return response.data;
-    } catch (error) {
-      console.error("Error fetching offres:", error);
-      throw error;
-    }
+    
   },
 
   // Fetch a single offre by ID
   async getOffre(id: string) {
-    try {
+    
       const response = await axios.get(`${API_URL}${id}`);
       return response.data;
-    } catch (error) {
-      console.error("Error fetching offre:", error);
-      throw error;
-    }
+    
   },
 
   // Add a new offre
@@ -120,7 +113,9 @@ const Offres = {
     }
   },
   updateStatut: async (id: string) => {
-    const response = await axios.patch(`${API_URL}${id}`);
+    const response = await axios.put(`${API_URL}${id}`);
+    console.log(response.data);
+    
     return response.data;
   },
 

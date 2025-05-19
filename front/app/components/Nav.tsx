@@ -79,13 +79,9 @@ export default function Navbar() {
       }
     };
 
-    ws.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+    
 
-    ws.current.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
+    
 
     return () => {
       if (ws.current) {

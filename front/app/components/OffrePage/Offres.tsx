@@ -13,13 +13,16 @@ export default function Offres() {
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [offres, setOffres] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [visibleCount, setVisibleCount] = useState(1);
     const [hoveredCard, setHoveredCard] = useState<string | null>(null);
     const [filtersApplied, setFiltersApplied] = useState(false);
     const [priceRange, setPriceRange] = useState<[number | null, number | null]>([null, null]);
     const [surfaceRange, setSurfaceRange] = useState<[number | null, number | null]>([null, null]);
     const [locationFilter, setLocationFilter] = useState<string>("");
     const [surfaceFilterEnabled, setSurfaceFilterEnabled] = useState(false);
+   
+    
+    // New state for controlling visible lines
+    const [visibleLines, setVisibleLines] = useState(3); // Start with 3 lines (18 offers)
 
     const toggleFavorite = (id: string, e: React.MouseEvent) => {
         e.preventDefault();
@@ -28,16 +31,16 @@ export default function Offres() {
     };
 
     useEffect(() => {
-        async function fetchOffres() {
-            try {
-                const data = await eventService.getOffres1();
-                setOffres(data);
-            } catch (error) {
-                console.error("Erreur lors de la récupération des offres:", error);
-            }
+    async function fetchOffres() {
+        try {
+            const data = await eventService.getOffres1();
+            setOffres(shuffleArray(data)); // Shuffle the data here
+        } catch (error) {
+            console.error("Erreur lors de la récupération des offres:", error);
         }
-        fetchOffres();
-    }, []);
+    }
+    fetchOffres();
+}, []);
 
     const filteredOffers = offres.filter((offer) => {
         const matchesCategory = selectedCategory === "all" || offer.propertyType === selectedCategory;
@@ -64,6 +67,15 @@ export default function Offres() {
         return matchesCategory && matchesSearch && matchesPrice && matchesLocation && matchesSurface;
     });
 
+    // Split offers into rows of 6 offers each
+    const rows = [];
+    for (let i = 0; i < filteredOffers.length; i += 6) {
+        rows.push(filteredOffers.slice(i, i + 6));
+    }
+
+    const totalLines = rows.length;
+    const visibleRows = rows.slice(0, visibleLines);
+
     const handleSearch = (query: string) => {
         setSearchQuery(query);
     };
@@ -74,6 +86,9 @@ export default function Offres() {
         setLocationFilter(filters.locationFilter);
         setSurfaceFilterEnabled(filters.surfaceFilterEnabled);
         setFiltersApplied(true);
+        // Reset visible lines when filters change
+        setVisibleLines(3);
+        setOffres(prev => shuffleArray([...prev]));
     };
 
     const resetFilters = () => {
@@ -84,19 +99,28 @@ export default function Offres() {
         setSelectedCategory("all");
         setFiltersApplied(false);
         setSurfaceFilterEnabled(false);
+        // Reset visible lines when filters are reset
+        setVisibleLines(3);
+        setOffres(prev => shuffleArray([...prev]));
     };
+    // Fisher-Yates shuffle algorithm
+function shuffleArray<T>(array: T[]): T[] {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+}
 
     const handleCategoryChange = (category: string) => {
         setSelectedCategory(category);
         if (category === "Material") {
             setSurfaceFilterEnabled(false);
         }
+        // Reset visible lines when category changes
+        setVisibleLines(3);
     };
-
-    const rows = [];
-    for (let i = 0; i < filteredOffers.length; i += 7) {
-        rows.push(filteredOffers.slice(i, i + 7));
-    }
 
     const imageHoverVariants = {
         hover: {
@@ -123,35 +147,34 @@ export default function Offres() {
     };
 
     return (
-        <section className="  bg-gray-50 dark:bg-gray-900 min-h-screen">
-            <div className="max-w-full mx-auto ">
+        <section className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+            <div className="max-w-full mx-auto">
                 {/* Section de recherche améliorée */}
-                <div className="bg-gradient-to-b from-teal-600 to-white ">
-                <OffreSearch
-                
-                    onSearch={handleSearch}
-                    onCategoryChange={handleCategoryChange}
-                    selectedCategory={selectedCategory}
-                    onFiltersApply={applyFilters}
-                    resetFilters={resetFilters}
-                    filtersApplied={filtersApplied}
-                    priceRange={priceRange}
-                    setPriceRange={setPriceRange}
-                    surfaceRange={surfaceRange}
-                    setSurfaceRange={setSurfaceRange}
-                    locationFilter={locationFilter}
-                    setLocationFilter={setLocationFilter}
-                    surfaceFilterEnabled={surfaceFilterEnabled}
-                    setSurfaceFilterEnabled={setSurfaceFilterEnabled}
-                /></div>
-                
+                <div className="bg-gradient-to-b from-teal-600 to-white">
+                    <OffreSearch
+                        onSearch={handleSearch}
+                        onCategoryChange={handleCategoryChange}
+                        selectedCategory={selectedCategory}
+                        onFiltersApply={applyFilters}
+                        resetFilters={resetFilters}
+                        filtersApplied={filtersApplied}
+                        priceRange={priceRange}
+                        setPriceRange={setPriceRange}
+                        surfaceRange={surfaceRange}
+                        setSurfaceRange={setSurfaceRange}
+                        locationFilter={locationFilter}
+                        setLocationFilter={setLocationFilter}
+                        surfaceFilterEnabled={surfaceFilterEnabled}
+                        setSurfaceFilterEnabled={setSurfaceFilterEnabled}
+                    />
+                </div>
 
                 {/* Sélection de catégorie */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
-                    className="flex justify-center items-center mb-12 space-x-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md "
+                    className="flex justify-center items-center mb-12 space-x-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md"
                 >
                     <button
                         onClick={() => handleCategoryChange("Land")}
@@ -205,7 +228,7 @@ export default function Offres() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="mb-6 text-gray-700 dark:text-gray-300 sm:px-6 lg:px-8 "
+                    className="mb-6 text-gray-700 dark:text-gray-300 sm:px-6 lg:px-8"
                 >
                     {filteredOffers.length} {filteredOffers.length === 1 ? 'offre trouvée' : 'offres trouvées'}
                     {filtersApplied && (
@@ -220,7 +243,7 @@ export default function Offres() {
 
                 {/* Grille des offres */}
                 <div className="space-y-8 sm:px-6 lg:px-8 mb-16">
-                    {rows.slice(0, visibleCount).map((row, rowIndex) => (
+                    {visibleRows.map((row, rowIndex) => (
                         <motion.div
                             key={rowIndex}
                             initial={{ opacity: 0, y: 20 }}
@@ -268,7 +291,7 @@ export default function Offres() {
                                                 </div>
 
                                                 {/* Bouton Favori */}
-                                                <button
+                                                {/* <button
                                                     onClick={(e) => toggleFavorite(offre._id, e)}
                                                     className={`absolute top-4 right-4 p-2 rounded-full transition-all ${favorites[offre._id]
                                                         ? 'text-red-500 bg-white/90 shadow-sm'
@@ -276,7 +299,7 @@ export default function Offres() {
                                                         }`}
                                                 >
                                                     <FiHeart className={`w-5 h-5 ${favorites[offre._id] ? 'fill-current' : ''}`} />
-                                                </button>
+                                                </button> */}
 
                                                 {/* Overlay au survol */}
                                                 <AnimatePresence>
@@ -346,7 +369,7 @@ export default function Offres() {
                 </div>
 
                 {/* Bouton "Afficher plus" */}
-                {visibleCount < rows.length && (
+                {visibleLines < totalLines && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -354,7 +377,7 @@ export default function Offres() {
                     >
                         <button
                             className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-full transition-all shadow-lg hover:shadow-xl"
-                            onClick={() => setVisibleCount((prev) => prev + 1)}
+                            onClick={() => setVisibleLines(prev => Math.min(prev + 4, totalLines))}
                         >
                             Afficher plus d'offres
                             <ArrowRight className="w-4 h-4 ml-2" />
