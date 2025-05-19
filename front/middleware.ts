@@ -22,7 +22,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // Protect /user routes
-  if (url.startsWith('/profile') && role !== 0) {
+  if (url.startsWith('/profile') && (role !== 0 && role !== 1 )) {
     return NextResponse.redirect(new URL('/Home', req.url))
   }
 

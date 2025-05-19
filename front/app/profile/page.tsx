@@ -25,30 +25,22 @@ export default function Profile() {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [previewImage, setPreviewImage] = useState(session?.user?.image || '');
 
-    const id_user =   session?.user?._id ||  session?.user?.user?._id ;
+    const id_user = session?.user?._id || session?.user?.user?._id;
     const [isPhoneVerified, setIsPhoneVerified] = useState(false);
     const [verificationCode, setVerificationCode] = useState('');
     const [showVerification, setShowVerification] = useState(false);
 
     useEffect(() => {
         async function fetchOffres() {
-
             if (session?.user?._id) {
-               
-                    const offres2 = await eventService.getAllOffresByUserId(session.user._id);
-
-                    setOffres2(offres2);
-                
+                const offres2 = await eventService.getAllOffresByUserId(session.user._id);
+                setOffres2(offres2);
             }
         }
         async function fetchOffres2() {
-
             if (session?.user?._id) {
-                
-                    const offres = await eventService.getAllOffresByUserId2(session.user._id);
-
-                    setOffres(offres);
-                
+                const offres = await eventService.getAllOffresByUserId2(session.user._id);
+                setOffres(offres);
             }
         }
         fetchOffres2();
@@ -131,7 +123,6 @@ export default function Profile() {
                 updatedUserData.image = selectedImage;
             }
 
-
             const updatedUser = await UserService.UpadetUser(user._id, updatedUserData);
 
             await update({
@@ -194,9 +185,9 @@ export default function Profile() {
         <div className="bg-gray-50 min-h-screen flex flex-col">
             <Nav />
             <main className="flex-grow container mx-auto px-4 sm:px-6 py-8">
-                <div className="flex flex-col lg:flex-row gap-6">
+                <div className="flex flex-col xl:flex-row gap-6">
                     {/* Left Side - Profile Card */}
-                    <div className="w-full lg:w-1/3 xl:w-1/4">
+                    <div className="w-full xl:w-1/3 xl:w-1/4">
                         <div className="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
                             <div className="p-4 sm:p-6 flex flex-col items-center">
                                 {/* Profile Photo (Editable) */}
@@ -364,7 +355,7 @@ export default function Profile() {
                     </div>
 
                     {/* Right Side - Profile Editing Section */}
-                    <div className="w-full lg:w-2/3 xl:w-3/4 space-y-4 sm:space-y-6">
+                    <div className="w-full xl:w-2/3 xl:w-3/4 space-y-4 sm:space-y-6">
                         {isEditing ? (
                             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                                 <div className="p-4 sm:p-6">
@@ -519,6 +510,7 @@ export default function Profile() {
 
                         {/* Annonces Sections */}
                         <div className="space-y-4 sm:space-y-6">
+                            {/* Pending Offers Section */}
                             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                                 <div className="p-4 sm:p-6">
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-2 sm:gap-0">
@@ -529,21 +521,34 @@ export default function Profile() {
                                             {offres.length} en attente
                                         </span>
                                     </div>
-                                    {offres.length > 0 ? (
-                                        <OffresSection offres={offres} />
-                                    ) : (
-                                        <div className="py-8 sm:py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-gray-200 rounded-lg">
-                                            <FiPlus className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mb-3 sm:mb-4" />
-                                            <h4 className="text-base sm:text-lg font-medium text-gray-600">Aucune annonce en attente</h4>
-                                            <p className="text-gray-500 mt-1 sm:mt-2 text-sm sm:text-base">Vous n'avez pas d'annonces en attente d'approbation</p>
-                                            <button className="mt-3 sm:mt-4 px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base">
-                                                Créer une annonce
-                                            </button>
-                                        </div>
-                                    )}
+                                    <div className="items-center justify-center">
+                                        {offres.length > 0 ? (
+                                            <OffresSection offres={offres} />
+                                        ) : (
+                                            <div className="w-full max-w-md py-12 px-4 text-center">
+                                                <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-blue-50 mb-4">
+                                                    <FiPlus className="h-10 w-10 text-blue-500" />
+                                                </div>
+                                                <h3 className="text-lg font-medium text-gray-900">Pas d'annonces en attente</h3>
+                                                <p className="mt-2 text-sm text-gray-500">
+                                                    Commencez par créer une nouvelle annonce pour la voir apparaître ici.
+                                                </p>
+                                                <div className="mt-6">
+                                                    <button
+                                                        type="button"
+                                                        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                                    >
+                                                        <FiPlus className="-ml-1 mr-2 h-5 w-5" />
+                                                        Nouvelle annonce
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
+                            {/* Published Offers Section */}
                             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                                 <div className="p-4 sm:p-6">
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-2 sm:gap-0">
@@ -554,15 +559,21 @@ export default function Profile() {
                                             {offres2.length} publiées
                                         </span>
                                     </div>
-                                    {offres2.length > 0 ? (
-                                        <OffresSection offres={offres2} />
-                                    ) : (
-                                        <div className="py-8 sm:py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-gray-200 rounded-lg">
-                                            <FiAlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mb-3 sm:mb-4" />
-                                            <h4 className="text-base sm:text-lg font-medium text-gray-600">Aucune annonce publiée</h4>
-                                            <p className="text-gray-500 mt-1 sm:mt-2 text-sm sm:text-base">Vous n'avez pas encore publié d'annonces</p>
-                                        </div>
-                                    )}
+                                    <div className=" justify-center">
+                                        {offres2.length > 0 ? (
+                                            <OffresSection offres={offres2} />
+                                        ) : (
+                                            <div className="w-full max-w-md py-12 px-4 text-center">
+                                                <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gray-50 mb-4">
+                                                    <FiAlertCircle className="h-10 w-10 text-gray-400" />
+                                                </div>
+                                                <h3 className="text-lg font-medium text-gray-900">Aucune annonce publiée</h3>
+                                                <p className="mt-2 text-sm text-gray-500">
+                                                    Vous n'avez pas encore publié d'annonces sur la plateforme.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
