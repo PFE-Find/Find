@@ -91,7 +91,6 @@ export const options: NextAuthOptions = {
     },
     callbacks: {
 
-
         async signIn({ user, account }) {
             if (account?.provider !== "credentials") {
                 return true
@@ -108,7 +107,6 @@ export const options: NextAuthOptions = {
         async jwt({ token, user, trigger }) {
 
             if (user) {
-
                 token.user = user;
             }
 
@@ -119,10 +117,8 @@ export const options: NextAuthOptions = {
             if (id) {
                 try {
 
-                    
-                    
+
                     const updatedUser = await userService.getUserById(id);
-                   
 
                     if (updatedUser) {
                         token.user = updatedUser;
@@ -133,16 +129,15 @@ export const options: NextAuthOptions = {
             }
             if (trigger === "update") {
 
-                
-                
-                try {
-                    
-                    const updatedUser = await userService.getUserById(id);
-                   
-                    
-                    if (updatedUser) {
-                        token.user = updatedUser;
+                if (id) {
+                    try {
 
+                        const updatedUser = await userService.getUserById(id);
+                        if (updatedUser) {
+                            token.user = updatedUser;
+                        }
+                    } catch (error) {
+                        console.error("Failed to fetch updated user:", error);
                     }
                 }
 
@@ -153,8 +148,7 @@ export const options: NextAuthOptions = {
         async session({ session, token }) {
             if (token?.user) {
                 session.user = token.user;
-                console.log(token);
-
+                
             }
             return session;
         },
