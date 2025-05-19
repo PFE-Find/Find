@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/Home', req.url))
   }
 
-  if (url.startsWith('/Chat') && role !== 0) {
+  if (url.startsWith('/Chat') && (role !== 0 && role !== 1 )) {
     return NextResponse.redirect(new URL('/Home', req.url))
   }
 
