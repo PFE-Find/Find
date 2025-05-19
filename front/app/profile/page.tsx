@@ -24,23 +24,29 @@ export default function Profile() {
     const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [previewImage, setPreviewImage] = useState(session?.user?.image || '');
+
+    const id_user =   session?.user?._id ||  session?.user?.user?._id ;
     const [isPhoneVerified, setIsPhoneVerified] = useState(false);
     const [verificationCode, setVerificationCode] = useState('');
     const [showVerification, setShowVerification] = useState(false);
 
     useEffect(() => {
         async function fetchOffres() {
+
             if (session?.user?._id) {
                
                     const offres2 = await eventService.getAllOffresByUserId(session.user._id);
+
                     setOffres2(offres2);
                 
             }
         }
         async function fetchOffres2() {
+
             if (session?.user?._id) {
                 
                     const offres = await eventService.getAllOffresByUserId2(session.user._id);
+
                     setOffres(offres);
                 
             }
