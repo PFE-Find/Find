@@ -167,7 +167,7 @@ const handleDelete = async () => {
         <Navbar />
 
         {/* Action Buttons - Fixed Position */}
-        <div className="fixed right-[450px] top-14 z-10 flex gap-4">
+        <div className="fixed right-[150px] top-14 z-10 flex gap-4">
           <motion.button
             onClick={handleAccept}
             whileHover={{ scale: 1.05 }}
@@ -192,7 +192,7 @@ const handleDelete = async () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="mt-24"
+          className="mt-32"
         >
           {/* User Profile Section */}
           {user && (

@@ -76,16 +76,19 @@ export default function Home() {
   const cards = [
     {
       image: "/assets/home1.jpg",
+      sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
       title: "Publiez votre annonce en quelques clics",
       description: "Ajoutez facilement une annonce avec une description détaillée, des photos et un prix."
     },
     {
       image: "/assets/home2.jpg",
+      sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
       title: "Trouvez rapidement des acheteurs ou vendeurs",
       description: "Grâce à notre système de recherche avancé, filtrez les annonces selon vos critères."
     },
     {
       image: "/assets/home4.jpg",
+      sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
       title: "Discutez directement avec les intéressés",
       description: "Entrez en contact via notre messagerie intégrée pour négocier et obtenir des informations."
     }
@@ -215,6 +218,7 @@ export default function Home() {
         >
           <Image
             src="/assets/home_1.jpeg"
+            sizes= "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             alt="Agriculture en Tunisie"
             fill
             className="object-cover"
@@ -319,12 +323,12 @@ export default function Home() {
 
 
 
-        {/* <div className="p-5 m-5">
+        <div className="p-5 m-5">
             <Comments></Comments>
         </div>
-     */}
+    
       <Footer />
-    {/* <ChatBot></ChatBot> */}
+    <ChatBot></ChatBot>
 
     </div>
   );

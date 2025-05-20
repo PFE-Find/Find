@@ -103,7 +103,7 @@ export default function Page6({ equipements, updateFields }: EquipmentPageProps)
                         alt={type.name}
                         fill
                         className="object-contain"
-                        loading="lazy"
+                        priority
                       />
                     </div>
                     <h3 className={`text-lg font-semibold mb-2 text-center 

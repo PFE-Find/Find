@@ -3,6 +3,7 @@ import SidBar from './SideBar'
 import Navbar from './NavBar'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiSearch, FiChevronDown, FiExternalLink, FiRefreshCw } from 'react-icons/fi'
 
@@ -23,14 +24,16 @@ interface Offre {
     propertyId: number | null;
     isNew?: boolean;
     isPromoted?: boolean;
-  }
+    createdAt: Date;
+    statut: boolean;
+}
+
 interface OffresProps {
     offres: Offre[]
     isLoading: boolean
     error: string | null
     onRefresh: () => void
 }
-
 
 const Offres: React.FC<OffresProps> = ({
     offres,
@@ -50,7 +53,7 @@ const Offres: React.FC<OffresProps> = ({
         return matchesCategory && matchesSearch
     })
 
-    // Animation variants
+    // Variantes d'animation
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -96,13 +99,13 @@ const Offres: React.FC<OffresProps> = ({
                     className="mt-28"
                 >
                     <motion.div variants={fadeIn} className="flex items-center justify-between mb-8">
-                        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Offers Management</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Gestion des Offres</h1>
                         <motion.button
                             onClick={onRefresh}
                             whileHover={{ rotate: 360 }}
                             whileTap={{ scale: 0.9 }}
-                            className="p-2 rounded-full bg-white shadow-md"
-                            aria-label="Refresh offers"
+                            className="p-2 rounded-full bg-white shadow-md hover:shadow-lg transition-shadow"
+                            aria-label="Rafraîchir les offres"
                         >
                             <FiRefreshCw className={`text-blue-600 ${isLoading ? 'animate-spin' : ''}`} />
                         </motion.button>
@@ -112,7 +115,7 @@ const Offres: React.FC<OffresProps> = ({
                         <motion.div
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="p-4 mb-6 text-red-600 bg-red-50 rounded-lg"
+                            className="p-4 mb-6 text-red-600 bg-red-50 rounded-lg border border-red-100"
                         >
                             {error}
                         </motion.div>
@@ -129,25 +132,23 @@ const Offres: React.FC<OffresProps> = ({
                             <input
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 value={searchQuery}
-                                placeholder="Search offers..."
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                                placeholder="Rechercher des offres..."
+                                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:border-gray-400"
                             />
                         </div>
 
-                        <div className=" w-full md:w-48">
+                        <div className="w-full md:w-48 relative">
                             <select
                                 value={selectedCategory}
                                 onChange={(e) => setSelectedCategory(e.target.value)}
-                                className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 cursor-pointer"
+                                className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 cursor-pointer hover:border-gray-400"
                             >
-                                <option value="all">All Categories</option>
-                                <option value="land">Land</option>
-                                <option value="farm">Farm</option>
-                                <option value="property">Property</option>
+                                <option value="all">Toutes catégories</option>
+                                <option value="land">Terrain</option>
+                                <option value="farm">Ferme</option>
+                                <option value="property">Propriété</option>
                             </select>
-                            {/* <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <FiChevronDown className="text-gray-400" />
-                            </div> */}
+                            <FiChevronDown className="absolute right-3 top-3.5 text-gray-400 pointer-events-none" />
                         </div>
                     </motion.div>
 
@@ -160,14 +161,17 @@ const Offres: React.FC<OffresProps> = ({
                                 initial={{ x: -20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 transition={{ delay: 0.2 }}
+                                className="flex items-center"
                             >
-                                Offers Table
+                                <span className="mr-2">📋</span>
+                                Tableau des Offres
                             </motion.div>
                         </div>
 
                         {isLoading ? (
                             <div className="py-16 flex justify-center items-center">
                                 <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                <span className="ml-3 text-gray-600">Chargement en cours...</span>
                             </div>
                         ) : (
                             <div className="overflow-y-auto max-h-[594px]">
@@ -175,10 +179,10 @@ const Offres: React.FC<OffresProps> = ({
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IMAGE</th>
-                                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TITLE</th>
-                                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CATEGORY</th>
+                                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TITRE</th>
+                                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CATÉGORIE</th>
                                             <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DATE</th>
-                                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS</th>
+                                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STATUT</th>
                                             <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ACTIONS</th>
                                         </tr>
                                     </thead>
@@ -191,8 +195,8 @@ const Offres: React.FC<OffresProps> = ({
                                                     initial="hidden"
                                                     animate="visible"
                                                     exit={{ opacity: 0 }}
-                                                    whileHover={{ scale: 1.01 }}
-                                                    className="border-b hover:bg-gray-50 transition-all duration-200"
+                                                    whileHover={{ backgroundColor: "#f9fafb" }}
+                                                    className="border-b transition-colors duration-200"
                                                 >
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <motion.div
@@ -202,7 +206,7 @@ const Offres: React.FC<OffresProps> = ({
                                                             <img
                                                                 src={offre.images?.[0]?.path || "/default-image.jpg"}
                                                                 alt={offre.titre}
-                                                                className="w-full h-full object-cover"
+                                                                className="w-full h-full object-cover hover:opacity-90 transition-opacity"
                                                             />
                                                         </motion.div>
                                                     </td>
@@ -210,11 +214,15 @@ const Offres: React.FC<OffresProps> = ({
                                                         <div className="text-sm font-medium text-gray-900">{offre.titre}</div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-500 capitalize">{offre.propertyType}</div>
+                                                        <div className="text-sm text-gray-500 capitalize">
+                                                            {offre.propertyType === 'land' ? 'Terrain' : 
+                                                             offre.propertyType === 'farm' ? 'Ferme' : 
+                                                             offre.propertyType === 'property' ? 'Propriété' : offre.propertyType}
+                                                        </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-500">
-                                                            {format(new Date(offre.createdAt), 'MMM dd, yyyy | hh:mm a')}
+                                                            {format(new Date(offre.createdAt), 'PPPp', { locale: fr })}
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -222,11 +230,10 @@ const Offres: React.FC<OffresProps> = ({
                                                             whileHover={{ scale: 1.05 }}
                                                             className={`px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center ${offre.statut === true
                                                                     ? "bg-green-100 text-green-800"
-                                                                    :  "bg-yellow-100 text-yellow-800"
-                                                                         
+                                                                    : "bg-yellow-100 text-yellow-800"
                                                                 }`}
                                                         >
-                                                            {offre.statut === true ? "Accepted" :  "Pending"}
+                                                            {offre.statut === true ? "Acceptée" : "En attente"}
                                                         </motion.span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -237,9 +244,9 @@ const Offres: React.FC<OffresProps> = ({
                                                             <Link
                                                                 href={`/components/Admin/DetailOffre/${offre._id}`}
                                                                 prefetch={false}
-                                                                className="text-blue-600 hover:text-blue-800 inline-flex items-center"
+                                                                className="text-blue-600 hover:text-blue-800 inline-flex items-center group"
                                                             >
-                                                                View <FiExternalLink className="ml-1" />
+                                                                Voir <FiExternalLink className="ml-1 transition-transform group-hover:translate-x-0.5" />
                                                             </Link>
                                                         </motion.div>
                                                     </td>
@@ -259,10 +266,10 @@ const Offres: React.FC<OffresProps> = ({
                                             initial={{ scale: 0.9 }}
                                             animate={{ scale: 1 }}
                                             transition={{ type: "spring", stiffness: 300 }}
-                                            className="inline-block p-6 bg-gray-100 rounded-xl"
+                                            className="inline-block p-6 bg-gray-50 rounded-xl border border-gray-200"
                                         >
                                             <div className="text-gray-500 text-lg">
-                                                No offers found. Try adjusting your filters or search query.
+                                                Aucune offre trouvée. Essayez d'ajuster vos filtres ou votre recherche.
                                             </div>
                                         </motion.div>
                                     </motion.div>
