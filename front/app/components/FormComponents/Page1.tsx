@@ -7,20 +7,24 @@ const STEPS = [
   {
     number: 1,
     title: "Décrivez votre bien",
+    sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
     description: "Terrain, matériel ou équipements ? Indiquez la localisation, superficie ou état.",
     image: "/assets/photo1.jpg"
   },
   {
     number: 2,
     title: "Mettez en valeur votre bien",
+    sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
     description: "Photos, titre et description. Nous vous aidons à attirer plus d'acheteurs.",
     image: "/assets/photo2.jpg"
   },
   {
     number: 3,
     title: "Finalisez et publiez",
+    sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
     description: "Fixez un prix et mettez votre annonce en ligne. Acheteurs et investisseurs vous contactent directement !",
     image: "/assets/photo3.jpg"
+    
   }
 ];
 
@@ -100,12 +104,14 @@ export default function Page1() {
                 <div className="flex-shrink-0 mt-4 md:mt-0 md:ml-6 w-full md:w-40 h-28 relative overflow-hidden rounded-lg">
                   <Image
                     src={step.image}
+                    sizes= "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     alt={`Étape ${step.number}`}
                     width={160}
                     height={112}
                     className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
+                    // loading="lazy"
                     quality={75}
+                    priority
                   />
                 </div>
               </div>

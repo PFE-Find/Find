@@ -232,7 +232,7 @@ export default function FormPages() {
         rules[stepIndex++] = (data) => {
             const errors = [];
             if (!data.prix) {
-                errors.push("Veuillez indiquer le prix de vente ou de location.");
+                errors.push("Veuillez indiquer le prix de vente.");
             }
             return errors;
         };
