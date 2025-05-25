@@ -35,11 +35,12 @@ export default function ReportPage() {
   return (
     <>
     <Reports 
-      reports={reports} 
-      isLoading={isLoading} 
-      error={error}
-      onRefresh={handleRefresh}
-    />
+        reports={reports}
+        isLoading={isLoading}
+        error={error}
+        onRefresh={handleRefresh} onDelete={function (reportId: string): void {
+          throw new Error('Function not implemented.')
+        } }    />
     </>
   )
 }

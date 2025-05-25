@@ -5,7 +5,7 @@ import eventService from '../../services/Offres'
 
 
 export default function OffrePage() {
-  const [offres, setOffres] = useState<Offer[]>([])
+  const [offres, setOffres] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 

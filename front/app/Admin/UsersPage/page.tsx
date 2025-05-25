@@ -5,7 +5,7 @@ import UserstService from '../../services/User'
 
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<Users[]>([])
+  const [users, setUsers] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -33,10 +33,13 @@ export default function UsersPage() {
 
   return (
     <Users 
-      users={users} 
-      isLoading={isLoading} 
+      users={users}
+      isLoading={isLoading}
       error={error}
-      onRefresh={handleRefresh}
-    />
+      onRefresh={handleRefresh} onEdit={function (userId: string): void {
+        throw new Error('Function not implemented.')
+      } } onDelete={function (userId: string): void {
+        throw new Error('Function not implemented.')
+      } }    />
   )
 }

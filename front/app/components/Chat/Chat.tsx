@@ -16,6 +16,24 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import Conversation from './conversation';
 
+// Define more specific session user types
+interface SessionUser {
+  _id: string;
+  name: string;
+  email?: string;
+  image?: string;
+  role?: string;
+  // Add other user properties you expect
+}
+
+interface ExtendedUser {
+  user?: {
+    _id: string;
+    // Add other nested user properties if needed
+  };
+  _id?: string;
+  // Add other direct properties if needed
+}
 export interface User {
   _id: string;
   name: string;
@@ -40,7 +58,12 @@ export interface Message {
 export default function ChatPage() {
   const [users, setUsers] = useState<User[]>([]);
   const { data: session } = useSession();
-  const currentUserId = session?.user?.user?._id || session?.user?._id || null;
+  const currentUserId = React.useMemo(() => {
+    if (!session) return null;
+    const user = session.user as (SessionUser & ExtendedUser);
+    return user?.user?._id || user?._id || null;
+  }, [session]);
+  // const currentUserId = session?.user?.user?._id || session?.user?._id || null;
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +72,7 @@ export default function ChatPage() {
   const [showConversation, setShowConversation] = useState(false);
   const ws = useRef<WebSocket | null>(null);
   const lastConversationUserRef = useRef<string | null>(null);
+  
 
   const formatRelativeTime = (dateString: string) => {
     return formatDistanceToNow(new Date(dateString), {
@@ -100,7 +124,7 @@ export default function ChatPage() {
     ws.current = new WebSocket(`${socketUrl}?userId=${currentUserId}`);
 
     ws.current.onopen = () => console.log('WebSocket connected');
-    
+
     ws.current.onclose = () => console.log('WebSocket disconnected');
 
     if (ws.current) {
@@ -109,8 +133,8 @@ export default function ChatPage() {
         if (data.type === 'NEW_MESSAGE') {
           setMessages(prev => [...prev, data.message]);
           updateUserList(data.message);
-          const otherUserId = data.message.senderId === currentUserId 
-            ? data.message.receiverId 
+          const otherUserId = data.message.senderId === currentUserId
+            ? data.message.receiverId
             : data.message.senderId;
           if (typeof window !== 'undefined') {
             localStorage.setItem('lastConversationUser', otherUserId);
@@ -131,19 +155,19 @@ export default function ChatPage() {
     const fetchUsersConversations = async () => {
       if (!currentUserId) return;
       setIsLoading(true);
-      
+
       try {
         const data = await messageService.getUsersConversations(currentUserId);
         setUsers(data);
-        
+
         if (lastConversationUserRef.current) {
-          const lastUser = data.find(user => user._id === lastConversationUserRef.current);
+          const lastUser = data.find((user : any) => user._id === lastConversationUserRef.current);
           if (lastUser) {
             await handleConversation(lastUser._id);
             return;
           }
         }
-        
+
         if (data.length > 0) {
           await handleConversation(data[0]._id);
         }
@@ -164,16 +188,16 @@ export default function ChatPage() {
     try {
       const conversation = await messageService.getConversation(currentUserId, userId);
       setMessages(conversation);
-      setUsers(prev => prev.map(user => 
+      setUsers(prev => prev.map(user =>
         user._id === userId ? { ...user, unreadCount: 0 } : user
       ));
-      
+
       const user = users.find(u => u._id === userId);
       if (user) {
         setSelectedUser(user);
         setShowConversation(true);
       }
-      
+
       if (typeof window !== 'undefined') {
         localStorage.setItem('lastConversationUser', userId);
         lastConversationUserRef.current = userId;
@@ -185,7 +209,7 @@ export default function ChatPage() {
     }
   };
 
-  const filteredUsers = users.filter(user => 
+  const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -201,7 +225,7 @@ export default function ChatPage() {
         {user.image ? (
           <img
             className={`${sizeClasses[size]} rounded-full object-cover border-2 border-teal-100`}
-            src={user.image.startsWith('/uploads') 
+            src={user.image.startsWith('/uploads')
               ? `http://localhost:3001${user.image}`
               : user.image}
             alt="Profile"
@@ -222,21 +246,17 @@ export default function ChatPage() {
             }}
           />
         ) : (
-          <div className={`${sizeClasses[size]} rounded-full border-2 border-teal-100 bg-gray-100 flex items-center justify-center`}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
+          <div className={`${sizeClasses[size]} rounded-full text-white font-medium border-2 border-teal-100 bg-teal-700 flex items-center justify-center`}>
+            {user?.name
+              ? user.name
+                .split(' ')
+                .map(n => n[0])
+                .join('')
+                .toUpperCase()
+                .substring(0, 2)
+              : <FiUser size={20} />
+            }
+
           </div>
         )}
         {user.online && (
@@ -253,8 +273,8 @@ export default function ChatPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen overflow-hidden">
-      <section className="relative bg-gradient-to-b from-teal-600 to-white pt-16 sm:pt-20 px-0 sm:px-4 h-screen">
-        <section className="bg-white bg-opacity-80 backdrop-blur-sm rounded-none sm:rounded-2xl h-[calc(100vh-64px)] sm:h-[calc(100vh-120px)] flex items-center justify-center py-0 sm:py-16 overflow-hidden">
+      <section className="relative bg-gradient-to-b from-teal-600 to-white pt-16 sm:pt-20 px-0 sm:px-10 h-screen">
+        <section className="bg-white bg-opacity-80 backdrop-blur-sm rounded-none sm:rounded-2xl h-[calc(100vh-64px)] sm:h-[calc(100vh-120px)] flex items-center justify-center sm:px-10 py-0 sm:py-16 overflow-hidden">
           <div className="w-full h-full bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-2xl flex overflow-hidden">
             {/* Sidebar - Hidden on mobile when conversation is open */}
             <AnimatePresence>
@@ -327,11 +347,10 @@ export default function ChatPage() {
                           key={user._id}
                           whileHover={{ scale: 1.01 }}
                           whileTap={{ scale: 0.98 }}
-                          className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 cursor-pointer rounded-lg sm:rounded-xl transition-all ${
-                            selectedUser?._id === user._id
+                          className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 cursor-pointer rounded-lg sm:rounded-xl transition-all ${selectedUser?._id === user._id
                               ? 'bg-teal-100 border border-teal-200'
                               : 'bg-white hover:bg-gray-100'
-                          }`}
+                            }`}
                           onClick={() => handleConversation(user._id)}
                         >
                           <UserAvatar user={user} size="md" />
@@ -372,7 +391,7 @@ export default function ChatPage() {
                     <div className="flex flex-col h-full w-full">
                       {/* Mobile header with back button */}
                       <div className="md:hidden flex items-center p-3 border-b bg-white">
-                        <button 
+                        <button
                           onClick={() => setShowConversation(false)}
                           className="mr-2 p-1 rounded-full hover:bg-gray-100"
                         >
@@ -388,7 +407,7 @@ export default function ChatPage() {
                           </div>
                         </div>
                       </div>
-                      
+
                       <Conversation
                         selectedUser={selectedUser}
                         messages={messages}
@@ -398,7 +417,7 @@ export default function ChatPage() {
                         setMessages={setMessages}
                         setUsers={setUsers}
                         users={users}
-                        updateUserList={updateUserList}
+                        // updateUserList={updateUserList}
                       />
                     </div>
                   ) : (

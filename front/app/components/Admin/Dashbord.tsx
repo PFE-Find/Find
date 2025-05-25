@@ -121,7 +121,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <SidBar />
+      <SidBar children={undefined} />
 
       <main className="flex-1 p-6 md:p-8 overflow-y-auto">
         <Navbar />
@@ -244,7 +244,7 @@ const Dashboard: React.FC = () => {
                           stepSize: 1 
                         },
                         grid: {
-                          drawBorder: false,
+                         
                           color: '#E5E7EB'
                         }
                       },

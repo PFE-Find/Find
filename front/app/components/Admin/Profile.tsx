@@ -9,7 +9,7 @@ const UserProfilePage = () => {
     return (
         <div className="flex min-h-screen bg-gray-100">
             {/* Sidebar */}
-            <SidBar />
+            <SidBar children={undefined} />
 
             {/* Main Content */}
             <main className="flex-1 p-8">

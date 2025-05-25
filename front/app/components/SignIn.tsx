@@ -16,7 +16,7 @@ export default function Connexion() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e : any) => {
     e.preventDefault()
     setIsLoading(true)
     setError('')

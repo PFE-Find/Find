@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiCheck, FiX, FiBell, FiTrash2, FiClock } from 'react-icons/fi';
+import { FiCheck, FiX, FiBell, FiTrash2, FiClock, FiUser } from 'react-icons/fi';
 import Navbar from "../components/Nav";
 import Footer from "../components/Footer";
 import NotifService from "../services/Notification"
@@ -61,7 +61,7 @@ export default function Notification() {
         case 'ALL_NOTIFICATIONS_READ':
           handleNotificationDeleted(data.notificationId);
           break;
-          case 'NOTIFICATION_DELETED':
+        case 'NOTIFICATION_DELETED':
           handleNotificationDeleted(data.notificationId);
           break;
         default:
@@ -83,47 +83,47 @@ export default function Notification() {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-  if (!currentUserId) return;
+      if (!currentUserId) return;
 
-  try {
-    setLoading(true);
-    const mockNotifications = await NotifService.getNotifications(currentUserId);
-    const notifsWithUsers = await Promise.all(
-      mockNotifications
-        .sort((a: Notification, b: Notification) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        )
-        .map(async (notif: Notification) => {
-          try {
-            const user = await UserService.getUserById(notif.senderId);
-            return {
-              ...notif,
-              user: {
-                name: user.name,
-                image: user.image?.startsWith('/uploads')
-                  ? `http://localhost:3001${user.image}`
-                  : user.image || '/default-profile.png'
+      try {
+        setLoading(true);
+        const mockNotifications = await NotifService.getNotifications(currentUserId);
+        const notifsWithUsers = await Promise.all(
+          mockNotifications
+            .sort((a: Notification, b: Notification) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            )
+            .map(async (notif: Notification) => {
+              try {
+                const user = await UserService.getUserById(notif.senderId);
+                return {
+                  ...notif,
+                  user: {
+                    name: user.name,
+                    image: user.image?.startsWith('/uploads')
+                      ? `http://localhost:3001${user.image}`
+                      : user.image || null 
+                  }
+                };
+              } catch (error) {
+                console.error(`Erreur lors de la récupération de l'utilisateur ${notif.senderId}:`, error);
+                return {
+                  ...notif,
+                  user: {
+                    name: `Utilisateur ${notif.senderId.slice(0, 4)}`,
+                    image: null 
+                  }
+                };
               }
-            };
-          } catch (error) {
-            console.error(`Erreur lors de la récupération de l'utilisateur ${notif.senderId}:`, error);
-            return {
-              ...notif,
-              user: {
-                name: `Utilisateur ${notif.senderId.slice(0, 4)}`,
-                image: '/default-profile.png'
-              }
-            };
-          }
-        })
-    );
-    setNotifications(notifsWithUsers);
-  } catch (error) {
-    console.error('Erreur lors de la récupération des notifications:', error);
-  } finally {
-    setLoading(false);
-  }
-};
+            })
+        );
+        setNotifications(notifsWithUsers);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des notifications:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchNotifications();
   }, [currentUserId]);
@@ -135,14 +135,14 @@ export default function Notification() {
       }
 
       const user = await UserService.getUserById(notification.senderId);
-      
+
       const newNotificationWithUser = {
         ...notification,
         user: {
           name: user?.name || `Utilisateur ${notification.senderId.slice(0, 4)}`,
           image: user?.image?.startsWith('/uploads')
             ? `http://localhost:3001${user.image}`
-            : user?.image || '/default-profile.png'
+            : user?.image || null 
         }
       };
 
@@ -160,7 +160,7 @@ export default function Notification() {
         ...notification,
         user: {
           name: `Utilisateur ${notification.senderId.slice(0, 4)}`,
-          image: '/default-profile.png'
+          image: null 
         }
       };
       setNotifications(prev => [fallbackNotification, ...prev]);
@@ -269,27 +269,40 @@ export default function Notification() {
                     exit={{ opacity: 0, x: -100 }}
                     transition={{ duration: 0.2 }}
                     className={`transition-all duration-200 transform hover:shadow-md w-full p-4 rounded-xl ${notification.isRead
-                        ? 'bg-white dark:bg-gray-700'
-                        : 'bg-blue-50 dark:bg-gray-800 border-l-4 border-blue-500'
+                      ? 'bg-white dark:bg-gray-700'
+                      : 'bg-blue-50 dark:bg-gray-800 border-l-4 border-blue-500'
                       }`}
                   >
                     <div className="flex items-start">
-                      {notification.user?.image ? (
+
+                      {notification?.user?.image ?(
+                        
                         <img
                           className="w-12 h-12 rounded-full mr-4 object-cover border-2 border-white dark:border-gray-600"
-                          src={notification.user.image}
+                          src={notification.user.image.startsWith('/uploads')
+                        ? `http://localhost:3001${notification.user.image}`
+                        : notification.user.image}
+                          // src={notification.user.image}
                           alt={notification.user.name}
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-full mr-4 bg-blue-500 flex items-center justify-center text-white font-medium border-2 border-white dark:border-gray-600">
-                          {notification.user?.name?.charAt(0)}
+                        <div className="w-12 h-12 rounded-full mr-4 bg-teal-700 flex items-center justify-center text-white font-medium border-2 border-white dark:border-gray-600">
+                          {notification.user?.name
+                            ? notification.user.name
+                              .split(' ')
+                              .map(n => n[0])
+                              .join('')
+                              .toUpperCase()
+                              .substring(0, 2)
+                            : <FiUser size={20} />
+                          }
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start">
                           <p className={`text-md font-semibold ${notification.isRead
-                              ? 'text-gray-700 dark:text-gray-300'
-                              : 'text-gray-900 dark:text-white'
+                            ? 'text-gray-700 dark:text-gray-300'
+                            : 'text-gray-900 dark:text-white'
                             }`}>
                             {notification.user?.name}
                           </p>
@@ -308,8 +321,8 @@ export default function Notification() {
                           </div>
                         </div>
                         <p className={`mt-2 text-sm ${notification.isRead
-                            ? 'text-gray-600 dark:text-gray-400'
-                            : 'text-gray-800 dark:text-gray-200'
+                          ? 'text-gray-600 dark:text-gray-400'
+                          : 'text-gray-800 dark:text-gray-200'
                           }`}>
                           {notification.text}
                         </p>

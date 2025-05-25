@@ -21,6 +21,7 @@ const Navbar: React.FC = () => {
   const { data: session } = useSession();
   
   
+  
   const userDropdownItems = [
     { name: 'Accueil', href: '/', protected: false },
     { name: 'Explorer', href: '/OffrePage', protected: false },
@@ -97,7 +98,7 @@ const Navbar: React.FC = () => {
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setDropdownOpen(false)}
                         >
-                          {item.icon}
+                          
                           {item.name}
                         </Link>
                       ))}

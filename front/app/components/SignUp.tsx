@@ -19,12 +19,12 @@ export default function SignUp() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
-  const handleChange = (e) => {
+  const handleChange = (e :any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
     setError('')
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError('')
@@ -49,7 +49,7 @@ export default function SignUp() {
         router.push('/signin')
       }, 2000)
       
-    } catch (err) {
+    } catch (err:any) {
       setError(err.message)
     } finally {
       setIsSubmitting(false)
