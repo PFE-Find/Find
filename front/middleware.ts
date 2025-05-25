@@ -8,20 +8,14 @@ export async function middleware(req: NextRequest) {
   const url = req.nextUrl.pathname
   console.log("hello",token);
   
-  // If no token, redirect to login
   if (!token) {
     return NextResponse.redirect(new URL('/Home', req.url))
   }
-  
-
   const role = token.user?.role
-  console.log(token.user?.role)
-
   if (url.startsWith('/Admin') && role !== 1) {
     return NextResponse.redirect(new URL('/Home', req.url))
   }
 
-  // Protect /user routes
   if (url.startsWith('/profile') && (role !== 0 && role !== 1 )) {
     return NextResponse.redirect(new URL('/Home', req.url))
   }
@@ -29,7 +23,9 @@ export async function middleware(req: NextRequest) {
   if (url.startsWith('/Chat') && (role !== 0 && role !== 1 )) {
     return NextResponse.redirect(new URL('/Home', req.url))
   }
-
+   if (url.startsWith('/Notification') && (role !== 0 && role !== 1 )) {
+    return NextResponse.redirect(new URL('/Home', req.url))
+  }
   return NextResponse.next()
 }
 
