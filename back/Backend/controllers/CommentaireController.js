@@ -1,6 +1,19 @@
 import Comment from "../models/Commantaire.js"
 
 
+export const GetComment = async (req, res, next) => {
+
+    try {
+        const comments = await Comment.find();
+        res.status(200).json(comments);
+
+
+    }
+    catch (error) {
+        next(error);
+    }
+
+}
 
 export const CreateComment = async (req, res, next) => {
     try {

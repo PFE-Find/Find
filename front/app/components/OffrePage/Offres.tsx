@@ -1,3 +1,4 @@
+// app/OffrePage/Offres.tsx
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -6,7 +7,8 @@ import Link from "next/link";
 import eventService from "../../services/Offres";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiHeart, FiMapPin, FiStar } from "react-icons/fi";
-import OffreSearch from "../Search"; // Import the new component
+import OffreSearch from "../Search";
+import Image from 'next/image'; // Import next/image
 
 export default function Offres() {
     const [favorites, setFavorites] = useState<{ [key: string]: boolean }>({});
@@ -19,10 +21,7 @@ export default function Offres() {
     const [surfaceRange, setSurfaceRange] = useState<[number | null, number | null]>([null, null]);
     const [locationFilter, setLocationFilter] = useState<string>("");
     const [surfaceFilterEnabled, setSurfaceFilterEnabled] = useState(false);
-   
-    
-    // New state for controlling visible lines
-    const [visibleLines, setVisibleLines] = useState(3); // Start with 3 lines (18 offers)
+    const [visibleLines, setVisibleLines] = useState(3);
 
     const toggleFavorite = (id: string, e: React.MouseEvent) => {
         e.preventDefault();
@@ -31,16 +30,16 @@ export default function Offres() {
     };
 
     useEffect(() => {
-    async function fetchOffres() {
-        try {
-            const data = await eventService.getOffres1();
-            setOffres(shuffleArray(data)); // Shuffle the data here
-        } catch (error) {
-            console.error("Erreur lors de la récupération des offres:", error);
+        async function fetchOffres() {
+            try {
+                const data = await eventService.getOffres1();
+                setOffres(shuffleArray(data));
+            } catch (error) {
+                console.error("Erreur lors de la récupération des offres:", error);
+            }
         }
-    }
-    fetchOffres();
-}, []);
+        fetchOffres();
+    }, []);
 
     const filteredOffers = offres.filter((offer) => {
         const matchesCategory = selectedCategory === "all" || offer.propertyType === selectedCategory;
@@ -67,7 +66,6 @@ export default function Offres() {
         return matchesCategory && matchesSearch && matchesPrice && matchesLocation && matchesSurface;
     });
 
-    // Split offers into rows of 6 offers each
     const rows = [];
     for (let i = 0; i < filteredOffers.length; i += 6) {
         rows.push(filteredOffers.slice(i, i + 6));
@@ -86,7 +84,6 @@ export default function Offres() {
         setLocationFilter(filters.locationFilter);
         setSurfaceFilterEnabled(filters.surfaceFilterEnabled);
         setFiltersApplied(true);
-        // Reset visible lines when filters change
         setVisibleLines(3);
         setOffres(prev => shuffleArray([...prev]));
     };
@@ -99,26 +96,24 @@ export default function Offres() {
         setSelectedCategory("all");
         setFiltersApplied(false);
         setSurfaceFilterEnabled(false);
-        // Reset visible lines when filters are reset
         setVisibleLines(3);
         setOffres(prev => shuffleArray([...prev]));
     };
-    // Fisher-Yates shuffle algorithm
-function shuffleArray<T>(array: T[]): T[] {
-  const newArray = [...array];
-  for (let i = newArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-  }
-  return newArray;
-}
+
+    function shuffleArray<T>(array: T[]): T[] {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
 
     const handleCategoryChange = (category: string) => {
         setSelectedCategory(category);
         if (category === "Material") {
             setSurfaceFilterEnabled(false);
         }
-        // Reset visible lines when category changes
         setVisibleLines(3);
     };
 
@@ -149,7 +144,7 @@ function shuffleArray<T>(array: T[]): T[] {
     return (
         <section className="bg-gray-50 dark:bg-gray-900 min-h-screen">
             <div className="max-w-full mx-auto">
-                {/* Section de recherche améliorée */}
+                {/* Improved Search Section */}
                 <div className="bg-gradient-to-b from-teal-600 to-white">
                     <OffreSearch
                         onSearch={handleSearch}
@@ -169,7 +164,7 @@ function shuffleArray<T>(array: T[]): T[] {
                     />
                 </div>
 
-                {/* Sélection de catégorie */}
+                {/* Category Selection */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -223,7 +218,7 @@ function shuffleArray<T>(array: T[]): T[] {
                     </button>
                 </motion.div>
 
-                {/* Nombre de résultats */}
+                {/* Number of Results */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -241,7 +236,7 @@ function shuffleArray<T>(array: T[]): T[] {
                     )}
                 </motion.div>
 
-                {/* Grille des offres */}
+                {/* Offers Grid */}
                 <div className="space-y-8 sm:px-6 lg:px-8 mb-16">
                     {visibleRows.map((row, rowIndex) => (
                         <motion.div
@@ -266,14 +261,16 @@ function shuffleArray<T>(array: T[]): T[] {
                                 >
                                     <Link href={`/OffreDetail/${offre._id}`} prefetch={false} className="block h-full">
                                         <div className="h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
-                                            {/* Conteneur d'image */}
+                                            {/* Image Container */}
                                             <div className="relative h-[200px] overflow-hidden">
-                                                <motion.img
-                                                    className="w-full h-full object-cover"
+                                                <Image
                                                     src={offre.images?.[0]?.path || "/default-property.jpg"}
                                                     alt={offre.titre}
-                                                    loading="lazy"
-                                                    variants={imageHoverVariants}
+                                                    fill
+                                                    style={{ objectFit: 'cover' }}
+                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                    priority={rowIndex === 0 && index === 0} // Prioritize the first image
+                                                    quality={75}
                                                 />
 
                                                 {/* Badges */}
@@ -290,7 +287,7 @@ function shuffleArray<T>(array: T[]): T[] {
                                                     )}
                                                 </div>
 
-                                                {/* Bouton Favori */}
+                                                {/* Favorite Button */}
                                                 {/* <button
                                                     onClick={(e) => toggleFavorite(offre._id, e)}
                                                     className={`absolute top-4 right-4 p-2 rounded-full transition-all ${favorites[offre._id]
@@ -301,7 +298,7 @@ function shuffleArray<T>(array: T[]): T[] {
                                                     <FiHeart className={`w-5 h-5 ${favorites[offre._id] ? 'fill-current' : ''}`} />
                                                 </button> */}
 
-                                                {/* Overlay au survol */}
+                                                {/* Hover Overlay */}
                                                 <AnimatePresence>
                                                     {hoveredCard === offre._id && (
                                                         <motion.div
@@ -322,7 +319,7 @@ function shuffleArray<T>(array: T[]): T[] {
                                                 </AnimatePresence>
                                             </div>
 
-                                            {/* Contenu */}
+                                            {/* Content */}
                                             <div className="p-6 flex-grow flex flex-col">
                                                 <div className="flex justify-between items-start mb-3">
                                                     <h3 className="text-xl font-bold text-gray-900 dark:text-white truncate">
@@ -350,7 +347,7 @@ function shuffleArray<T>(array: T[]): T[] {
                                                                 </p>
                                                             </div>
                                                         )}
-                                                        
+
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="text-xs text-gray-500 dark:text-gray-400">Prix</p>
@@ -368,7 +365,7 @@ function shuffleArray<T>(array: T[]): T[] {
                     ))}
                 </div>
 
-                {/* Bouton "Afficher plus" */}
+                {/* "Show More" Button */}
                 {visibleLines < totalLines && (
                     <motion.div
                         initial={{ opacity: 0 }}

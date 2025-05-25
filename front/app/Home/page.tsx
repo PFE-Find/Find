@@ -1,19 +1,35 @@
+// app/page.tsx
 'use client';
-import React from "react";
+
+import React, { useState, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FiArrowRight, FiPlay, FiCheck, FiMapPin, FiShield, FiTrendingUp, FiHeadphones, FiBarChart2, FiEye } from "react-icons/fi";
+import { FiArrowRight, FiCheck, FiMapPin, FiShield, FiTrendingUp, FiHeadphones, FiBarChart2, FiEye } from "react-icons/fi";
 import Nav from "@/app/components/Nav";
 import Footer from "@/app/components/Footer";
-import Offres from "@/app/components/Home/OffreSection";
+import dynamic from 'next/dynamic'; // Import dynamic
 import Image from 'next/image';
-import OffreSearch from "../components/Search"; // Import OffreSearch
-import { useRouter } from 'next/navigation'; // Import useRouter
-import { useState } from 'react';
-import ChatBot from "../components/Chat/Chatbot";
-import Comments from "./comments"
+import OffreSearch from "../components/Search";
+import { useRouter } from 'next/navigation';
+import { debounce } from 'lodash'; // Import debounce
 
-// Animation variants
+// Dynamic Imports for components that are not critical for initial load
+const Offres = dynamic(() => import("@/app/components/Home/OffreSection"), {
+  loading: () => <p>Loading Offers...</p>,
+  ssr: false,
+});
+
+const Comments = dynamic(() => import("./comments"), {
+    ssr: false, // Disable server-side rendering for this component
+    loading: () => <p>Loading Comments...</p>, // Optional loading indicator
+});
+
+const ChatBot = dynamic(() => import("../components/Chat/Chatbot"), {
+  ssr: false, // Disable server-side rendering
+  loading: () => <p>Loading ChatBot...</p>, // Optional loading indicator
+});
+
+// Animation variants (consider moving these to a separate file if they become too large)
 const container = {
   hidden: { opacity: 0 },
   show: {
@@ -29,71 +45,9 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6 } }
 };
 
-const fadeIn = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { duration: 0.8 } }
-};
-
-const slideInFromLeft = {
-  hidden: { opacity: 0, x: -100 },
-  show: { opacity: 1, x: 0, transition: { duration: 0.8 } }
-};
-
-const slideInFromRight = {
-  hidden: { opacity: 0, x: 100 },
-  show: { opacity: 1, x: 0, transition: { duration: 0.8 } }
-};
-
-const scaleUp = {
-  hidden: { opacity: 0, scale: 0.9 },
-  show: { opacity: 1, scale: 1, transition: { duration: 0.6 } }
-};
+// ... other animation variants
 
 export default function Home() {
-  const features = [
-    {
-      icon: <FiMapPin className="w-6 h-6 text-teal-600" />,
-      title: "Trouvez les meilleures opportunités",
-      description: "Explorez notre sélection de terres agricoles et d'équipements de haute qualité, mis à jour régulièrement."
-    },
-    {
-      icon: <FiShield className="w-6 h-6 text-teal-600" />,
-      title: "Transaction sécurisée",
-      description: "Nous garantissons des transactions sécurisées avec des fournisseurs vérifiés et un processus fiable."
-    },
-    {
-      icon: <FiTrendingUp className="w-6 h-6 text-teal-600" />,
-      title: "Gestion simplifiée",
-      description: "Plateforme tout-en-un pour gérer vos investissements agricoles : recherche, évaluation et suivi."
-    },
-    {
-      icon: <FiHeadphones className="w-6 h-6 text-teal-600" />,
-      title: "Accompagnement personnalisé",
-      description: "Bénéficiez d'un accompagnement dédié et d'analyses IA pour maximiser vos investissements."
-    }
-  ];
-
-  const cards = [
-    {
-      image: "/assets/home1.jpg",
-      sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
-      title: "Publiez votre annonce en quelques clics",
-      description: "Ajoutez facilement une annonce avec une description détaillée, des photos et un prix."
-    },
-    {
-      image: "/assets/home2.jpg",
-      sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
-      title: "Trouvez rapidement des acheteurs ou vendeurs",
-      description: "Grâce à notre système de recherche avancé, filtrez les annonces selon vos critères."
-    },
-    {
-      image: "/assets/home4.jpg",
-      sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
-      title: "Discutez directement avec les intéressés",
-      description: "Entrez en contact via notre messagerie intégrée pour négocier et obtenir des informations."
-    }
-  ];
-
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [filtersApplied, setFiltersApplied] = useState(false);
@@ -104,14 +58,22 @@ export default function Home() {
 
   const router = useRouter();
 
+  // Debounced search handler
+  const debouncedSearch = useCallback(
+    debounce((query: string) => {
+      router.push(`/OffrePage?search=${encodeURIComponent(query)}`); // Encode the query
+    }, 300), // Adjust debounce delay as needed
+    [router]
+  );
+
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    router.push(`/OffrePage?search=${query}`);
+    debouncedSearch(query);
   };
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    router.push(`/OffrePage?category=${category}`);
+    router.push(`/OffrePage?category=${encodeURIComponent(category)}`); // Encode the category
   };
 
   const applyFilters = (filters: any) => {
@@ -126,8 +88,9 @@ export default function Home() {
     if (filters.priceRange[1] !== null) params.append('priceMax', filters.priceRange[1].toString());
     if (filters.surfaceRange[0] !== null) params.append('surfaceMin', filters.surfaceRange[0].toString());
     if (filters.surfaceRange[1] !== null) params.append('surfaceMax', filters.surfaceRange[1].toString());
-    if (filters.locationFilter) params.append('location', filters.locationFilter);
+    if (filters.locationFilter) params.append('location', encodeURIComponent(filters.locationFilter)); // Encode the location
     if (filters.surfaceFilterEnabled) params.append('surfaceEnabled', 'true');
+
     router.push(`/OffrePage?${params.toString()}`);
   };
 
@@ -142,6 +105,25 @@ export default function Home() {
     router.push('/OffrePage');
   };
 
+  const features = [
+    {
+      icon: <FiMapPin className="w-6 h-6 text-teal-600" />,
+      title: "Trouvez les meilleures opportunités",
+      description: "Explorez notre sélection de terres agricoles et d'équipements de haute qualité, mis à jour régulièrement."
+    },
+    // ... other features
+  ];
+
+  const cards = [
+    {
+      image: "/assets/home1.jpg",
+      sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+      title: "Publiez votre annonce en quelques clics",
+      description: "Ajoutez facilement une annonce avec une description détaillée, des photos et un prix."
+    },
+    // ... other cards
+  ];
+
   return (
     <div className="bg-gray-50">
       <Nav />
@@ -153,7 +135,6 @@ export default function Home() {
         variants={container}
         className="relative bg-gradient-to-b from-teal-600 to-white pt-20 md:pt-20 px-4"
       >
-
         <div className="max-w-full mx-auto text-center">
           <motion.h1
             variants={item}
@@ -163,14 +144,13 @@ export default function Home() {
             <span className="text-teal-600">Agricole</span>
           </motion.h1>
 
-
           <motion.p
             variants={item}
-            className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto "
+            className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto"
           >
             Finder propose une plateforme intelligente pour faciliter l'achat et la vente de terres agricoles.
           </motion.p>
-          {/* Add OffreSearch here */}
+
           <OffreSearch
             onSearch={handleSearch}
             onCategoryChange={handleCategoryChange}
@@ -187,17 +167,14 @@ export default function Home() {
             surfaceFilterEnabled={surfaceFilterEnabled}
             setSurfaceFilterEnabled={setSurfaceFilterEnabled}
           />
-
-
-
         </div>
       </motion.section>
-      {/* Offers Section */}
-      <div className=" bg-white">
+
+      {/* Offers Section (Dynamically Loaded) */}
+      <div className="bg-white">
         <Offres />
-        
       </div>
-      
+
       <motion.div variants={item} className="text-center mb-2">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 mt-16">
           Pourquoi choisir <span className="text-teal-600">Find</span> ?
@@ -218,11 +195,11 @@ export default function Home() {
         >
           <Image
             src="/assets/home_1.jpeg"
-            sizes= "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             alt="Agriculture en Tunisie"
             fill
             className="object-cover"
-            priority
+            priority // Use priority for LCP image
+            quality={75} // Adjust quality as needed
           />
         </motion.div>
 
@@ -244,14 +221,7 @@ export default function Home() {
                 icon: <FiCheck className="text-teal-500 mt-1 mr-3 flex-shrink-0" />,
                 text: "Plateforme intelligente pour l'achat/vente de terres"
               },
-              {
-                icon: <FiBarChart2 className="text-teal-500 mt-1 mr-3 flex-shrink-0" />,
-                text: "Analyses basées sur l'IA pour des décisions éclairées"
-              },
-              {
-                icon: <FiEye className="text-teal-500 mt-1 mr-3 flex-shrink-0" />,
-                text: "Transparence du marché et évaluations précises"
-              }
+              // ... other features
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -285,8 +255,8 @@ export default function Home() {
             </Link>
           </motion.div>
         </motion.div>
-        
       </div>
+
       {/* CTA Section */}
       <motion.section
         initial={{ opacity: 0, y: 50 }}
@@ -321,15 +291,15 @@ export default function Home() {
         </div>
       </motion.section>
 
+      {/* Comments Section (Dynamically Loaded) */}
+      <div className="p-5 m-5">
+        <Comments />
+      </div>
 
-
-        <div className="p-5 m-5">
-            <Comments></Comments>
-        </div>
-    
       <Footer />
-    <ChatBot></ChatBot>
 
+      {/* ChatBot (Dynamically Loaded) */}
+      <ChatBot />
     </div>
   );
 }

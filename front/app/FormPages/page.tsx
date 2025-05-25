@@ -10,19 +10,19 @@ import { useSession } from "next-auth/react";
 
 
 // Chargement dynamique des composants pour améliorer les performances
-const Page1 = dynamic(() => import("../components/FormComponents/Page1"), { loading: () => <Loader /> });
-const Page2 = dynamic(() => import("../components/FormComponents/Page2"), { loading: () => <Loader /> });
-const Page3 = dynamic(() => import("../components/FormComponents/Page3"), { loading: () => <Loader /> });
-const Page4 = dynamic(() => import("../components/FormComponents/Page4"), { loading: () => <Loader /> });
-const Page5 = dynamic(() => import("../components/FormComponents/Page5"), { loading: () => <Loader /> });
-const Page6 = dynamic(() => import("../components/FormComponents/Page6"), { loading: () => <Loader /> });
-const Page7 = dynamic(() => import("../components/FormComponents/Page7"), { loading: () => <Loader /> });
-const Page8 = dynamic(() => import("../components/FormComponents/Page8"), { loading: () => <Loader /> });
-const Page9 = dynamic(() => import("../components/FormComponents/Page9"), { loading: () => <Loader /> });
-const Page10 = dynamic(() => import("../components/FormComponents/Page10"), { loading: () => <Loader /> });
-const Page11 = dynamic(() => import("../components/FormComponents/Page11"), { loading: () => <Loader /> });
-const Page12 = dynamic(() => import("../components/FormComponents/Page12"), { loading: () => <Loader /> });
-const Page13 = dynamic(() => import("../components/FormComponents/Page13"), { loading: () => <Loader /> });
+const Page1 = dynamic(() => import("../components/FormComponents/Page1"), );
+const Page2 = dynamic(() => import("../components/FormComponents/Page2"), );
+const Page3 = dynamic(() => import("../components/FormComponents/Page3"), );
+const Page4 = dynamic(() => import("../components/FormComponents/Page4"), );
+const Page5 = dynamic(() => import("../components/FormComponents/Page5"), );
+const Page6 = dynamic(() => import("../components/FormComponents/Page6"), );
+const Page7 = dynamic(() => import("../components/FormComponents/Page7"), );
+const Page8 = dynamic(() => import("../components/FormComponents/Page8"), );
+const Page9 = dynamic(() => import("../components/FormComponents/Page9"), );
+const Page10 = dynamic(() => import("../components/FormComponents/Page10"), );
+const Page11 = dynamic(() => import("../components/FormComponents/Page11"), );
+const Page12 = dynamic(() => import("../components/FormComponents/Page12"), );
+const Page13 = dynamic(() => import("../components/FormComponents/Page13"), );
 
 const stepsLabels = [
     "Décrivez votre bien",
@@ -61,11 +61,7 @@ const INITIAL_DATA: FormData = {
     etat: "",
     photos: [],
 };
-export const Loader = () => (
-    <div className="flex justify-center items-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-    </div>
-  );
+
 export default function FormPages() {
     const router = useRouter();
     const [data, setData] = useState<FormData>(INITIAL_DATA);

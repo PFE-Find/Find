@@ -7,7 +7,7 @@ const CommentService = {
   // Fetch all comments
   async getComments() {
     try {
-      const response = await axios.get(`${API_URL}/`);
+      const response = await axios.get(`${API_URL}/getcomment`);
       return response.data;
     } catch (error) {
       console.error("Error fetching comments:", error);

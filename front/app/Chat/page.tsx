@@ -10,7 +10,7 @@ export default function Chat() {
         <>
         <Navbar/>
         <ChatPage/>
-        <ChatBot/>
+        {/* <ChatBot/> */}
         <Footer></Footer>
         </>
     );

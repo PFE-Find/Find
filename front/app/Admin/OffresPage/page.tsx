@@ -2,11 +2,11 @@
 import { useEffect, useState } from 'react'
 import Offres from '../../components/Admin/Offres'
 import eventService from '../../services/Offres'
-import { Offer } from '../../components/Admin/Offres' // Define this type (see below)
+// Define this type (see below)
 import SidBar from '../../components/Admin/SideBar'
 
 export default function OffrePage() {
-  const [offres, setOffres] = useState<Offer[]>([])
+  const [offres, setOffres] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 

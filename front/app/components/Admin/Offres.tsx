@@ -87,7 +87,7 @@ const Offres: React.FC<OffresProps> = ({
             animate={{ opacity: 1 }}
             className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100"
         >
-            <SidBar />
+            <SidBar children={undefined} />
 
             <main className="flex-1 p-6 md:p-8 overflow-hidden">
                 <Navbar />

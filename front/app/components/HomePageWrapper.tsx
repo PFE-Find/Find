@@ -9,5 +9,5 @@ const HomePage = dynamic(() => import("@/app/Home/page"), {
 });
 
 export default function HomePageWrapper({ session }: { session: any }) {
-  return <HomePage session={session} />;
+  return <HomePage/>;
 }

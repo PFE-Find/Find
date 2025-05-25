@@ -13,6 +13,7 @@ import {
   FiTrash2,
   FiX,
   FiArrowLeft,
+  FiUser,
 } from 'react-icons/fi';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import messageService from '../../services/Message';
@@ -22,8 +23,8 @@ interface ConversationProps {
   selectedUser: User;
   messages: Message[];
   isLoading: boolean;
-  currentUserId: string;
-  ws: WebSocket;
+  currentUserId: any;
+  ws: any;
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   setUsers: React.Dispatch<React.SetStateAction<User[]>>;
   users: User[];
@@ -81,9 +82,9 @@ const Conversation: React.FC<ConversationProps> = ({
 
   // Scroll to bottom when messages change
   useEffect(() => {
-   
-   
-    
+
+
+
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
@@ -107,10 +108,10 @@ const Conversation: React.FC<ConversationProps> = ({
         case 'NEW_MESSAGE':
           // Always use the current selectedUser from state, not from closure
           const currentSelectedUser = selectedUser;
-         
-          
 
-          if (data.message.senderId ==  currentSelectedUser._id || data.message.receiverId ==  currentSelectedUser._id) {
+
+
+          if (data.message.senderId == currentSelectedUser._id || data.message.receiverId == currentSelectedUser._id) {
             handleNewMessage(data.message);
           }
           break;
@@ -137,7 +138,7 @@ const Conversation: React.FC<ConversationProps> = ({
     return () => {
       ws.onmessage = null;
     };
-  }, [ws,selectedUser]);
+  }, [ws, selectedUser]);
 
 
 
@@ -420,13 +421,30 @@ const Conversation: React.FC<ConversationProps> = ({
             </button>
           )}
           <div className="relative">
-            <img
-              className="w-10 h-10 rounded-full object-cover border-2 border-teal-100"
-              src={selectedUser.image?.startsWith('/uploads')
-                ? `http://localhost:3001${selectedUser.image}`
-                : selectedUser.image || '/default-profile.png'}
-              alt={selectedUser.name}
-            />
+            {selectedUser?.image ? (
+
+              <img
+                className="w-10 h-10 rounded-full object-cover border-2 border-teal-100"
+                src={selectedUser.image.startsWith('/uploads')
+                  ? `http://localhost:3001${selectedUser.image}`
+                  : selectedUser.image}
+                // src={notification.user.image}
+                alt={selectedUser.name}
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-teal-700 flex items-center justify-center text-white font-medium border-2 border-teal-100 dark:border-gray-600">
+                {selectedUser?.name
+                  ? selectedUser.name
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .substring(0, 2)
+                  : <FiUser size={20} />
+                }
+              </div>
+            )}
+
             <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${selectedUser.online ? 'bg-green-500' : 'bg-gray-400'}`}></span>
           </div>
           <div>
@@ -472,8 +490,8 @@ const Conversation: React.FC<ConversationProps> = ({
                   variants={messageVariants}
                   transition={{ duration: 0.2 }}
                   className={`flex ${msg.senderId === currentUserId
-                      ? 'justify-end'
-                      : 'justify-start'
+                    ? 'justify-end'
+                    : 'justify-start'
                     }`}
                 >
                   {editingMessageId === msg._id ? (
@@ -525,8 +543,8 @@ const Conversation: React.FC<ConversationProps> = ({
                   ) : (
                     <div
                       className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl relative group ${msg.senderId === currentUserId
-                          ? 'bg-teal-500 text-white'
-                          : 'bg-white shadow'
+                        ? 'bg-teal-500 text-white'
+                        : 'bg-white shadow'
                         }`}
                     >
                       <p className="text-sm break-words">{msg.text}</p>
@@ -534,8 +552,8 @@ const Conversation: React.FC<ConversationProps> = ({
                         <div className="flex items-center">
                           <p
                             className={`text-xs ${msg.senderId === currentUserId
-                                ? 'text-teal-100'
-                                : 'text-gray-400'
+                              ? 'text-teal-100'
+                              : 'text-gray-400'
                               }`}
                           >
                             {formatTime(msg.createdAt)}

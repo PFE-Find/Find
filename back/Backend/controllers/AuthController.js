@@ -62,18 +62,18 @@ export const SignUp = async (req, res, next) => {
     const confirmationLink = `${domain}/verify-email?token=${verificationToken.token}`
 
 
-    sendMail(email, "Email Verification", `<!DOCTYPE html>
+    sendMail(email, "Vérification d'email - Find", `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
     <title>Email Verification</title>
   </head>
-  <body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+  <body style="font-family: Arial, sans-serif; background-color: #f0f8f7; padding: 20px;">
     <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 5px; text-align: center;">
       <h2 style="color: #333333;">Welcome to Find!</h2>
       <p style="color: #555555;">Hi ${name},</p>
       <p style="color: #555555;">Thank you for signing up. Please verify your email address by clicking the button below:</p>
-      <a href="${confirmationLink}" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #007BFF; color: #ffffff; text-decoration: none; border-radius: 4px;">Verify Email</a>
+      <a href="${confirmationLink}" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #007c72; color: #ffffff; text-decoration: none; border-radius: 4px;">Verify Email</a>
       <p style="color: #999999; margin-top: 20px;">If the button doesn't work, copy and paste the following link into your browser:</p>
       <p style="color: #999999; margin-top: 20px;">This link will expire in 24 hours.</p>
       <p style="color: #999999;">If you did not create an account, no further action is required.</p>
@@ -81,7 +81,7 @@ export const SignUp = async (req, res, next) => {
     </div>
   </body>
 </html>
- `);
+`);
     res.status(201).json({ message: 'User created successfully!' });
   } catch (err) {
     console.error(err);

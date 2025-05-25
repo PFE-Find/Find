@@ -19,7 +19,8 @@ import {
   Star,
   PlusCircle,
   Menu,
-  X
+  X,
+  
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -40,6 +41,13 @@ const Sidebar = () => {
         setSidenav(true);
       }
     };
+    interface MenuItem {
+  name: string;
+  icon: React.ReactNode;
+  link?: string; 
+  
+}
+
 
     handleResize(); // Set initial state
     window.addEventListener('resize', handleResize);
@@ -60,7 +68,7 @@ const Sidebar = () => {
       icon: <LayoutDashboard className="w-5 h-5" />,
       subItems: [
         { name: "Aperçu", link: "/Admin/DashBoard" },
-        { name: "Commentaires", link: "/dashboard/stats" },
+        { name: "Commentaires", link: "/Admin/Comment" },
         { name: "Signalements", link: "/Admin/Reports" }
       ]
     },
@@ -194,14 +202,7 @@ const Sidebar = () => {
                       )}
                     </>
                   ) : (
-                    <Link
-                      href={menu.link || "#"}
-                      className={`flex items-center p-3 rounded-lg transition-all ${isActive(menu.link || "") ? 'bg-teal-600/50 text-white' : 'hover:bg-teal-600/30 text-teal-100'}`}
-                      onClick={() => isMobile && setSidenav(false)}
-                    >
-                      <span className="text-teal-200">{menu.icon}</span>
-                      {sidenav && <span className="ml-3 text-sm font-medium">{menu.name}</span>}
-                    </Link>
+                    <div/>
                   )}
                 </li>
               ))}

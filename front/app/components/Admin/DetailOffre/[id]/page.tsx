@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import SidBar from "../../SideBar";
 import Navbar from "../../NavBar";
@@ -146,7 +146,7 @@ const handleDelete = async () => {
   if (!offre) {
     return (
       <div className="flex min-h-screen bg-gray-50">
-        <SidBar />
+        <SidBar children={undefined} />
         <main className="flex-1 p-8">
           <Navbar />
           <div className="mt-28 text-center text-gray-500">
@@ -162,7 +162,7 @@ const handleDelete = async () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <SidBar />
+      <SidBar children={undefined} />
       <main className="flex-1 p-6 md:p-8 overflow-y-auto">
         <Navbar />
 
