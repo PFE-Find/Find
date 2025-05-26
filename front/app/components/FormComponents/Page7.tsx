@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import * as nsfwjs from "nsfwjs";
 import "../../globals.css";
 
-export default function ImageUploader({ data, updateFields }) {
+export default function ImageUploader({ data, updateFields } : any) {
   const [imageURLs, setImageURLs] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | React.ReactNode | null>(null);
@@ -42,7 +42,7 @@ export default function ImageUploader({ data, updateFields }) {
     }
   }, [imageURLs, data, updateFields]);
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e:any) => {
     e.preventDefault();
     setIsDragging(true);
   };
@@ -111,7 +111,7 @@ export default function ImageUploader({ data, updateFields }) {
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e:any) => {
     e.preventDefault();
     setIsDragging(false);
     if (e.dataTransfer.files.length) {

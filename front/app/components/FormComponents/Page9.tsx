@@ -6,10 +6,10 @@ import { CurrencyDollarIcon, ChevronDownIcon, CheckCircleIcon, InformationCircle
 
 type PricePageProps = {
   data: {
-    prix: number | null;
+    prix: string ;
     unit: string;
   };
-  updateFields: (fields: { prix: number | null; unit: string }) => void;
+  updateFields: (fields: any) => void;
 };
 
 const currencyUnits = [

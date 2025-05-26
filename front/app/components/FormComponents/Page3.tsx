@@ -11,7 +11,7 @@ const MapComponent = dynamic(() => import('../MapComponent'), {
   ssr: false,
 });
 
-export default function Example({ data, updateFields }) {
+export default function Example({ data, updateFields } : any) {
   const defaultLocation = {
     coordinates: [36.8065, 10.1815], // Default: Tunis
     placeName: "Tunis, Tunisia"
@@ -25,7 +25,7 @@ useEffect(() => {
   }
 }, [data]);
 
-  const handlePositionChange = useCallback((newPosition) => {
+  const handlePositionChange = useCallback((newPosition: any) => {
     setPosition(newPosition);
     console.log("Position updated:", newPosition);
     updateFields({ ...data, localisation: newPosition.coordinates, placeName: newPosition.placeName });
