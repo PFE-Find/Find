@@ -92,8 +92,8 @@ export default function EnhancedMapComponent({
   setPosition,
   zoom = 6,
   className = ""
-}: MapComponentProps) {
-  const [currentPosition, setCurrentPosition] = useState<Position>(DEFAULT_POSITION);
+}: any) {
+  const [currentPosition, setCurrentPosition] = useState<any>(DEFAULT_POSITION);
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
