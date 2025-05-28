@@ -7,17 +7,12 @@ import Link from 'next/link';
 
 
 
-export default function ListingPreview({ data, updateFields }) {
+export default function ListingPreview({ data }: any ) {
     const savedImages = JSON.parse(localStorage.getItem('uploadedPhotos') || '[]');
-    const firstImage = savedImages.length > 0 ? savedImages[0] : filteredOffers[0].image;
-    const [favorites, setFavorites] = useState<{ [key: number]: boolean }>({});
-    const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+    const firstImage = savedImages[0] ;
+    
 
-    const toggleFavorite = (id: number, e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
-    };
+    
 
     // Animation variants
     const cardVariants = {

@@ -18,6 +18,7 @@ export default function Profile() {
     const [editedName, setEditedName] = useState(session?.user?.name || '');
     const [editedEmail, setEditedEmail] = useState(session?.user?.email || '');
     const [phoneNumber, setPhoneNumber] = useState(session?.user?.phone || '');
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -29,7 +30,6 @@ export default function Profile() {
     const [isPhoneVerified, setIsPhoneVerified] = useState(false);
     const [verificationCode, setVerificationCode] = useState('');
     const [showVerification, setShowVerification] = useState(false);
-
     useEffect(() => {
         async function fetchOffres() {
             if (session?.user?._id) {
@@ -68,22 +68,26 @@ export default function Profile() {
 
     const validatePassword = () => {
         const errors = [];
-        if (newPassword.length < 8) {
-            errors.push("Le mot de passe doit contenir au moins 8 caractères");
+
+        // Only validate if user is trying to change password
+        if (newPassword || confirmPassword) {
+            if (newPassword.length < 8) {
+                errors.push("Le mot de passe doit contenir au moins 8 caractères");
+            }
+            if (!/[A-Z]/.test(newPassword)) {
+                errors.push("Le mot de passe doit contenir au moins une majuscule");
+            }
+            if (!/[0-9]/.test(newPassword)) {
+                errors.push("Le mot de passe doit contenir au moins un chiffre");
+            }
+            if (newPassword !== confirmPassword) {
+                errors.push("Les mots de passe ne correspondent pas");
+            }
         }
-        if (!/[A-Z]/.test(newPassword)) {
-            errors.push("Le mot de passe doit contenir au moins une majuscule");
-        }
-        if (!/[0-9]/.test(newPassword)) {
-            errors.push("Le mot de passe doit contenir au moins un chiffre");
-        }
-        if (newPassword !== confirmPassword) {
-            errors.push("Les mots de passe ne correspondent pas");
-        }
+
         setPasswordErrors(errors);
         return errors.length === 0;
     };
-
     const handleSendVerification = async () => {
         try {
             toast.success("Code de vérification envoyé à votre téléphone");
@@ -146,30 +150,58 @@ export default function Profile() {
     };
 
     const handlePasswordChange = async () => {
-        if (!validatePassword()) return;
+        // Clear previous errors
+        setPasswordErrors([]);
+        setIsChangingPassword(true); // Add this line
+
+        // Validate again
+        if (!validatePassword()) {
+            setIsChangingPassword(false); // Add this line
+            return;
+        }
 
         try {
             const user = session?.user?.user || session?.user;
             if (!user) {
-                console.error('No user session found');
+                toast.error('Aucun utilisateur trouvé');
+                setIsChangingPassword(false); // Add this line
                 return;
             }
 
-            await UserService.changePassword(user._id, {
-                currentPassword,
+            const isSocialLogin = !user.password;
+
+            if (!isSocialLogin && !currentPassword) {
+                toast.error('Veuillez entrer votre mot de passe actuel');
+                return;
+            }
+
+            const payload = {
+                currentPassword: isSocialLogin ? undefined : currentPassword,
                 newPassword
-            });
+            };
+
+            await UserService.changePassword(user._id, payload);
+
 
             toast.success('Mot de passe changé avec succès');
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
             setPasswordErrors([]);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error changing password:', error);
-            toast.error('Erreur lors du changement de mot de passe');
+            const errorMessage = error.response?.data?.message ||
+                error.message ||
+                'Erreur lors du changement de mot de passe';
+            toast.error(errorMessage);
+
+            setCurrentPassword('');
+        } finally {
+            setIsChangingPassword(false);
         }
     };
+
+
 
     const formatDate = (dateString: string | Date) => {
         if (!dateString) return 'N/A';
@@ -196,7 +228,7 @@ export default function Profile() {
                                         {previewImage ? (
                                             <div className="relative">
                                                 <img
-                                                    src={previewImage?.startsWith('/uploads') 
+                                                    src={previewImage?.startsWith('/uploads')
                                                         ? `http://localhost:3001${previewImage}`
                                                         : previewImage}
                                                     className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 object-cover rounded-full border-4 ${isEditing ? 'border-blue-300' : 'border-white'
@@ -271,12 +303,12 @@ export default function Profile() {
                                 <div className="text-center w-full">
                                     <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1 truncate max-w-full">{session?.user?.name}</h2>
                                     <p className="text-gray-600 mb-2 flex items-center justify-center gap-2 truncate max-w-full">
-                                        <FiMail className="text-gray-400 flex-shrink-0" /> 
+                                        <FiMail className="text-gray-400 flex-shrink-0" />
                                         <span className="truncate">{session?.user?.email}</span>
                                     </p>
                                     {phoneNumber && (
                                         <p className="text-gray-600 mb-2 flex items-center justify-center gap-2 truncate max-w-full">
-                                            <FiPhone className="text-gray-400 flex-shrink-0" /> 
+                                            <FiPhone className="text-gray-400 flex-shrink-0" />
                                             <span className="truncate">{phoneNumber}</span>
                                             {isPhoneVerified && (
                                                 <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full flex-shrink-0">
@@ -293,11 +325,10 @@ export default function Profile() {
                                 {/* Edit Profile Button */}
                                 <button
                                     onClick={() => setIsEditing(!isEditing)}
-                                    className={`w-full mt-4 sm:mt-6 px-4 py-2 sm:py-3 rounded-lg flex items-center justify-center gap-2 font-medium transition-all hover:shadow-md ${
-                                        isEditing 
-                                            ? 'bg-gray-500 text-white hover:bg-gray-600'
-                                            : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
-                                    }`}
+                                    className={`w-full mt-4 sm:mt-6 px-4 py-2 sm:py-3 rounded-lg flex items-center justify-center gap-2 font-medium transition-all hover:shadow-md ${isEditing
+                                        ? 'bg-gray-500 text-white hover:bg-gray-600'
+                                        : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
+                                        }`}
                                 >
                                     <FiEdit2 className="w-4 h-4 sm:w-5 sm:h-5" />
                                     {isEditing ? 'Annuler' : 'Modifier le profil'}
@@ -439,16 +470,20 @@ export default function Profile() {
                                         <div>
                                             <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">Changer le mot de passe</h3>
                                             <div className="space-y-2 sm:space-y-3">
-                                                <div>
-                                                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">Mot de passe actuel</label>
-                                                    <input
-                                                        id="currentPassword"
-                                                        type="password"
-                                                        value={currentPassword}
-                                                        onChange={(e) => setCurrentPassword(e.target.value)}
-                                                        className="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base"
-                                                    />
-                                                </div>
+                                                {session?.user?.password && (
+                                                    <div>
+                                                        <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">Mot de passe actuel</label>
+                                                        <input
+                                                            id="currentPassword"
+                                                            type="password"
+                                                            value={currentPassword}
+                                                            onChange={(e) => setCurrentPassword(e.target.value)}
+                                                            className="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base"
+                                                            required={!!session?.user?.password}
+                                                        />
+                                                    </div>
+                                                )}
+
                                                 <div>
                                                     <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">Nouveau mot de passe</label>
                                                     <input
@@ -481,9 +516,8 @@ export default function Profile() {
                                                 <button
                                                     onClick={handlePasswordChange}
                                                     className="w-full bg-blue-500 text-white px-3 py-2 sm:px-4 sm:py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm sm:text-base"
-                                                    disabled={!currentPassword || !newPassword || !confirmPassword || passwordErrors.length > 0}
                                                 >
-                                                    Changer le mot de passe
+                                                    {isChangingPassword ? 'Changement en cours...' : 'Changer le mot de passe'}
                                                 </button>
                                             </div>
                                         </div>

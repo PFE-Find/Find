@@ -30,6 +30,9 @@ const stepsLabels = [
     "Finalisez et publiez"
 ];
 
+
+
+
 type FormData = {
     titre: string;
     description: string;
@@ -61,6 +64,8 @@ const INITIAL_DATA: FormData = {
     etat: "",
     photos: [],
 };
+
+
 
 export default function FormPages() {
     const router = useRouter();

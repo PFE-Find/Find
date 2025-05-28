@@ -6,9 +6,9 @@ import { StarIcon, HomeModernIcon } from '@heroicons/react/24/solid';
 
 type ConditionPageProps = {
   data: {
-    etat: number;
+    etat: string;
   };
-  updateFields: (fields: { etat: number }) => void;
+  updateFields: (fields: { etat: string }) => void;
 };
 
 const conditionLabels = [
@@ -25,7 +25,7 @@ const conditionLabels = [
 ];
 
 export default function ConditionForm({ data, updateFields }: ConditionPageProps) {
-  const [rating, setRating] = useState<number>(data.etat || 0);
+  const [rating, setRating] = useState<any>(data.etat || 0);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
@@ -37,7 +37,7 @@ export default function ConditionForm({ data, updateFields }: ConditionPageProps
     }
   }, [rating]);
 
-  const handleRating = (value: number) => {
+  const handleRating = (value: any) => {
     setRating(value);
     updateFields({ etat: value });
   };

@@ -7,29 +7,29 @@ import { motion } from "framer-motion";
 import { FiArrowRight, FiCheck, FiMapPin, FiShield, FiTrendingUp, FiHeadphones, FiBarChart2, FiEye } from "react-icons/fi";
 import Nav from "@/app/components/Nav";
 import Footer from "@/app/components/Footer";
-import dynamic from 'next/dynamic'; // Import dynamic
+import dynamic from 'next/dynamic'; 
 import Image from 'next/image';
 import OffreSearch from "../components/Search";
 import { useRouter } from 'next/navigation';
-import { debounce } from 'lodash'; // Import debounce
+import { debounce } from 'lodash'; 
+import { useSession } from "next-auth/react";
 
-// Dynamic Imports for components that are not critical for initial load
 const Offres = dynamic(() => import("@/app/components/Home/OffreSection"), {
   loading: () => <p>Loading Offers...</p>,
   ssr: false,
 });
 
 const Comments = dynamic(() => import("./comments"), {
-    ssr: false, // Disable server-side rendering for this component
-    loading: () => <p>Loading Comments...</p>, // Optional loading indicator
+    ssr: false, 
+    loading: () => <p>Loading Comments...</p>, 
 });
 
 const ChatBot = dynamic(() => import("../components/Chat/Chatbot"), {
-  ssr: false, // Disable server-side rendering
-  loading: () => <p>Loading ChatBot...</p>, // Optional loading indicator
+  ssr: false, 
+  loading: () => <p>Loading ChatBot...</p>, 
 });
 
-// Animation variants (consider moving these to a separate file if they become too large)
+
 const container = {
   hidden: { opacity: 0 },
   show: {
@@ -45,7 +45,6 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6 } }
 };
 
-// ... other animation variants
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -55,14 +54,14 @@ export default function Home() {
   const [surfaceRange, setSurfaceRange] = useState<[number | null, number | null]>([null, null]);
   const [locationFilter, setLocationFilter] = useState<string>("");
   const [surfaceFilterEnabled, setSurfaceFilterEnabled] = useState(false);
+   const { data: session } = useSession();
 
   const router = useRouter();
 
-  // Debounced search handler
   const debouncedSearch = useCallback(
     debounce((query: string) => {
-      router.push(`/OffrePage?search=${encodeURIComponent(query)}`); // Encode the query
-    }, 300), // Adjust debounce delay as needed
+      router.push(`/OffrePage?search=${encodeURIComponent(query)}`); 
+    }, 300), 
     [router]
   );
 
@@ -73,7 +72,7 @@ export default function Home() {
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    router.push(`/OffrePage?category=${encodeURIComponent(category)}`); // Encode the category
+    router.push(`/OffrePage?category=${encodeURIComponent(category)}`); 
   };
 
   const applyFilters = (filters: any) => {
@@ -88,7 +87,7 @@ export default function Home() {
     if (filters.priceRange[1] !== null) params.append('priceMax', filters.priceRange[1].toString());
     if (filters.surfaceRange[0] !== null) params.append('surfaceMin', filters.surfaceRange[0].toString());
     if (filters.surfaceRange[1] !== null) params.append('surfaceMax', filters.surfaceRange[1].toString());
-    if (filters.locationFilter) params.append('location', encodeURIComponent(filters.locationFilter)); // Encode the location
+    if (filters.locationFilter) params.append('location', encodeURIComponent(filters.locationFilter)); 
     if (filters.surfaceFilterEnabled) params.append('surfaceEnabled', 'true');
 
     router.push(`/OffrePage?${params.toString()}`);
@@ -111,7 +110,7 @@ export default function Home() {
       title: "Trouvez les meilleures opportunités",
       description: "Explorez notre sélection de terres agricoles et d'équipements de haute qualité, mis à jour régulièrement."
     },
-    // ... other features
+   
   ];
 
   const cards = [
@@ -121,7 +120,7 @@ export default function Home() {
       title: "Publiez votre annonce en quelques clics",
       description: "Ajoutez facilement une annonce avec une description détaillée, des photos et un prix."
     },
-    // ... other cards
+    
   ];
 
   return (
@@ -243,7 +242,7 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.7 }}
             viewport={{ once: true }}
           >
-            <Link href="/offres" passHref>
+            <Link href="/FormPages" passHref>
               <motion.button
                 whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
                 whileTap={{ scale: 0.98 }}
@@ -268,7 +267,53 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Prêt à transformer votre expérience agricole ?</h2>
           <p className="text-lg mb-8">Rejoignez des milliers d'agriculteurs et d'investisseurs qui font confiance à Find</p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+          {session ? (
+  // Show these when user is logged in
+  <div className="flex flex-col sm:flex-row justify-center gap-4">
+    <Link href="/profile">
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="px-8 py-3 bg-white text-teal-600 rounded-lg font-medium hover:bg-gray-100 transition-all"
+      >
+        Mon Tableau de Bord
+      </motion.button>
+    </Link>
+    <Link href="/FormPages">
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="px-8 py-3 border border-white text-white rounded-lg font-medium hover:bg-teal-700 transition-all"
+      >
+        Publier une Annonce
+      </motion.button>
+    </Link>
+  </div>
+) : (
+  // Show these when user is not logged in
+  <div className="flex flex-col sm:flex-row justify-center gap-4">
+    <Link href="/signup">
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="px-8 py-3 bg-white text-teal-600 rounded-lg font-medium hover:bg-gray-100 transition-all"
+      >
+        S'inscrire gratuitement
+      </motion.button>
+    </Link>
+    <Link href="/aboutUs">
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="px-8 py-3 border border-white text-white rounded-lg font-medium hover:bg-teal-700 transition-all"
+      >
+        À propos
+      </motion.button>
+    </Link>
+  </div>
+)}
+          {/* <div className="flex flex-col sm:flex-row justify-center gap-4">
+
             <Link href="/inscription">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -287,7 +332,7 @@ export default function Home() {
                 Nous contacter
               </motion.button>
             </Link>
-          </div>
+          </div> */}
         </div>
       </motion.section>
 
