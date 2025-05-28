@@ -287,7 +287,7 @@ export default function Navbar() {
                       ))}
 
                       <button
-                        onClick={() => signOut()}
+                        onClick={() => signOut({ callbackUrl: "/" })}
                         className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 transition-colors border-t border-gray-100"
                       >
                         <FiLogOut className="mr-2" />

@@ -182,9 +182,9 @@ export default function Connexion() {
                   Se souvenir de moi
                 </label>
               </div>
-              <Link href="/mot-de-passe-oublie" className="text-sm text-green-600 hover:underline">
+              {/* <Link href="/mot-de-passe-oublie" className="text-sm text-green-600 hover:underline">
                 Mot de passe oublié ?
-              </Link>
+              </Link> */}
             </motion.div>
 
             <motion.button

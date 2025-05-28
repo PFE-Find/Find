@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiCheckCircle } from 'react-icons/fi'
 import { FaFacebook, FaGoogle, FaGithub } from 'react-icons/fa'
 import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 
 export default function SignUp() {
   const router = useRouter()
@@ -283,6 +284,7 @@ export default function SignUp() {
                     variants={itemVariants}
                     type="button"
                     whileHover={{ y: -2 }}
+                       onClick={() => signIn('google', { callbackUrl: '/' })}
                     className="flex items-center justify-center py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <FaGoogle className="text-red-600 text-xl" />
@@ -292,6 +294,7 @@ export default function SignUp() {
                     variants={itemVariants}
                     type="button"
                     whileHover={{ y: -2 }}
+                       onClick={() => signIn('github', { callbackUrl: '/' })}
                     className="flex items-center justify-center py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <FaGithub className="text-gray-800 text-xl" />
