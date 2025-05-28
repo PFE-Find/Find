@@ -34,6 +34,39 @@ console.log("role",role);
   }
 };
 
+// controllers/UserController.js
+export const updatePassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    // If user has a password, we require currentPassword verification
+    if (user.password) {
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Mot de passe actuel incorrect" });
+      }
+    }
+
+    // Hash and update new password
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.status(200).json({ message: "Mot de passe mis à jour avec succès" });
+
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du mot de passe :", error);
+    res.status(500).json({ message: "Erreur interne du serveur" });
+  }
+};
+
+
 
 export const updateUser = async (req, res) => {
   try {
