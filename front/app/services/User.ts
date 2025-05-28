@@ -50,6 +50,18 @@ const userService = {
     }
   },
 
+   // Update an password
+  async changePassword(id: string, data: { currentPassword?: string, newPassword: string }) {
+  try {
+    const response = await axios.put(`${API_URL}/changePassword/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error("Error changePassword:", error);
+    throw error;
+  }
+},
+
+
 async updateUserRole(id: string, role: number) {
   console.log("role",role);
     try {
