@@ -2,7 +2,8 @@
 
 import { ChangeEvent, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Info, AlertCircle, PenLine } from 'lucide-react';
+import { Info, AlertCircle, PenLine, XCircle } from 'lucide-react';
+import leoProfanity from 'leo-profanity';
 
 type DescriptionPageProps = {
   data: { description?: string };
@@ -13,7 +14,23 @@ export default function DescriptionEditor({ data, updateFields }: DescriptionPag
     const [text, setText] = useState<string>(data.description || "");
     const [isFocused, setIsFocused] = useState(false);
     const [showTips, setShowTips] = useState(false);
+    const [profanityError, setProfanityError] = useState<string | null>(null);
+    const [lastValidValue, setLastValidValue] = useState("");
     const characterLimit = 500;
+
+    useEffect(() => {
+        async function loadDictionaries() {
+           
+
+            // Fetch Arabic profanity list. Replace this with your actual source.
+            const arResponse = await fetch('/api/arabic-profanity'); // Example API endpoint
+            const ar = await arResponse.json();
+
+            // leoProfanity.loadDictionary([...new Set([...fr, ...en, ...ar])];
+            setLastValidValue(text);
+        }
+        loadDictionaries();
+    }, []);
 
     useEffect(() => {
         updateFields({ description: text });
@@ -22,6 +39,23 @@ export default function DescriptionEditor({ data, updateFields }: DescriptionPag
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         const newValue = event.target.value.slice(0, characterLimit);
         setText(newValue);
+    };
+
+    const handleBlur = () => {
+        setIsFocused(false);
+
+        if (text.trim() && leoProfanity.check(text)) {
+            setProfanityError("Le langage inapproprié n'est pas autorisé");
+            setText(lastValidValue);
+            updateFields({ description: lastValidValue });
+        } else {
+            setProfanityError(null);
+            setLastValidValue(text);
+        }
+    };
+
+    const closeError = () => {
+        setProfanityError(null);
     };
 
     const variants = {
@@ -68,6 +102,43 @@ export default function DescriptionEditor({ data, updateFields }: DescriptionPag
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
                 >
+                    <AnimatePresence>
+                        {profanityError && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.3 }}
+                                className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-sm"
+                            >
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0">
+                                        <XCircle className="h-5 w-5 text-red-500" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <p className="text-sm text-red-700">
+                                            {profanityError}
+                                        </p>
+                                    </div>
+                                    <div className="ml-auto pl-3">
+                                        <div className="-mx-1.5 -my-1.5">
+                                            <button
+                                                type="button"
+                                                onClick={closeError}
+                                                className="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                            >
+                                                <span className="sr-only">Fermer</span>
+                                                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     <div className="relative mb-2">
                         <div className="flex items-center justify-between">
                             <label htmlFor="property-description" className="block text-sm font-medium text-gray-700 mb-1">
@@ -109,19 +180,19 @@ export default function DescriptionEditor({ data, updateFields }: DescriptionPag
                     </div>
 
                     <motion.div 
-                        className={`relative transition-all duration-200 ${isFocused ? 'ring-2 ring-green-500' : ''}`}
+                        className={`relative transition-all duration-200 ${isFocused ? 'ring-2 ring-green-500' : ''} ${profanityError ? 'ring-2 ring-red-500' : ''}`}
                         whileHover={{ scale: 1.005 }}
                     >
                         <textarea
                             id="property-description"
                             rows={8}
-                            className={`block p-4 w-full text-base text-gray-900 bg-white rounded-xl border ${isFocused ? 'border-green-500' : 'border-gray-300'} shadow-sm focus:outline-none transition-all duration-200 resize-none`}
+                            className={`block p-4 w-full text-base text-gray-900 bg-white rounded-xl border ${isFocused ? 'border-green-500' : 'border-gray-300'} ${profanityError ? 'border-red-500' : ''} shadow-sm focus:outline-none transition-all duration-200 resize-none`}
                             placeholder="Décrivez votre bien en détail (caractéristiques, équipements, localisation, etc.)..."
                             value={text}
                             onChange={handleChange}
                             maxLength={characterLimit}
                             onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
+                            onBlur={handleBlur}
                         />
                     </motion.div>
 

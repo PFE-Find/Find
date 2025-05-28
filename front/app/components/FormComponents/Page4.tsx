@@ -6,10 +6,10 @@ import { UserIcon, ChevronDownIcon, InformationCircleIcon } from '@heroicons/rea
 
 type SurfacePageProps = {
   data: {
-    Superficie: number | null;
+    Superficie: string;
     unit: string;
   };
-  updateFields: (fields: { Superficie: number | null; unit: string }) => void;
+  updateFields: (fields: { Superficie: string; unit: string }) => void;
 };
 
 const surfaceUnits = [
@@ -34,7 +34,7 @@ export default function SurfaceForm({ data, updateFields }: SurfacePageProps) {
     if (value === '' || /^[0-9]*\.?[0-9]*$/.test(value)) {
       setSurface(value);
       updateFields({ 
-        Superficie: value === '' ? null : parseFloat(value),
+        Superficie: value ,
         unit 
       });
     }
@@ -43,8 +43,9 @@ export default function SurfaceForm({ data, updateFields }: SurfacePageProps) {
   const handleUnitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedUnit = e.target.value;
     setUnit(selectedUnit);
+    
     updateFields({ 
-      Superficie: surface === '' ? null : parseFloat(surface),
+      Superficie: surface ,
       unit: selectedUnit 
     });
   };
