@@ -63,7 +63,7 @@ export const options: NextAuthOptions = {
                     if (!res.ok) return null;
                    
                     const user = await res.json();
-                    return user ? { ...user, id: user._id || user.id } : null;
+                    return user ? { ...user, id: user._id || user.id || user.user.id || user.user._id} : null;
                 } catch (error) {
                     console.error("Authorize error:", error);
                     return null;
@@ -79,11 +79,13 @@ export const options: NextAuthOptions = {
     callbacks: {
         async signIn({ user, account }) {
             if (account?.provider !== "credentials") return true;
+           
             
             const userId = user?._id || user?.id;
             if (!userId) return false;
-            
+             
             const existingUser = await userService.getUserById(userId);
+
             return !!existingUser?.emailVerified;
         },
 

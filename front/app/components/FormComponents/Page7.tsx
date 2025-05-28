@@ -51,7 +51,7 @@ export default function ImageUploader({ data, updateFields }) {
     setIsDragging(false);
   };
 
-  const checkImageProfanity = async (base64: string): Promise<boolean> => {
+  /*const checkImageProfanity = async (base64: string): Promise<boolean> => {
     if (!model) return false;
     const img = new Image();
     img.src = base64;
@@ -59,7 +59,7 @@ export default function ImageUploader({ data, updateFields }) {
     const preds = await model.classify(img,1);
     console.log(preds);
     return preds.some(p => p.className !== "Neutral");
-  };
+  };*/
 
   const handleUpdatePhotos = async (files: FileList) => {
     const selected = Array.from(files);
