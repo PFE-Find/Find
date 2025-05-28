@@ -156,20 +156,7 @@ const Reports: React.FC<ReportProps> = ({
                             />
                         </div>
 
-                        <div className="w-full md:w-48 relative">
-                            <select
-                                value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
-                                className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 cursor-pointer hover:border-gray-400"
-                            >
-                                <option value="all">Toutes catégories</option>
-                                <option value="spam">Spam</option>
-                                <option value="misinformation">Désinformation</option>
-                                <option value="harassment">Harcèlement</option>
-                                <option value="inappropriate language">Langage inapproprié</option>
-                            </select>
-                            <FiChevronDown className="absolute right-3 top-3.5 text-gray-400 pointer-events-none" />
-                        </div>
+                        
                     </motion.div>
 
                     <motion.div

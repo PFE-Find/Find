@@ -137,16 +137,16 @@ const Offres: React.FC<OffresProps> = ({
                             />
                         </div>
 
-                        <div className="w-full md:w-48 relative">
+                        <div className="w-full md:w-48 ">
                             <select
                                 value={selectedCategory}
                                 onChange={(e) => setSelectedCategory(e.target.value)}
                                 className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 cursor-pointer hover:border-gray-400"
                             >
                                 <option value="all">Toutes catégories</option>
-                                <option value="land">Terrain</option>
-                                <option value="farm">Ferme</option>
-                                <option value="property">Propriété</option>
+                                <option value="Land">Terrain</option>
+                                <option value="Material">Matriel</option>
+                               
                             </select>
                             <FiChevronDown className="absolute right-3 top-3.5 text-gray-400 pointer-events-none" />
                         </div>
@@ -215,9 +215,9 @@ const Offres: React.FC<OffresProps> = ({
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-500 capitalize">
-                                                            {offre.propertyType === 'land' ? 'Terrain' : 
-                                                             offre.propertyType === 'farm' ? 'Ferme' : 
-                                                             offre.propertyType === 'property' ? 'Propriété' : offre.propertyType}
+                                                            {offre.propertyType === 'Land' ? 'Terrain' : 
+                                                             offre.propertyType === 'Matriel' ? 'Matériel' : 
+                                                             offre.propertyType}
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">

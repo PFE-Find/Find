@@ -298,8 +298,7 @@ const UsersTable: React.FC<UsersProps> = ({
                                                 {getRoleIcon(userToUpdate.role)}
                                                 <span className="font-medium">
                                                     {userToUpdate.role === 0 ? "Utilisateur" :
-                                                     userToUpdate.role === 1 ? "Administrateur" :
-                                                     "Administrateur limité"}
+                                                      "Administrateur" }
                                                 </span>
                                             </div>
                                         </div>
@@ -315,7 +314,7 @@ const UsersTable: React.FC<UsersProps> = ({
                                             >
                                                 <option value={0}>Utilisateur</option>
                                                 <option value={1}>Administrateur</option>
-                                                <option value={2}>Administrateur limité</option>
+                                              
                                             </select>
                                         </div>
                                     </div>
@@ -423,7 +422,7 @@ const UsersTable: React.FC<UsersProps> = ({
                                     <option value="all">Tous les rôles</option>
                                     <option value="1">Administrateur</option>
                                     <option value="0">Utilisateur</option>
-                                    <option value="2">Administrateur limité</option>
+                                   
                                 </select>
                             </div>
                         </motion.div>
@@ -450,7 +449,7 @@ const UsersTable: React.FC<UsersProps> = ({
                             ) : (
                                 <div className="overflow-y-auto max-h-[594px]">
                                     <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50 sticky top-0">
+                                        <thead className="bg-gray-50  top-0">
                                             <tr>
                                                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AVATAR</th>
                                                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NOM</th>
@@ -510,8 +509,7 @@ const UsersTable: React.FC<UsersProps> = ({
                                                                     {getRoleIcon(user.role)}
                                                                     <span className="text-sm text-gray-500 capitalize">
                                                                         {user.role === 0 ? "Utilisateur" :
-                                                                         user.role === 1 ? "Administrateur" :
-                                                                         "Administrateur limité"}
+                                                                          "Administrateur" }
                                                                     </span>
                                                                 </div>
                                                             </td>

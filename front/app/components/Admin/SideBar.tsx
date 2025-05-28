@@ -2,13 +2,13 @@
 import { useSession, signOut } from 'next-auth/react';
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { 
-  Home, 
-  Users, 
-  Settings, 
-  User, 
-  ShoppingCart, 
-  DollarSign, 
+import {
+  Home,
+  Users,
+  Settings,
+  User,
+  ShoppingCart,
+  DollarSign,
   Bell,
   ChevronDown,
   ChevronUp,
@@ -20,7 +20,7 @@ import {
   PlusCircle,
   Menu,
   X,
-  
+
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -42,11 +42,11 @@ const Sidebar = () => {
       }
     };
     interface MenuItem {
-  name: string;
-  icon: React.ReactNode;
-  link?: string; 
-  
-}
+      name: string;
+      icon: React.ReactNode;
+      link?: string;
+
+    }
 
 
     handleResize(); // Set initial state
@@ -78,7 +78,7 @@ const Sidebar = () => {
       subItems: [
         { name: "Nouvelles offres", link: "/Admin/NewOffres" },
         { name: "Toutes les offres", link: "/Admin/OffresPage" },
-        { name: "Créer une offre", link: "/Admin/CreateOffre", icon: <PlusCircle className="w-4 h-4 ml-1" /> }
+
       ]
     },
     {
@@ -105,7 +105,7 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile Toggle Button */}
-      <button 
+      <button
         onClick={toggleSidebar}
         className={`fixed z-50 md:hidden top-4 left-4 p-2 rounded-lg bg-teal-700 text-white`}
       >
@@ -113,7 +113,7 @@ const Sidebar = () => {
       </button>
 
       {/* Sidebar */}
-      <div 
+      <div
         className={`fixed inset-y-0 left-0 z-40 flex flex-col transition-all duration-300 ease-in-out 
           ${sidenav ? 'w-[320px]' : 'w-20'} 
           bg-gradient-to-b from-teal-700 to-teal-900 shadow-xl
@@ -121,7 +121,7 @@ const Sidebar = () => {
       >
         {/* Conteneur principal */}
         <div className="flex flex-col h-full overflow-hidden">
-          
+
           {/* Section Logo */}
           <div className={`flex items-center justify-center py-6 transition-all ${sidenav ? 'px-4' : 'px-2'} border-b border-teal-600`}>
             {sidenav ? (
@@ -138,17 +138,34 @@ const Sidebar = () => {
           {session ? (
             <div className={`flex flex-col items-center py-4 border-b border-teal-600 transition-all ${sidenav ? 'px-4' : 'px-2'}`}>
               <div className="relative">
-                <img
-                  className="w-16 h-16 rounded-full object-cover border-2 border-teal-200"
-                  src={
-                    session.user?.image
-                      ? session.user.image.startsWith('/uploads')
+                {session.user?.image ? (
+                  <img
+                    className="w-16 h-16 rounded-full object-cover border-2 border-green-100"
+                    src={
+                      session.user.image.startsWith('/uploads')
                         ? `http://localhost:3001${session.user.image}`
                         : session.user.image
-                      : '/default-avatar.png'
-                  }
-                  alt="Photo de profil"
-                />
+                    }
+                    alt="User profile"
+                  />
+                ) : (
+                  <div className="w-16 h-16 flex items-center justify-center rounded-full border-2 border-green-100 bg-gray-200 text-gray-500">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-8 h-8"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 14c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm0 2c-2.21 0-4 1.79-4 4h8c0-2.21-1.79-4-4-4z"
+                      />
+                    </svg>
+                  </div>
+                )}
                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-teal-700"></span>
               </div>
               {sidenav && (
@@ -176,14 +193,14 @@ const Sidebar = () => {
                           <>
                             <span className="ml-3 text-sm font-medium">{menu.name}</span>
                             <span className="ml-auto">
-                              {openMenu === menu.name ? 
-                                <ChevronUp className="w-4 h-4 text-teal-200" /> : 
+                              {openMenu === menu.name ?
+                                <ChevronUp className="w-4 h-4 text-teal-200" /> :
                                 <ChevronDown className="w-4 h-4 text-teal-200" />}
                             </span>
                           </>
                         )}
                       </button>
-                      
+
                       {openMenu === menu.name && sidenav && (
                         <ul className="ml-2 mt-1 space-y-1 pl-7">
                           {menu.subItems.map((subItem) => (
@@ -202,7 +219,7 @@ const Sidebar = () => {
                       )}
                     </>
                   ) : (
-                    <div/>
+                    <div />
                   )}
                 </li>
               ))}
@@ -212,17 +229,11 @@ const Sidebar = () => {
           {/* Bouton de déconnexion */}
           {session && (
             <div className="p-4 border-t border-teal-600">
-              <button 
+              <button
                 onClick={() => signOut()}
                 className="w-full flex items-center justify-center p-2 rounded-lg bg-teal-600/30 hover:bg-teal-600/50 text-teal-100 transition-all"
               >
-                {sidenav ? (
-                  <span className="text-sm font-medium">Déconnexion</span>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                )}
+
               </button>
             </div>
           )}

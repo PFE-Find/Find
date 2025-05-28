@@ -19,11 +19,12 @@ const Navbar: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
-  
-  
-  
+
+
+
   const userDropdownItems = [
     { name: 'Accueil', href: '/', protected: false },
+    { name: 'Paramètres', href: '/profile', protected: false },
     { name: 'Explorer', href: '/OffrePage', protected: false },
     { name: 'Àpropos', href: '/aboutUs', protected: false },
     { name: 'Notifications', href: '/Notification', protected: true },
@@ -34,26 +35,26 @@ const Navbar: React.FC = () => {
       <div className="px-6 py-4 flex items-center justify-between">
         {/* Breadcrumb */}
         <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center"
-          >
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/assets/logo.png"
-                alt="Find Logo"
-                width={40}
-                height={40}
-                className="rounded-lg"
-              />
-              <span className="ml-3 text-2xl font-bold text-teal-600">Find</span>
-            </Link>
-          </motion.div>
+          whileHover={{ scale: 1.05 }}
+          className="flex items-center"
+        >
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/assets/logo.png"
+              alt="Find Logo"
+              width={40}
+              height={40}
+              className="rounded-lg"
+            />
+            <span className="ml-3 text-2xl font-bold text-teal-600">Find</span>
+          </Link>
+        </motion.div>
 
         {/* Search and Actions */}
 
         <div className="flex items-center space-x-4">
 
-         
+
 
           {/* Icons */}
 
@@ -65,17 +66,34 @@ const Navbar: React.FC = () => {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center focus:outline-none"
                 >
-                  <img
-                    className="w-16 h-16 rounded-full object-cover border-2 border-green-100"
-                    src={
-                      session.user?.image
-                        ? session.user.image.startsWith('/uploads')
+                  {session.user?.image ? (
+                    <img
+                      className="w-16 h-16 rounded-full object-cover border-2 border-green-100"
+                      src={
+                        session.user.image.startsWith('/uploads')
                           ? `http://localhost:3001${session.user.image}`
                           : session.user.image
-                        : '/default-avatar.png' // Fallback image
-                    }
-                    alt="User profile"
-                  />
+                      }
+                      alt="User profile"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 flex items-center justify-center rounded-full border-2 border-green-100 bg-gray-200 text-gray-500">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-8 h-8"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 14c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm0 2c-2.21 0-4 1.79-4 4h8c0-2.21-1.79-4-4-4z"
+                        />
+                      </svg>
+                    </div>
+                  )}
                 </button>
 
                 <AnimatePresence>
@@ -98,7 +116,7 @@ const Navbar: React.FC = () => {
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setDropdownOpen(false)}
                         >
-                          
+
                           {item.name}
                         </Link>
                       ))}
@@ -108,7 +126,7 @@ const Navbar: React.FC = () => {
                         className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         <FiLogOut className="mr-2" />
-                        Sign out
+                        Déconnexion
                       </button>
                     </motion.div>
                   )}

@@ -171,19 +171,7 @@ const Comments: React.FC<CommentProps> = ({
                             />
                         </div>
 
-                        <div className="w-full md:w-48 relative">
-                            <select
-                                value={selectedStatus}
-                                onChange={(e) => setSelectedStatus(e.target.value)}
-                                className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 cursor-pointer hover:border-gray-400"
-                            >
-                                <option value="all">Tous les statuts</option>
-                                <option value="active">Actif</option>
-                                <option value="pending">En attente</option>
-                                <option value="deleted">Supprimé</option>
-                            </select>
-                            <FiChevronDown className="absolute right-3 top-3.5 text-gray-400 pointer-events-none" />
-                        </div>
+                        
                     </motion.div>
 
                     <motion.div
