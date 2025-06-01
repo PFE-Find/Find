@@ -10,6 +10,8 @@ import Image from 'next/image';
 import OffreSearch from "../components/Search"; // Import OffreSearch
 import { useRouter } from 'next/navigation'; // Import useRouter
 import { useState } from 'react';
+import ChatBot from "../components/Chat/Chatbot";
+
 
 // Animation variants
 const container = {
@@ -246,7 +248,7 @@ export default function Home() {
           </div>
         </div>
       </motion.section>
-
+      <ChatBot/>
       <Footer />
     </div>
   );

@@ -7,7 +7,7 @@ import { FiMessageSquare, FiSend, FiTrash2 } from 'react-icons/fi';
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
 import dynamic from 'next/dynamic';
-
+import { IMG_URL , Websocket_URL} from "../../services/URLService";
 // Import dynamique du composant de dialogue pour le chargement différé
 const Dialog = dynamic(() => import('./dialog'), {
   ssr: false,
@@ -49,7 +49,7 @@ export default function CommentSection({ offreId, currentUserId }: CommentSectio
                 user: {
                   name: user.name,
                   image: user.image?.startsWith('/uploads') 
-                    ? `http://localhost:3001${user.image}`
+                    ? `${IMG_URL}${user.image}`
                     : user.image || '/default-profile.png'
                 }
               };
@@ -101,7 +101,7 @@ export default function CommentSection({ offreId, currentUserId }: CommentSectio
               user: {
                 name: user.name,
                 image: user.image?.startsWith('/uploads') 
-                  ? `http://localhost:3001${user.image}`
+                  ? `${IMG_URL}${user.image}`
                   : user.image || '/default-profile.png'
               }
             };

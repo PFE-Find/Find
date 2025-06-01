@@ -1,12 +1,13 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:3001/api/Posts/";
+
+import { API_URL } from "./URLService";
 
 const Offres = {
   // Fetch all offres
   async getOffres() {
     try {
-      const response = await axios.get(`${API_URL}GetAll`);
+      const response = await axios.get(`${API_URL}/Posts/GetAll`);
       return response.data;
     } catch (error) {
       console.error("Error fetching offres:", error);
@@ -16,7 +17,7 @@ const Offres = {
   // Fetch all offres with statue true
   async getOffres1() {
     try {
-      const response = await axios.get(`${API_URL}GetAll1`);
+      const response = await axios.get(`${API_URL}/Posts/GetAll1`);
       return response.data;
     } catch (error) {
       console.error("Error fetching offres:", error);
@@ -26,7 +27,7 @@ const Offres = {
   // Fetch all offres with statue false
   async getOffres2() {
     try {
-      const response = await axios.get(`${API_URL}GetAll2`);
+      const response = await axios.get(`${API_URL}/Posts/GetAll2`);
       return response.data;
     } catch (error) {
       console.error("Error fetching offres:", error);
@@ -36,7 +37,7 @@ const Offres = {
 
   async getLands() {
     try {
-      const response = await axios.get(`${API_URL}GetLand`);
+      const response = await axios.get(`${API_URL}/Posts/GetLand`);
       return response.data;
     } catch (error) {
       console.error("Error fetching Lands:", error);
@@ -45,7 +46,7 @@ const Offres = {
   },
   async getMaterials() {
     try {
-      const response = await axios.get(`${API_URL}GetMaterials`);
+      const response = await axios.get(`${API_URL}/Posts/GetMaterials`);
       return response.data;
     } catch (error) {
       console.error("Error fetching Materials:", error);
@@ -58,7 +59,7 @@ const Offres = {
     
       
       
-      const response = await axios.get(`${API_URL}GetAll3/${id}`);
+      const response = await axios.get(`${API_URL}/Posts/GetAll3/${id}`);
       return response.data;
    
       
@@ -67,7 +68,7 @@ const Offres = {
   async getAllOffresByUserId2(id: string) {
     
    
-      const response = await axios.get(`${API_URL}GetAll4/${id}`);
+      const response = await axios.get(`${API_URL}/Posts/GetAll4/${id}`);
       return response.data;
     
   },
@@ -75,7 +76,7 @@ const Offres = {
   // Fetch a single offre by ID
   async getOffre(id: string) {
     
-      const response = await axios.get(`${API_URL}${id}`);
+      const response = await axios.get(`${API_URL}/Posts/${id}`);
       return response.data;
     
   },
@@ -83,7 +84,7 @@ const Offres = {
   // Add a new offre
   async addOffre(offreData: any) {
     try {
-      const response = await axios.post(`${API_URL}`, offreData);
+      const response = await axios.post(`${API_URL}/Posts/`, offreData);
       return response.data;
     } catch (error) {
       console.error("Error adding offre:", error);
@@ -94,7 +95,7 @@ const Offres = {
   // Delete an offre
   async deleteOffre(id: string) {
     try {
-      const response = await axios.delete(`${API_URL}deleteItem/${id}`);
+      const response = await axios.delete(`${API_URL}/Posts/deleteItem/${id}`);
       return response.data;
     } catch (error) {
       console.error("Error deleting offre:", error);
@@ -105,7 +106,7 @@ const Offres = {
   // Update an offre
   async updateOffre(id: string, offreData: any) {
     try {
-      const response = await axios.put(`${API_URL}updateItem/${id}`, offreData);
+      const response = await axios.put(`${API_URL}/Posts/updateItem/${id}`, offreData);
       return response.data;
     } catch (error) {
       console.error("Error updating offre:", error);
@@ -113,7 +114,7 @@ const Offres = {
     }
   },
   updateStatut: async (id: string) => {
-    const response = await axios.put(`${API_URL}${id}`);
+    const response = await axios.put(`${API_URL}/Posts/${id}`);
     console.log(response.data);
     
     return response.data;
@@ -122,7 +123,7 @@ const Offres = {
   // Get total number of offres
   async getTotalOffres() {
     try {
-      const response = await axios.get<number>(`${API_URL}totalOffres`);
+      const response = await axios.get<number>(`${API_URL}/Posts/totalOffres`);
       return response.data;
     } catch (error) {
       console.error("Error fetching total offres:", error);
@@ -133,7 +134,7 @@ const Offres = {
   // Search for offres
   async search(searchQuery: string) {
     try {
-      const response = await axios.get(`${API_URL}search?search=${searchQuery}`);
+      const response = await axios.get(`${API_URL}/Posts/search?search=${searchQuery}`);
       return response.data;
     } catch (error) {
       console.error("Error searching for offres:", error);

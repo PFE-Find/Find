@@ -3,13 +3,14 @@ import { Report } from "../models/Report";
 import { User } from "../models/User";
 import { log } from "console";
 
-const API_URL = "http://127.0.0.1:3001/api/auth";
+
+import { API_URL } from "./URLService";
 
 const userService = {
   // Fetch all reports
   async getReports() {
     try {
-      const response = await axios.get(`${API_URL}/`);
+      const response = await axios.get(`${API_URL}/auth/`);
       return response.data;
     } catch (error) {
       console.error("Error fetching reports:", error);
@@ -20,7 +21,7 @@ const userService = {
   async findUserByEmail( email :  string)
   {
     try{
-      const response =  await axios.post(`${API_URL}/findUserByEmail/`, email);
+      const response =  await axios.post(`${API_URL}/auth/findUserByEmail/`, email);
       return response; 
     }
     catch(error)
@@ -30,7 +31,7 @@ const userService = {
   },
   async SignUp(eventData: User) {
     try {
-      const response = await axios.post(`${API_URL}/`, eventData);
+      const response = await axios.post(`${API_URL}/auth/`, eventData);
       return response.data;
     } catch (error) {
       console.error("Error adding report:", error);
@@ -42,7 +43,7 @@ const userService = {
   // Update an report
   async updateReport(id: string, eventData: Report) {
     try {
-      const response = await axios.put(`${API_URL}/${id}`, eventData);
+      const response = await axios.put(`${API_URL}/auth/${id}`, eventData);
       return response.data;
     } catch (error) {
       console.error("Error fetchreport:", error);
@@ -53,7 +54,7 @@ const userService = {
    // Update an password
   async changePassword(id: string, data: { currentPassword?: string, newPassword: string }) {
   try {
-    const response = await axios.put(`${API_URL}/changePassword/${id}`, data);
+    const response = await axios.put(`${API_URL}/auth/changePassword/${id}`, data);
     return response.data;
   } catch (error) {
     console.error("Error changePassword:", error);
@@ -65,7 +66,7 @@ const userService = {
 async updateUserRole(id: string, role: number) {
   console.log("role",role);
     try {
-      const response = await axios.put(`${API_URL}/updateUserRole/${id}`, { role });
+      const response = await axios.put(`${API_URL}/auth/updateUserRole/${id}`, { role });
       return response.data;
     } catch (error) {
       console.error("Error updating user role:", error);
@@ -76,7 +77,7 @@ async updateUserRole(id: string, role: number) {
   async getUserById(id: string) {
     try {
       
-      const response = await axios.get(`${API_URL}/${id}`);
+      const response = await axios.get(`${API_URL}/auth/${id}`);
       return response.data;
     } catch (error) {
       console.error("Error fetch user:", error);
@@ -85,7 +86,7 @@ async updateUserRole(id: string, role: number) {
   },
   async getUsers() {
     try {
-      const response = await axios.get(`${API_URL}`);
+      const response = await axios.get(`${API_URL}/auth`);
       return response.data;
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -96,7 +97,7 @@ async updateUserRole(id: string, role: number) {
     
     
     try {
-      const response = await axios.put(`${API_URL}/updateUser/${id}`, formData, {
+      const response = await axios.put(`${API_URL}/auth/updateUser/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -109,7 +110,7 @@ async updateUserRole(id: string, role: number) {
   },
   async deleteUser(id: string) {
     try {
-      const response = await axios.delete(`${API_URL}/deleteUser/${id}`);
+      const response = await axios.delete(`${API_URL}/auth/deleteUser/${id}`);
       return response.data;
     } catch (error) {
       console.error("Error deleting User:", error);

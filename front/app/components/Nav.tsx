@@ -10,6 +10,7 @@ import { FiUser, FiSettings, FiDollarSign, FiPlus, FiLogOut, FiBell } from 'reac
 import { HiOutlineMenuAlt3, HiX } from 'react-icons/hi';
 import NotifService from '@/app/services/Notification';
 import { toast } from 'react-toastify';
+import { IMG_URL , Websocket_URL  } from ".././services/URLService";
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -44,8 +45,8 @@ export default function Navbar() {
 
     fetchUnreadCount();
 
-    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001';
-    ws.current = new WebSocket(`${socketUrl}?userId=${currentUserId}`);
+
+    ws.current = new WebSocket(`${Websocket_URL}?userId=${currentUserId}`);
 
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -140,7 +141,7 @@ export default function Navbar() {
           {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="flex items-center"
+            className="flex items-center  "
           >
             <Link href="/" className="flex items-center">
               <Image
@@ -210,7 +211,7 @@ export default function Navbar() {
                     <img
                       className="w-16 h-16 rounded-full object-cover border-2 border-teal-100"
                       src={session.user.image.startsWith('/uploads')
-                        ? `http://localhost:3001${session.user.image}`
+                        ? `${IMG_URL}${session.user.image}`
                         : session.user.image}
                       alt="Profile"
                       onError={(e) => {

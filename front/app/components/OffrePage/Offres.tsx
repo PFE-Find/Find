@@ -1,4 +1,3 @@
-// app/OffrePage/Offres.tsx
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -8,7 +7,7 @@ import eventService from "../../services/Offres";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiHeart, FiMapPin, FiStar } from "react-icons/fi";
 import OffreSearch from "../Search";
-import Image from 'next/image'; // Import next/image
+import Image from 'next/image';
 
 export default function Offres() {
     const [favorites, setFavorites] = useState<{ [key: string]: boolean }>({});
@@ -117,13 +116,6 @@ export default function Offres() {
         setVisibleLines(3);
     };
 
-    const imageHoverVariants = {
-        hover: {
-            scale: 1.05,
-            transition: { duration: 0.3 }
-        }
-    };
-
     const cardVariants = {
         hidden: { opacity: 0, y: 20 },
         visible: (i: number) => ({
@@ -142,10 +134,11 @@ export default function Offres() {
     };
 
     return (
-        <section className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+         <section className="bg-gray-50 dark:bg-gray-900 min-h-screen">
             <div className="max-w-full mx-auto">
                 {/* Improved Search Section */}
-                <div className="bg-gradient-to-b from-teal-600 to-white">
+                <div className="bg-gradient-to-b from-teal-600 to-white pb-8 pt-8">
+       
                     <OffreSearch
                         onSearch={handleSearch}
                         onCategoryChange={handleCategoryChange}
@@ -164,12 +157,59 @@ export default function Offres() {
                     />
                 </div>
 
-                {/* Category Selection */}
+                {/* Mobile Category Selection */}
+                <div className="md:hidden mb-6 overflow-x-auto pb-2">
+                    <div className="flex space-x-4 w-max px-4">
+                        <button
+                            onClick={() => handleCategoryChange("Land")}
+                            className={`flex flex-col items-center text-center space-y-2 p-3 rounded-lg transition-colors min-w-[80px] ${selectedCategory === "Land" ? 'bg-green-50 dark:bg-gray-700' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                        >
+                            <img
+                                className="w-8 h-8 object-cover"
+                                src="/assets/icons/location.png"
+                                alt="Terrain"
+                            />
+                            <h5 className="text-xs font-bold text-gray-900 dark:text-white">
+                                Terrains
+                            </h5>
+                        </button>
+
+                        <button
+                            onClick={() => handleCategoryChange("Material")}
+                            className={`flex flex-col items-center text-center space-y-2 p-3 rounded-lg transition-colors min-w-[80px] ${selectedCategory === "Material" ? 'bg-green-50 dark:bg-gray-700' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                        >
+                            <img
+                                className="w-8 h-8 object-cover"
+                                src="/assets/icons/machine.png"
+                                alt="Matériel"
+                            />
+                            <h5 className="text-xs font-bold text-gray-900 dark:text-white">
+                                Matériels
+                            </h5>
+                        </button>
+
+                        <button
+                            onClick={() => handleCategoryChange("all")}
+                            className={`flex flex-col items-center text-center p-3 rounded-lg transition-colors min-w-[80px] ${selectedCategory === "all" ? 'bg-green-50 dark:bg-gray-700' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                        >
+                            <img
+                                className="w-7 h-7 object-cover"
+                                src="/assets/icons/select-all.png"
+                                alt="Tous"
+                            />
+                            <h5 className="text-xs font-bold text-gray-900 dark:text-white mt-1">
+                                Toutes
+                            </h5>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Desktop Category Selection */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
-                    className="flex justify-center items-center mb-12 space-x-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md"
+                    className="hidden md:flex justify-center items-center mb-8 space-x-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md"
                 >
                     <button
                         onClick={() => handleCategoryChange("Land")}
@@ -206,7 +246,7 @@ export default function Offres() {
                     <button
                         onClick={() => handleCategoryChange("all")}
                         className={`flex flex-col items-center text-center p-2 rounded-lg transition-colors ${selectedCategory === "all" ? 'bg-green-50 dark:bg-gray-700' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
-                    >
+                        >
                         <img
                             className="w-8 h-8 object-cover"
                             src="/assets/icons/select-all.png"
@@ -223,28 +263,28 @@ export default function Offres() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="mb-6 text-gray-700 dark:text-gray-300 sm:px-6 lg:px-8"
+                    className="mb-4 px-4 text-gray-700 dark:text-gray-300"
                 >
                     {filteredOffers.length} {filteredOffers.length === 1 ? 'offre trouvée' : 'offres trouvées'}
                     {filtersApplied && (
                         <button
                             onClick={resetFilters}
-                            className="ml-4 text-sm text-green-600 dark:text-green-400 hover:underline"
+                            className="ml-2 text-sm text-green-600 dark:text-green-400 hover:underline"
                         >
-                            Réinitialiser les filtres
+                            Réinitialiser
                         </button>
                     )}
                 </motion.div>
 
                 {/* Offers Grid */}
-                <div className="space-y-8 sm:px-6 lg:px-8 mb-16">
+                <div className="space-y-4 px-2 mb-8">
                     {visibleRows.map((row, rowIndex) => (
                         <motion.div
                             key={rowIndex}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: rowIndex * 0.1 }}
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6"
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4"
                         >
                             {row.map((offre, index) => (
                                 <motion.div
@@ -260,43 +300,32 @@ export default function Offres() {
                                     onMouseLeave={() => setHoveredCard(null)}
                                 >
                                     <Link href={`/OffreDetail/${offre._id}`} prefetch={false} className="block h-full">
-                                        <div className="h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
+                                        <div className="h-full flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700">
                                             {/* Image Container */}
-                                            <div className="relative h-[200px] overflow-hidden">
+                                            <div className="relative h-[180px] sm:h-[200px] overflow-hidden">
                                                 <Image
                                                     src={offre.images?.[0]?.path || "/default-property.jpg"}
                                                     alt={offre.titre}
                                                     fill
                                                     style={{ objectFit: 'cover' }}
-                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                    priority={rowIndex === 0 && index === 0} // Prioritize the first image
+                                                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                                    priority={rowIndex === 0 && index < 2} // Prioritize first 2 images
                                                     quality={75}
                                                 />
 
                                                 {/* Badges */}
-                                                <div className="absolute top-4 left-4 flex flex-col space-y-2">
+                                                <div className="absolute top-2 left-2 flex flex-col space-y-1">
                                                     {offre.isNew && (
-                                                        <span className="bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                                                        <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                                             Nouveau
                                                         </span>
                                                     )}
                                                     {offre.isPromoted && (
-                                                        <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                                                        <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                                             En vedette
                                                         </span>
                                                     )}
                                                 </div>
-
-                                                {/* Favorite Button */}
-                                                {/* <button
-                                                    onClick={(e) => toggleFavorite(offre._id, e)}
-                                                    className={`absolute top-4 right-4 p-2 rounded-full transition-all ${favorites[offre._id]
-                                                        ? 'text-red-500 bg-white/90 shadow-sm'
-                                                        : 'text-gray-400 bg-white/80 hover:text-red-500'
-                                                        }`}
-                                                >
-                                                    <FiHeart className={`w-5 h-5 ${favorites[offre._id] ? 'fill-current' : ''}`} />
-                                                </button> */}
 
                                                 {/* Hover Overlay */}
                                                 <AnimatePresence>
@@ -310,7 +339,7 @@ export default function Offres() {
                                                             <motion.span
                                                                 initial={{ scale: 0.8 }}
                                                                 animate={{ scale: 1 }}
-                                                                className="bg-white text-gray-900 font-medium px-4 py-2 rounded-full shadow-lg"
+                                                                className="bg-white text-gray-900 font-medium px-3 py-1.5 rounded-full shadow-lg text-sm"
                                                             >
                                                                 Voir les détails
                                                             </motion.span>
@@ -320,38 +349,35 @@ export default function Offres() {
                                             </div>
 
                                             {/* Content */}
-                                            <div className="p-6 flex-grow flex flex-col">
-                                                <div className="flex justify-between items-start mb-3">
-                                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white truncate">
+                                            <div className="p-4 flex-grow flex flex-col">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate">
                                                         {offre.titre}
                                                     </h3>
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-100 capitalize">
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-100 capitalize">
                                                         {offre.propertyType}
                                                     </span>
                                                 </div>
 
-                                                <div className="flex items-center text-gray-600 dark:text-gray-400 text-sm mb-3">
-                                                    <FiMapPin className="mr-1.5 flex-shrink-0" />
+                                                <div className="flex items-center text-gray-600 dark:text-gray-400 text-xs mb-2">
+                                                    <FiMapPin className="mr-1 flex-shrink-0" />
                                                     <span className="truncate">
                                                         {offre.placeName || "Localisation non spécifiée"}
                                                     </span>
                                                 </div>
 
-                                                <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                                                    <div className="flex items-center space-x-3">
-                                                        {offre.Superficie && offre.Superficie !== "0" && (
-                                                            <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400">Superficie</p>
-                                                                <p className="font-semibold text-gray-900 dark:text-white">
-                                                                    {offre.Superficie} {offre.unit}
-                                                                </p>
-                                                            </div>
-                                                        )}
-
-                                                    </div>
+                                                <div className="mt-auto pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                                    {offre.Superficie && offre.Superficie !== "0" && (
+                                                        <div className="bg-gray-50 dark:bg-gray-700 p-1.5 rounded-lg">
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400">Superficie</p>
+                                                            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                                                {offre.Superficie} {offre.unit}
+                                                            </p>
+                                                        </div>
+                                                    )}
                                                     <div className="text-right">
                                                         <p className="text-xs text-gray-500 dark:text-gray-400">Prix</p>
-                                                        <h4 className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                                                        <h4 className="text-lg font-bold text-blue-600 dark:text-blue-400">
                                                             {offre.prix} TND
                                                         </h4>
                                                     </div>
@@ -370,13 +396,13 @@ export default function Offres() {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="text-center mt-12"
+                        className="text-center mt-8 mb-12 px-4"
                     >
                         <button
-                            className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-full transition-all shadow-lg hover:shadow-xl"
-                            onClick={() => setVisibleLines(prev => Math.min(prev + 4, totalLines))}
+                            className="inline-flex items-center px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-full transition-all shadow-md hover:shadow-lg text-sm"
+                            onClick={() => setVisibleLines(prev => Math.min(prev + 3, totalLines))}
                         >
-                            Afficher plus d'offres
+                            Afficher plus
                             <ArrowRight className="w-4 h-4 ml-2" />
                         </button>
                     </motion.div>

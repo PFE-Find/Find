@@ -1,7 +1,7 @@
 import axios from "axios";
 
 
-const API_URL = "http://127.0.0.1:3001/api/VerificationToken";
+import { API_URL } from "./URLService";
 
 const VerificationService = {
   
@@ -11,7 +11,7 @@ async verifyEmail(token: string)
 {
    try {
       
-      const response = await axios.post(`${API_URL}/verif`,{token});
+      const response = await axios.post(`${API_URL}/VerificationToken/verif`,{token});
       return response.data;
     } catch (error) {
       console.error("Error verifying Email", error);
@@ -23,7 +23,7 @@ async verifyEmail(token: string)
 async getVerificationTokenByEmail(email: string) {
     try {
       
-      const response = await axios.post(`${API_URL}/verifToken`,email);
+      const response = await axios.post(`${API_URL}/VerificationToken/verifToken`,email);
       return response.data;
     } catch (error) {
       console.error("Error fetch verif token:", error);
@@ -33,7 +33,7 @@ async getVerificationTokenByEmail(email: string) {
   async delelteExisitingToken (id: string) {
     try {
       
-      const response = await axios.post(`${API_URL}/deleteToken/${id}`,);
+      const response = await axios.post(`${API_URL}/VerificationToken/deleteToken/${id}`,);
       return response.data;
     } catch (error) {
       console.error("Error deleting  verif token:", error);
@@ -43,7 +43,7 @@ async getVerificationTokenByEmail(email: string) {
   async createVerificationToken (id: string) {
     try {
       
-      const response = await axios.post(`${API_URL}/deleteToken/${id}`,);
+      const response = await axios.post(`${API_URL}/VerificationToken/deleteToken/${id}`,);
       return response.data;
     } catch (error) {
       console.error("Error deleting  verif token:", error);

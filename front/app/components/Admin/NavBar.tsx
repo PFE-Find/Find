@@ -7,6 +7,7 @@ import { Home, Users, Settings, User, ShoppingCart, DollarSign, Bell, Search, Lo
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from "framer-motion";
 import Image from 'next/image';
+import { IMG_URL } from "../../services/URLService";
 
 import { useSession, signOut } from 'next-auth/react';
 import { FiDollarSign, FiLogOut, FiPlus, FiSettings, FiUser } from "react-icons/fi";
@@ -71,7 +72,7 @@ const Navbar: React.FC = () => {
                       className="w-16 h-16 rounded-full object-cover border-2 border-green-100"
                       src={
                         session.user.image.startsWith('/uploads')
-                          ? `http://localhost:3001${session.user.image}`
+                          ? `${IMG_URL}${session.user.image}`
                           : session.user.image
                       }
                       alt="User profile"

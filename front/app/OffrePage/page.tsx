@@ -13,8 +13,9 @@ export default function OffrePage() {
         <div className="">
         {/* <Search /> */}
         <Offre />
+        <ChatBot/>
         <Footer></Footer>
-        {/* <ChatBot/> */}
+        
         
         </div>
         </>

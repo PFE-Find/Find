@@ -6,6 +6,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import clientPromise from "@/app/lib/db";
 import userService from "@/app/services/User";
+import { API_URL } from "../../../services/URLService";
 
 export const options: NextAuthOptions = {
     providers: [
@@ -49,7 +50,7 @@ export const options: NextAuthOptions = {
                 }
 
                 try {
-                    const res = await fetch("http://127.0.0.1:3001/api/auth/signin/", {
+                    const res = await fetch(`${API_URL}/auth/signin/`, {
                         method: "POST",
                         body: JSON.stringify({
                             email: credentials.email,

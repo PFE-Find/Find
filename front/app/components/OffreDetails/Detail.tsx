@@ -18,7 +18,7 @@ import Map from "./Maps";
 import Conversation from "../Chat/conversation";
 import messageService from "@/app/services/Message";
 import CommentSection from './CommentSection';
-
+import { IMG_URL ,Websocket_URL} from "../../services/URLService";
 interface Offre {
   offre: {
     id: string;
@@ -125,8 +125,8 @@ export default function Detail({ offre }: Offre) {
   useEffect(() => {
     if (!currentUserId) return;
 
-    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001';
-    ws.current = new WebSocket(`${socketUrl}?userId=${currentUserId}`);
+   
+    ws.current = new WebSocket(`${Websocket_URL}?userId=${currentUserId}`);
 
     ws.current.onopen = () => console.log('WebSocket connected');
 
@@ -364,7 +364,7 @@ export default function Detail({ offre }: Offre) {
                     transition={{ delay: 0.2 }}
                     className="w-16 h-16 rounded-full object-cover border-2 border-green-100"
                     src={user?.image?.startsWith('/uploads')
-                      ? `http://localhost:3001${user.image}`
+                      ? `${IMG_URL}${user.image}`
                       : user?.image || '/default-profile.png'}
                     alt="Profile"
                   />
