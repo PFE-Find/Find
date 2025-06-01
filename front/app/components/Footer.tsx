@@ -17,7 +17,7 @@ export default function Footer() {
 
   const socialLinks = [
     { icon: <FiFacebook className="w-5 h-5" />, name: "Facebook" },
-    { icon: <FiTwitter className="w-5 h-5" />, name: "Twitter" },
+    // { icon: <FiTwitter className="w-5 h-5" />, name: "Twitter" },
     { icon: <FiInstagram className="w-5 h-5" />, name: "Instagram" },
     { icon: <FiLinkedin className="w-5 h-5" />, name: "LinkedIn" },
     { icon: <FiYoutube className="w-5 h-5" />, name: "YouTube" }
@@ -26,7 +26,7 @@ export default function Footer() {
   const contactInfo = [
     { icon: <FiMapPin className="w-5 h-5" />, text: "Tunis, Tunisia" },
     { icon: <FiPhone className="w-5 h-5" />, text: "+216 12 345 678" },
-    { icon: <FiMail className="w-5 h-5" />, text: "contact@find-agri.com" }
+    { icon: <FiMail className="w-5 h-5" />, text: "bienvenue.a.find@gmail.com" }
   ];
 
   return (

@@ -23,6 +23,7 @@ import {
 
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { IMG_URL } from "../../services/URLService";
 
 const Sidebar = () => {
   const [sidenav, setSidenav] = useState(true);
@@ -143,7 +144,7 @@ const Sidebar = () => {
                     className="w-16 h-16 rounded-full object-cover border-2 border-green-100"
                     src={
                       session.user.image.startsWith('/uploads')
-                        ? `http://localhost:3001${session.user.image}`
+                        ? `${IMG_URL}${session.user.image}`
                         : session.user.image
                     }
                     alt="User profile"
@@ -226,17 +227,7 @@ const Sidebar = () => {
             </ul>
           </nav>
 
-          {/* Bouton de déconnexion */}
-          {session && (
-            <div className="p-4 border-t border-teal-600">
-              <button
-                onClick={() => signOut()}
-                className="w-full flex items-center justify-center p-2 rounded-lg bg-teal-600/30 hover:bg-teal-600/50 text-teal-100 transition-all"
-              >
-
-              </button>
-            </div>
-          )}
+          
         </div>
       </div>
     </>

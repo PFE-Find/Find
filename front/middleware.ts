@@ -11,7 +11,7 @@ export async function middleware(req: NextRequest) {
   if (!token) {
     return NextResponse.redirect(new URL('/Home', req.url))
   }
-  const role = token.user?.role
+  const role = token.user?.role 
   if (url.startsWith('/Admin') && role !== 1) {
     return NextResponse.redirect(new URL('/Home', req.url))
   }

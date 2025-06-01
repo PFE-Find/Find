@@ -1,11 +1,13 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:3001/api/Message/";
+
+
+import { API_URL } from "./URLService";
 
 const Message = {
     async getMessages() {
         try {
-          const response = await axios.get(`${API_URL}getall`);
+          const response = await axios.get(`${API_URL}/Message/getall`);
           return response.data;
         } catch (error) {
           console.error("Error fetching messages:", error);
@@ -15,7 +17,7 @@ const Message = {
       async getUsersConversations(userId: string) {
         try {
 
-          const response = await axios.get(`${API_URL}getUsersConversations/${userId}`);
+          const response = await axios.get(`${API_URL}/Message/getUsersConversations/${userId}`);
           return response.data;
         } catch (error) {
           console.error("Error fetching Users:", error);
@@ -25,7 +27,7 @@ const Message = {
       async sendMessage(message: any) {
         console.log("message",message);
         try {
-          const response = await axios.post(`${API_URL}`, message);
+          const response = await axios.post(`${API_URL}/Message/`, message);
           return response.data;
         } catch (error) {
           console.error("Error adding message:", error);
@@ -35,7 +37,7 @@ const Message = {
       async getConversation(user1Id: string,user2Id: string) {
         try {
 
-          const response = await axios.get(`${API_URL}getConversation/${user1Id}/${user2Id}`);
+          const response = await axios.get(`${API_URL}/Message/getConversation/${user1Id}/${user2Id}`);
           return response.data;
         } catch (error) {
           console.error("Error fetching Conversation:", error);
@@ -45,7 +47,7 @@ const Message = {
       async deleteMessage(id: string) {
         try {
 
-          const response = await axios.delete(`${API_URL}deleteMessage/${id}`);
+          const response = await axios.delete(`${API_URL}/Message/deleteMessage/${id}`);
           return response.data;
         } catch (error) {
           console.error("Error delete message:", error);
@@ -54,7 +56,7 @@ const Message = {
       },
       async updateMessage(id: string, text: string) {
         try {
-            const response = await axios.put(`${API_URL}updateMessage/${id}`, { text });
+            const response = await axios.put(`${API_URL}/Message/updateMessage/${id}`, { text });
             return response.data;
         } catch (error) {
             console.error("Error update message:", error);

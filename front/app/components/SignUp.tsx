@@ -7,6 +7,7 @@ import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiCheckCircle } 
 import { FaFacebook, FaGoogle, FaGithub } from 'react-icons/fa'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
+import { API_URL } from ".././services/URLService";
 
 export default function SignUp() {
   const router = useRouter()
@@ -66,7 +67,7 @@ export default function SignUp() {
     setError('')
     
     try {
-      const res = await fetch('http://localhost:3001/api/auth/signup/', {
+      const res = await fetch(`${API_URL}/auth/signup/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

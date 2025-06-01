@@ -2,13 +2,14 @@
 import Nav from "@/app/components/Nav";
 import Footer from "../components/Footer";
 import "../styles/Profile.css";
-import { useSession, updateSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import OffresSection from "./OffreSection";
 import { useEffect, useState } from "react";
 import eventService from "../services/Offres";
 import UserService from "../services/User";
 import { FiUser, FiEdit2, FiSave, FiX, FiPlus, FiAlertCircle, FiLock, FiPhone, FiMail } from "react-icons/fi";
 import { toast } from 'react-toastify';
+import { IMG_URL } from ".././services/URLService";
 
 export default function Profile() {
     const { data: session, update } = useSession();
@@ -229,7 +230,7 @@ export default function Profile() {
                                             <div className="relative">
                                                 <img
                                                     src={previewImage?.startsWith('/uploads')
-                                                        ? `http://localhost:3001${previewImage}`
+                                                        ? `${IMG_URL}${previewImage}`
                                                         : previewImage}
                                                     className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 object-cover rounded-full border-4 ${isEditing ? 'border-blue-300' : 'border-white'
                                                         } shadow-lg transition-all duration-300 ${isEditing ? 'ring-2 ring-blue-500' : ''

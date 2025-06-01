@@ -21,6 +21,7 @@ import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { X, ChevronLeft, ChevronRight, MessageCircle, Settings } from "lucide-react";
 import { FaLeaf, FaShieldAlt } from 'react-icons/fa';
 import { useSession } from "next-auth/react";
+import { IMG_URL } from "../../../../services/URLService";
 
 const Details: React.FC = () => {
   const [offre, setOffre] = useState<any>(null);
@@ -217,7 +218,7 @@ const handleDelete = async () => {
                         src={
                           user?.image
                             ? user.image.startsWith('/uploads')
-                              ? `http://localhost:3001${user.image}`
+                              ? `${IMG_URL}${user.image}`
                               : user.image
                             : '/default-avatar.png' // Fallback image
                         }
