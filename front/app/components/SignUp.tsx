@@ -7,6 +7,7 @@ import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiCheckCircle } 
 import { FaFacebook, FaGoogle, FaGithub } from 'react-icons/fa'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
+import { API_URL } from ".././services/URLService";
 
 export default function SignUp() {
   const router = useRouter()
@@ -19,19 +20,54 @@ export default function SignUp() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([])
 
-  const handleChange = (e :any) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+  const validatePassword = (password: string) => {
+    const errors = []
+    if (password.length < 8) {
+      errors.push('Le mot de passe doit contenir au moins 8 caractères')
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Le mot de passe doit contenir au moins une majuscule')
+    }
+    
+    if (!/[0-9]/.test(password)) {
+      errors.push('Le mot de passe doit contenir au moins un chiffre')
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push('Le mot de passe doit contenir au moins un caractère spécial')
+    }
+    return errors
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+    
+    // Validation du mot de passe en temps réel
+    if (name === 'password') {
+      const errors = validatePassword(value)
+      setPasswordErrors(errors)
+    }
+    
     setError('')
   }
 
-  const handleSubmit = async (e:any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validation finale du mot de passe avant soumission
+    const passwordValidationErrors = validatePassword(formData.password)
+    if (passwordValidationErrors.length > 0) {
+      setPasswordErrors(passwordValidationErrors)
+      return
+    }
+    
     setIsSubmitting(true)
     setError('')
     
     try {
-      const res = await fetch('http://localhost:3001/api/auth/signup/', {
+      const res = await fetch(`${API_URL}/auth/signup/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,24 +76,24 @@ export default function SignUp() {
       })
 
       const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Something went wrong')
+      if (!res.ok) throw new Error(data.message || 'Une erreur est survenue')
       
-      // Show success message
+      // Afficher le message de succès
       setSuccess(true)
       
-      // Redirect to login after 2 seconds
+      // Redirection vers la page de connexion après 2 secondes
       setTimeout(() => {
         router.push('/signin')
       }, 2000)
       
-    } catch (err:any) {
+    } catch (err: any) {
       setError(err.message)
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  // Animation variants
+  // Variantes d'animation
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -92,7 +128,7 @@ export default function SignUp() {
         animate={{ scale: 1 }}
         className="w-full max-w-md"
       >
-        {/* Success Alert */}
+        {/* Message de succès */}
         <AnimatePresence>
           {success && (
             <motion.div
@@ -103,10 +139,9 @@ export default function SignUp() {
             >
               <FiCheckCircle className="text-green-500 text-xl mr-3 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="text-green-800 font-medium">Account created successfully!</h3>
-                <p className="text-green-600 text-sm mt-1">Email Verification Was Sent!</p>
-                <p className="text-green-600 text-sm mt-1">Redirecting to login page...</p>
-
+                <h3 className="text-green-800 font-medium">Compte créé avec succès !</h3>
+                <p className="text-green-600 text-sm mt-1">Un email de vérification a été envoyé !</p>
+                <p className="text-green-600 text-sm mt-1">Redirection vers la page de connexion...</p>
               </div>
             </motion.div>
           )}
@@ -118,7 +153,7 @@ export default function SignUp() {
           animate="visible"
           className="bg-white rounded-xl shadow-lg overflow-hidden"
         >
-          {/* Header */}
+          {/* En-tête */}
           <motion.div 
             variants={itemVariants}
             className="p-8 pb-6 text-center"
@@ -126,7 +161,7 @@ export default function SignUp() {
             <Link href="/" className="inline-flex items-center mb-6">
               <Image
                 src="/assets/logo.png"
-                alt="Find Logo"
+                alt="Logo Find"
                 width={40}
                 height={40}
                 className="mr-2 rounded-lg"
@@ -137,14 +172,14 @@ export default function SignUp() {
             <motion.h1 
               className="text-2xl font-bold text-gray-800 mb-2"
             >
-              créer votre compte
+              Créer votre compte
             </motion.h1>
             <p className="text-gray-500">
-            Rejoignez notre plateforme pour découvrir les meilleures offres agricoles
+              Rejoignez notre plateforme pour découvrir les meilleures offres agricoles
             </p>
           </motion.div>
 
-          {/* Error Message */}
+          {/* Message d'erreur */}
           <AnimatePresence>
             {error && (
               <motion.div 
@@ -161,7 +196,7 @@ export default function SignUp() {
             )}
           </AnimatePresence>
 
-          {/* Form (hidden on success) */}
+          {/* Formulaire (masqué en cas de succès) */}
           <AnimatePresence>
             {!success && (
               <motion.div
@@ -174,7 +209,7 @@ export default function SignUp() {
                 >
                   <motion.div variants={itemVariants} className="mb-4">
                     <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="name">
-                    Nom Complet
+                      Nom Complet
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -187,7 +222,7 @@ export default function SignUp() {
                         value={formData.name}
                         onChange={handleChange}
                         className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        placeholder="John Doe"
+                        placeholder="Jean Dupont"
                         required
                       />
                     </div>
@@ -195,7 +230,7 @@ export default function SignUp() {
 
                   <motion.div variants={itemVariants} className="mb-4">
                     <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="email">
-                    Adresse Email
+                      Adresse Email
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -208,13 +243,13 @@ export default function SignUp() {
                         value={formData.email}
                         onChange={handleChange}
                         className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        placeholder="name@example.com"
+                        placeholder="email@exemple.com"
                         required
                       />
                     </div>
                   </motion.div>
 
-                  <motion.div variants={itemVariants} className="mb-6">
+                  <motion.div variants={itemVariants} className="mb-4">
                     <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="password">
                       Mot De Passe
                     </label>
@@ -240,27 +275,36 @@ export default function SignUp() {
                         {showPassword ? <FiEyeOff className="text-gray-400" /> : <FiEye className="text-gray-400" />}
                       </button>
                     </div>
+                    {passwordErrors.length > 0 && (
+                      <div className="mt-2 text-sm text-red-500">
+                        <ul className="list-disc pl-5 space-y-1">
+                          {passwordErrors.map((error, index) => (
+                            <li key={index}>{error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </motion.div>
 
                   <motion.button
                     variants={itemVariants}
                     type="submit"
-                    disabled={isSubmitting}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center"
+                    disabled={isSubmitting || passwordErrors.length > 0}
+                    whileHover={{ scale: passwordErrors.length > 0 ? 1 : 1.02 }}
+                    whileTap={{ scale: passwordErrors.length > 0 ? 1 : 0.98 }}
+                    className={`w-full ${passwordErrors.length > 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'} text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center`}
                   >
                     {isSubmitting ? (
                       <span className="inline-block h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                     ) : (
                       <>
-                        Sign Up <FiArrowRight className="ml-2" />
+                        S'inscrire <FiArrowRight className="ml-2" />
                       </>
                     )}
                   </motion.button>
                 </motion.form>
 
-                {/* Divider */}
+                {/* Séparateur */}
                 <motion.div variants={itemVariants} className="px-8 mb-6">
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center">
@@ -268,23 +312,22 @@ export default function SignUp() {
                     </div>
                     <div className="relative flex justify-center text-sm">
                       <span className="px-2 bg-white text-gray-500">
-                        Or continue with
+                        Ou continuer avec
                       </span>
                     </div>
                   </div>
                 </motion.div>
 
-                {/* Social Login */}
+                {/* Connexion sociale */}
                 <motion.div 
                   variants={containerVariants}
                   className="grid grid-cols-2 gap-3 px-8 pb-8"
                 >
-                
                   <motion.button
                     variants={itemVariants}
                     type="button"
                     whileHover={{ y: -2 }}
-                       onClick={() => signIn('google', { callbackUrl: '/' })}
+                    onClick={() => signIn('google', { callbackUrl: '/' })}
                     className="flex items-center justify-center py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <FaGoogle className="text-red-600 text-xl" />
@@ -294,22 +337,22 @@ export default function SignUp() {
                     variants={itemVariants}
                     type="button"
                     whileHover={{ y: -2 }}
-                       onClick={() => signIn('github', { callbackUrl: '/' })}
+                    onClick={() => signIn('github', { callbackUrl: '/' })}
                     className="flex items-center justify-center py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <FaGithub className="text-gray-800 text-xl" />
                   </motion.button>
                 </motion.div>
 
-                {/* Login Link */}
+                {/* Lien de connexion */}
                 <motion.div 
                   variants={itemVariants}
                   className="bg-gray-50 px-8 py-4 text-center rounded-b-xl"
                 >
                   <p className="text-gray-600">
-                    Already have an account?{' '}
+                    Vous avez déjà un compte ?{' '}
                     <Link href="/signin" className="text-green-600 hover:underline font-medium">
-                      Sign in
+                      Se connecter
                     </Link>
                   </p>
                 </motion.div>

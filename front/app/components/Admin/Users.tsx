@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FiSearch, FiChevronDown, FiExternalLink, FiRefreshCw, FiEdit, FiTrash2, FiUser, FiUserCheck, FiUserX } from 'react-icons/fi'
 import { User } from 'lucide-react'
 import userService from '@/app/services/User'
+import { IMG_URL } from "../../services/URLService";
 
 interface UsersProps {
     users: User[]
@@ -273,7 +274,7 @@ const UsersTable: React.FC<UsersProps> = ({
                                         {userToUpdate.image ? (
                                             <img
                                                 src={userToUpdate.image.startsWith('/uploads')
-                                                    ? `http://localhost:3001${userToUpdate.image}`
+                                                    ? `${IMG_URL}${userToUpdate.image}`
                                                     : userToUpdate.image}
                                                 alt={userToUpdate.name}
                                                 className="w-12 h-12 rounded-full object-cover shadow-md"
@@ -298,8 +299,7 @@ const UsersTable: React.FC<UsersProps> = ({
                                                 {getRoleIcon(userToUpdate.role)}
                                                 <span className="font-medium">
                                                     {userToUpdate.role === 0 ? "Utilisateur" :
-                                                     userToUpdate.role === 1 ? "Administrateur" :
-                                                     "Administrateur limité"}
+                                                      "Administrateur" }
                                                 </span>
                                             </div>
                                         </div>
@@ -315,7 +315,7 @@ const UsersTable: React.FC<UsersProps> = ({
                                             >
                                                 <option value={0}>Utilisateur</option>
                                                 <option value={1}>Administrateur</option>
-                                                <option value={2}>Administrateur limité</option>
+                                              
                                             </select>
                                         </div>
                                     </div>
@@ -400,7 +400,7 @@ const UsersTable: React.FC<UsersProps> = ({
                             variants={fadeIn}
                             className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4"
                         >
-                            <div className="relative w-full md:w-96">
+                            <div className=" w-full md:w-96">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <FiSearch className="text-gray-400" />
                                 </div>
@@ -423,7 +423,7 @@ const UsersTable: React.FC<UsersProps> = ({
                                     <option value="all">Tous les rôles</option>
                                     <option value="1">Administrateur</option>
                                     <option value="0">Utilisateur</option>
-                                    <option value="2">Administrateur limité</option>
+                                   
                                 </select>
                             </div>
                         </motion.div>
@@ -450,7 +450,7 @@ const UsersTable: React.FC<UsersProps> = ({
                             ) : (
                                 <div className="overflow-y-auto max-h-[594px]">
                                     <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50 sticky top-0">
+                                        <thead className="bg-gray-50  top-0">
                                             <tr>
                                                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AVATAR</th>
                                                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NOM</th>
@@ -482,7 +482,7 @@ const UsersTable: React.FC<UsersProps> = ({
                                                                     {user.image ? (
                                                                         <img
                                                                             src={user.image.startsWith('/uploads')
-                                                                                ? `http://localhost:3001${user.image}`
+                                                                                ? `${IMG_URL}${user.image}`
                                                                                 : user.image}
                                                                             alt={user.name}
                                                                             className="w-full h-full object-cover"
@@ -510,8 +510,7 @@ const UsersTable: React.FC<UsersProps> = ({
                                                                     {getRoleIcon(user.role)}
                                                                     <span className="text-sm text-gray-500 capitalize">
                                                                         {user.role === 0 ? "Utilisateur" :
-                                                                         user.role === 1 ? "Administrateur" :
-                                                                         "Administrateur limité"}
+                                                                          "Administrateur" }
                                                                     </span>
                                                                 </div>
                                                             </td>

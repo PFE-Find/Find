@@ -18,7 +18,7 @@ import {
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import messageService from '../../services/Message';
 import { Message, User } from './Chat';
-
+import { IMG_URL } from "../../services/URLService";
 interface ConversationProps {
   selectedUser: User;
   messages: Message[];
@@ -426,7 +426,7 @@ const Conversation: React.FC<ConversationProps> = ({
               <img
                 className="w-10 h-10 rounded-full object-cover border-2 border-teal-100"
                 src={selectedUser.image.startsWith('/uploads')
-                  ? `http://localhost:3001${selectedUser.image}`
+                  ? `${IMG_URL}${selectedUser.image}`
                   : selectedUser.image}
                 // src={notification.user.image}
                 alt={selectedUser.name}
@@ -450,18 +450,11 @@ const Conversation: React.FC<ConversationProps> = ({
           <div>
             <h2 className="text-lg font-semibold text-gray-800">{selectedUser.name}</h2>
             <p className="text-xs text-gray-500">
-              {selectedUser.online ? 'Online' : 'Offline'}
+             
             </p>
           </div>
         </div>
-        <div className="flex space-x-2">
-          <button className="p-2 text-gray-500 hover:text-teal-600 rounded-full hover:bg-gray-100 transition-colors">
-            <FiSearch className="w-5 h-5" />
-          </button>
-          <button className="p-2 text-gray-500 hover:text-teal-600 rounded-full hover:bg-gray-100 transition-colors">
-            <FiMoreVertical className="w-5 h-5" />
-          </button>
-        </div>
+        
       </div>
 
       {/* Messages Area */}

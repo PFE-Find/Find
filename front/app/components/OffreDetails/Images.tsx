@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
+
 interface ImageObject {
     path: string;
 }

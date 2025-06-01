@@ -8,7 +8,7 @@ import Footer from "../components/Footer";
 import NotifService from "../services/Notification"
 import { useSession } from 'next-auth/react';
 import UserService from "@/app/services/User";
-
+import { IMG_URL , Websocket_URL} from ".././services/URLService";
 interface Notification {
   _id: string;
   senderId: string;
@@ -47,7 +47,7 @@ export default function Notification() {
   useEffect(() => {
     if (!currentUserId) return;
 
-    ws.current = new WebSocket(`ws://localhost:3001?userId=${currentUserId}`);
+    ws.current = new WebSocket(`${Websocket_URL}?userId=${currentUserId}`);
 
     const handleWebSocketMessage = (event: MessageEvent) => {
       const data = JSON.parse(event.data);
@@ -101,7 +101,7 @@ export default function Notification() {
                   user: {
                     name: user.name,
                     image: user.image?.startsWith('/uploads')
-                      ? `http://localhost:3001${user.image}`
+                      ? `${IMG_URL}${user.image}`
                       : user.image || null 
                   }
                 };
@@ -141,7 +141,7 @@ export default function Notification() {
         user: {
           name: user?.name || `Utilisateur ${notification.senderId.slice(0, 4)}`,
           image: user?.image?.startsWith('/uploads')
-            ? `http://localhost:3001${user.image}`
+            ? `${IMG_URL}${user.image}`
             : user?.image || null 
         }
       };
@@ -280,7 +280,7 @@ export default function Notification() {
                         <img
                           className="w-12 h-12 rounded-full mr-4 object-cover border-2 border-white dark:border-gray-600"
                           src={notification.user.image.startsWith('/uploads')
-                        ? `http://localhost:3001${notification.user.image}`
+                        ? `${IMG_URL}${notification.user.image}`
                         : notification.user.image}
                           // src={notification.user.image}
                           alt={notification.user.name}

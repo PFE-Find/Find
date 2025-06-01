@@ -15,7 +15,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import Conversation from './conversation';
-
+import { IMG_URL , Websocket_URL } from "../../services/URLService";
 // Define more specific session user types
 interface SessionUser {
   _id: string;
@@ -120,8 +120,8 @@ export default function ChatPage() {
   useEffect(() => {
     if (!currentUserId) return;
 
-    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001';
-    ws.current = new WebSocket(`${socketUrl}?userId=${currentUserId}`);
+    
+    ws.current = new WebSocket(`${Websocket_URL}?userId=${currentUserId}`);
 
     ws.current.onopen = () => console.log('WebSocket connected');
 
@@ -226,7 +226,7 @@ export default function ChatPage() {
           <img
             className={`${sizeClasses[size]} rounded-full object-cover border-2 border-teal-100`}
             src={user.image.startsWith('/uploads')
-              ? `http://localhost:3001${user.image}`
+              ? `${IMG_URL}${user.image}`
               : user.image}
             alt="Profile"
             onError={(e) => {
@@ -289,32 +289,7 @@ export default function ChatPage() {
                   <div className="flex justify-between items-center mb-4 sm:mb-6">
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Messages</h2>
                     <div className="relative">
-                      <button
-                        className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-white rounded-full shadow-sm text-sm hover:bg-gray-100 transition-colors"
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        aria-label="Menu"
-                      >
-                        <FiMoreVertical className="text-gray-500" />
-                      </button>
-                      <AnimatePresence>
-                        {isMenuOpen && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-100"
-                          >
-                            <div className="py-1">
-                              <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                <FiUser className="mr-2" /> New conversation
-                              </button>
-                              <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                <FiMessageSquare className="mr-2" /> Settings
-                              </button>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                     
                     </div>
                   </div>
 
