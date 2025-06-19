@@ -80,7 +80,7 @@ def intent_is_property_request(text: str) -> bool:
     
     
   
-    return any(re.search(pattern, text.lower()) for pattern in en_patterns + fr_patterns)
+    return any(re.search(pattern, text.lower()) for pattern in patterns + fr_patterns)
 
 def vector_search(query: str, k=TOP_K):
     offers, offer_snippets, offer_embeds = get_db_connection()
