@@ -80,10 +80,6 @@ export default function Navbar() {
       }
     };
 
-    
-
-    
-
     return () => {
       if (ws.current) {
         ws.current.close();
@@ -141,7 +137,7 @@ export default function Navbar() {
           {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="flex items-center  "
+            className="flex items-center"
           >
             <Link href="/" className="flex items-center">
               <Image
@@ -151,7 +147,7 @@ export default function Navbar() {
                 height={40}
                 className="rounded-lg"
               />
-              <span className="ml-3 text-2xl font-bold text-teal-600">Find</span>
+              <span className="ml-3 text-2xl font-bold text-teal-600 hidden md:block">Find</span>
             </Link>
           </motion.div>
 
