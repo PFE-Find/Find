@@ -217,10 +217,10 @@ export default function Profile() {
     return (
         <div className="bg-gray-50 min-h-screen flex flex-col">
             <Nav />
-            <main className="flex-grow container mx-auto px-4 sm:px-6 py-8">
+            <main className="flex-grow  mx-auto px-4 sm:px-6 py-8">
                 <div className="flex flex-col xl:flex-row gap-6">
                     {/* Left Side - Profile Card */}
-                    <div className="w-full xl:w-1/3 xl:w-1/4">
+                    <div className="w-full ">
                         <div className="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
                             <div className="p-4 sm:p-6 flex flex-col items-center">
                                 {/* Profile Photo (Editable) */}
@@ -387,7 +387,7 @@ export default function Profile() {
                     </div>
 
                     {/* Right Side - Profile Editing Section */}
-                    <div className="w-full xl:w-2/3 xl:w-3/4 space-y-4 sm:space-y-6">
+                    <div className="w-full ">
                         {isEditing ? (
                             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                                 <div className="p-4 sm:p-6">
@@ -568,7 +568,7 @@ export default function Profile() {
                                                 <p className="mt-2 text-sm text-gray-500">
                                                     Commencez par créer une nouvelle annonce pour la voir apparaître ici.
                                                 </p>
-                                                <div className="mt-6">
+                                                {/* <div className="mt-6">
                                                     <button
                                                         type="button"
                                                         className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -576,7 +576,7 @@ export default function Profile() {
                                                         <FiPlus className="-ml-1 mr-2 h-5 w-5" />
                                                         Nouvelle annonce
                                                     </button>
-                                                </div>
+                                                </div> */}
                                             </div>
                                         )}
                                     </div>

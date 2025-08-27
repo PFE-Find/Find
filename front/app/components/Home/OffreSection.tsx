@@ -35,7 +35,7 @@ export default function Offres() {
       try {
         const data = await eventService.getOffres1();
         setOffres(data);
-        
+
       } catch (error) {
         console.error("Error fetching offres:", error);
       }
@@ -56,10 +56,10 @@ export default function Offres() {
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
       const { scrollLeft, clientWidth } = scrollContainerRef.current;
-      const scrollTo = direction === "left" 
-        ? scrollLeft - clientWidth * 0.8 
+      const scrollTo = direction === "left"
+        ? scrollLeft - clientWidth * 0.8
         : scrollLeft + clientWidth * 0.8;
-      
+
       scrollContainerRef.current.scrollTo({
         left: scrollTo,
         behavior: 'smooth'
@@ -114,7 +114,7 @@ export default function Offres() {
           </button>
 
           {/* Updated scroll container with hidden scrollbar */}
-          <div 
+          <div
             ref={scrollContainerRef}
             className="overflow-x-auto pb-8 scrollbar-hide"
             style={{
@@ -128,7 +128,7 @@ export default function Offres() {
                 display: none;
               }
             `}</style>
-            
+
             <div className="flex space-x-6 w-max px-1">
               <AnimatePresence>
                 {filteredOffers.map((offre, index) => (
@@ -155,7 +155,7 @@ export default function Offres() {
                             loading="lazy"
                             variants={imageHoverVariants}
                           />
-                          
+
                           {/* Favorite Button */}
                           {/* <button
                             onClick={(e) => toggleFavorite(offre._id, e)}
@@ -167,12 +167,12 @@ export default function Offres() {
                           >
                             <FiHeart className={`w-5 h-5 ${favorites[offre._id] ? 'fill-current' : ''}`} />
                           </button> */}
-                          
-                          
+
+
                           {/* Hover Overlay */}
                           <AnimatePresence>
                             {hoveredCard === offre._id && (
-                              <motion.div 
+                              <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
@@ -253,31 +253,36 @@ export default function Offres() {
         </div>
       </div>
       <motion.div
-                  variants={item}
-                  className="flex flex-col sm:flex-row justify-center gap-4"
-                >
-                  <Link href="/OffrePage">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex items-center px-8 py-4 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-all"
-                    >
-                      Explorer les offres
-                      <FiArrowRight className="ml-2" />
-                    </motion.button>
-                  </Link>
-      
-                  <Link href="/inscription">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex items-center px-8 py-4 border border-teal-600 text-teal-600 rounded-lg font-medium hover:bg-teal-50 transition-all"
-                    >
-                      <FiPlay className="mr-2" />
-                      Voir la démo
-                    </motion.button>
-                  </Link>
-                </motion.div>
+        variants={item}
+        className="flex flex-col sm:flex-row justify-center gap-4"
+      >
+        <Link href="/OffrePage">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center px-8 py-4 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-all"
+          >
+            Explorer les offres
+            <FiArrowRight className="ml-2" />
+          </motion.button>
+        </Link>
+
+        <a
+          href="https://youtu.be/UriEPXTApa0"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center px-8 py-4 border border-teal-600 text-teal-600 rounded-lg font-medium hover:bg-teal-50 transition-all"
+          >
+            <FiPlay className="mr-2" />
+            Voir la démo
+          </motion.button>
+        </a>
+
+      </motion.div>
     </section>
   );
 }
