@@ -19,7 +19,7 @@ load_dotenv('.env.local')
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "your-gemini-api-key-here")
 GEMINI_MODEL = "gemini-1.5-flash"  # or "gemini-1.5-pro" for more capable model
 
-MONGO_URL = "mongodb://localhost:27017/"
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017/")
 DB_NAME = "PostsDB"
 COLLECTION = "posts"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
