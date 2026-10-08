@@ -1,0 +1,89 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
+
+  backend:
+    build: ./back/Backend
+    restart: unless-stopped
+    environment:
+      PORT: "3001"
+      MONGODB_URI: mongodb://mongo:27017/PostsDB
+      JWT_SECRET: ${JWT_SECRET:-find-jwt-secret-change-me}
+    ports:
+      - "3001:3001"
+    volumes:
+      - backend-uploads:/app/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('net').connect(3001,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  llm:
+    build: ./back/llm_backend
+    restart: unless-stopped
+    env_file:
+      - ./back/llm_backend/.env.local
+    environment:
+      MONGO_URL: mongodb://mongo:27017/
+    ports:
+      - "8000:8000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s = socket.create_connection(('127.0.0.1', 8000), 3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  front:
+    build:
+      context: ./front
+      args:
+        MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/PostsDB}
+        NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-find-dev-secret-change-me}
+        NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+        API_URL_INTERNAL: http://backend:3001/api
+    restart: unless-stopped
+    environment:
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/PostsDB}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-find-dev-secret-change-me}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      API_URL_INTERNAL: http://backend:3001/api
+      GOOGLE_PLACES_API_KEY: ${GOOGLE_PLACES_API_KEY:-}
+      GITHUB_ID: ${GITHUB_ID:-}
+      GITHUB_SECRET: ${GITHUB_SECRET:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('net').connect(3000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mongo-data:
+  backend-uploads:
