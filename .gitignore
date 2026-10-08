@@ -1,0 +1,23 @@
+# Secrets / environment
+.env
+.env.*
+!.env.example
+
+# Build artifacts / logs
+*.log
+*.err
+*.pid
+front-build.*
+llm-build.*
+err.txt
+out.txt
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
